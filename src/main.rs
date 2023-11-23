@@ -37,7 +37,6 @@ async fn main() -> std::io::Result<()> {
                     let (req, _) = req.into_parts();
                     let current_exe_path=PathBuf::from(current_exe().unwrap());
                     let file = NamedFile::open_async(Path::new(current_exe_path.parent().unwrap()).join("static_files/404.html")).await?;
-                    println!("{:?}", file);
                     let res = file.into_response(&req);
                     Ok(ServiceResponse::new(req, res))
                 }))
