@@ -35,4 +35,8 @@ Use it to serve static files from a folder, example serving a website locally.
 ```bash
 live_server /path-to-static-folder
 ```
+Example: to serve your current directory.
+```bash
+live_server ./
+```
 live_server will serve the root `index.html` or provide a file list of the folder.
