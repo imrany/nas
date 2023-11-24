@@ -1,6 +1,6 @@
 # live_server
 
-__live_server__ is an opensource, cross-platform http server for client-side website project.
+__live_server__ is an opensource, cross-platform http server for static files.
 
 ## Looking for latest release of a version branch?
 
