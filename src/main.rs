@@ -31,8 +31,14 @@ async fn main() -> std::io::Result<()> {
         process::exit(1);
     }
 
+    let launcher= launch_browser("http://localhost:8080").await;
+    match launcher {
+        Err(e) => println!("{}",e),
+        _ => println!("Browser launched\nServing on http://localhost:8080")
+    }
+
     let file_path = args[1].clone();
-    let server=HttpServer::new(move ||
+    HttpServer::new(move ||
         App::new()
             .service(Files::new("/",&file_path).show_files_listing().index_file("index.html")
                 .default_handler(fn_service(|req: ServiceRequest| async {
@@ -46,18 +52,5 @@ async fn main() -> std::io::Result<()> {
     )
     .bind(("127.0.0.1",8080))?
     .run()
-    .await?
-
-    // match server {
-    //     Ok(_) =>  {
-            
-    //         // match laucher {
-    //         //     Ok(_) => println!("Browser launched\nServing on http://localhost:8080"),
-    //         //     Err(e) => println!("{}",e)
-    //         // }
-    //     },
-    //     Err(e) => println!("{}", e)
-    // }
-    // launch_browser("http://localhost:8080").await.unwrap();
-    // Ok(());
+    .await
 }

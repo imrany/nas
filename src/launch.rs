@@ -23,8 +23,8 @@ pub async fn launch_browser(url:&str)->Result<(), Box<dyn std::error::Error>>{
     });
 
     // create a new browser page and navigate to the url
-    let page = browser.new_page(url).await?;
-    page.wait_for_navigation().await?.content().await?;
+    browser.new_page(url).await?;
+    // page.wait_for_navigation().await?.content().await?;
 
     handle.await;
     Ok(())
