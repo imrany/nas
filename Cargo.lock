@@ -1301,6 +1301,7 @@ dependencies = [
  "async-std",
  "chromiumoxide",
  "current_platform",
+ "futures",
 ]
 
 [[package]]

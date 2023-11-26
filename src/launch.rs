@@ -5,21 +5,20 @@ use chromiumoxide::browser::{
 use anyhow::{
     Result,
 };
+use futures::StreamExt;
 use async_std;
 
 // #[async_std::main]
 pub async fn launch_browser(url:&str)->Result<(), Box<dyn std::error::Error>>{
     // create a `Browser` that spawns a `chromium` process running with UI (`with_head()`, headless is default) 
    // and the handler that drives the websocket etc.
-   let (browser, handler) =
+   let (browser, mut handler) =
     Browser::launch(BrowserConfig::builder().with_head().build()?).await?;
 
     // spawn a new task that continuously polls the handler
     let handle = async_std::task::spawn(async move {
-        while let Some(h) = handler.next().await {
-            if h.is_err() {
-                break;
-            }
+        loop {
+            let _event = handler.next().await.unwrap();
         }
     });
 
