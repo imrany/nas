@@ -19,6 +19,8 @@ use std::{
     process,
     path::{Path,PathBuf}
 };
+mod launch;
+use launch::launch_browser;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -28,8 +30,10 @@ async fn main() -> std::io::Result<()> {
         println!("Problem parsing arguments: Enter path \nexample: live_server /home/username/Desktop/static");
         process::exit(1);
     }
+
     let file_path = args[1].clone();
-    println!("Running on http://localhost:8080");
+    println!("Serving on http://localhost:8080");
+    launch_browser("http://localhost:8080");
     HttpServer::new(move ||
         App::new()
             .service(Files::new("/",&file_path).show_files_listing().index_file("index.html")
