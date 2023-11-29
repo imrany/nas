@@ -58,7 +58,6 @@ async fn main() -> Result<(),std::io::Error> {
 
     match server {
         Ok(serve) => {
-            println!("Serving on http://localhost:8080");
             serve.run().await.unwrap_or_else(|err| println!("{}",err));
         },
         Err(e) =>  println!("{}",e)
