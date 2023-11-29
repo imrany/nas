@@ -6,6 +6,7 @@ __live_server__ is an opensource, cross-platform http server for static files.
 
 | Versions | Date | Platform | Release |
 |----------|------|---------|----------|
+|live_server v0.0.2  | 2023-11-28 | Linux_x64 | [live_server-v0.0.3-linux-x64.tar.gz](https://github.com/imrany/live_server/releases/download/v0.0.2/live_server.tar.gz) |
 |live_server v0.0.3  | 2023-11-28 | Linux_x64 | [live_server-v0.0.3-linux-x64.tar.gz](https://github.com/imrany/live_server/releases/download/v0.0.2/live_server.tar.gz) |
 |live_server v0.0.2  | 2023-11-23 | Linux_x64 | [live_server-v0.0.2-linux-x64.tar.gz](https://github.com/imrany/live_server/releases/download/v0.0.2/live_server.tar.gz) |
 
