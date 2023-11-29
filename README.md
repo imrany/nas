@@ -15,10 +15,12 @@ __live_server__ is an opensource, cross-platform http server for static files.
 ### Linux
 * Download the latest release
 * extract the `.tar.gz` folder, rename the folder to `live_server` move the folder to `~`
+
 ```bash
 tar -xf live_server.tar.gz && mv live_server ~
 ```
 * open `.bashrc` and edith the `PATH` variable
+
 ```bash
 cd ~ && nano .bashrc
 ```
