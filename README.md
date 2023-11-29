@@ -39,4 +39,4 @@ Example: to serve your current directory.
 ```bash
 live_server ./
 ```
-live_server will look for the root `index.html` and serve it or provide a list of files and folders in that directory you are serving.
+live_server will look for the root `index.html` and serve it or it will provide a list of files and folders in that directory you are serving if it doesn't find `index.html`.
