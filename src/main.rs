@@ -75,7 +75,8 @@ async fn main() -> Result<(),std::io::Error> {
             if let Some(path) = path.as_deref() {
                 serve_me(path.to_string()).await;
             }else {
-                println!("n0n4");
+                println!("Specify a path to serve.");
+                println!("hint: To serve the current folder - 'zippy serve ./'.");
             }
 
         }
