@@ -1,5 +1,3 @@
-# zippy
-
 __zippy__ is an opensource, cross-platform http server for static files.
 
 ## Looking for latest release of a version branch?
