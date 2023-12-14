@@ -1179,21 +1179,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "969488b55f8ac402214f3f5fd243ebb7206cf82de60d3172994707a4bcc2b829"
 
 [[package]]
-name = "live_server"
-version = "0.1.0"
-dependencies = [
- "actix-files",
- "actix-web",
- "anyhow",
- "async-std",
- "clap",
- "current_platform",
- "futures",
- "local-ip-address",
- "open",
-]
-
-[[package]]
 name = "local-channel"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2165,6 +2150,21 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.39",
+]
+
+[[package]]
+name = "zippy"
+version = "1.0.0"
+dependencies = [
+ "actix-files",
+ "actix-web",
+ "anyhow",
+ "async-std",
+ "clap",
+ "current_platform",
+ "futures",
+ "local-ip-address",
+ "open",
 ]
 
 [[package]]

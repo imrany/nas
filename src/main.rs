@@ -74,6 +74,8 @@ async fn main() -> Result<(),std::io::Error> {
         Some(Commands::Serve { path }) => {
             if let Some(path) = path.as_deref() {
                 serve_me(path.to_string()).await;
+            }else {
+                println!("n0n4");
             }
 
         }
