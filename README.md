@@ -1,13 +1,14 @@
-__zippy__ is an opensource, cross-platform http server for static files.
+__Zippy__ is an opensource, cross-platform http server for static files.
 
 ## Looking for latest release of a version branch?
 
-| Versions | Date | Platform | Release |
-|----------|------|---------|----------|
-|zippy v0.0.3  | 2023-12-01 | Windows_x64 | [zippy-v0.0.3-windows-x64.zip](https://github.com/imrany/zippy/releases/download/v0.0.3/windows-x64.zip) |
-|zippy v0.0.3  | 2023-11-28 | Linux_x64 | [zippy-v0.0.3-linux-x64.tar.gz](https://github.com/imrany/zippy/releases/download/v0.0.3/linux-x64.tar.gz) |
-|zippy v0.0.2  | 2023-11-23 | Linux_x64 | [zippy-v0.0.2-linux-x64.tar.gz](https://github.com/imrany/zippy/releases/download/v0.0.2/zippy.tar.gz) |
+| __Versions__ | __Status__ | __Release Date__ | __Releases__ |
+|--------------|------------|------------------|--------------|
+|zippy v0.1.0  | Current - Latest features | 2023-12-01 | [Releases](./releases.md) |
+|zippy v0.0.3  | LTS - Recommended for most users | 2023-12-01 | [Releases](./releases.md) |
+|zippy v0.0.2  | Not maintained - unstable | 2023-11-23 | [Releases](./releases.md) |
 
+To get all previous releases, go to [Releases](./releases.md)
 
 ## How to setup zippy
 
