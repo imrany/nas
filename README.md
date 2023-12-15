@@ -2,11 +2,11 @@ __Zippy__ is an opensource, cross-platform http server for static files.
 
 ## Looking for latest release of a version branch?
 
-| __Versions__ | __Status__ | __Release Date__ | __Releases__ |
+| __Zippy versions__ | __Status__ | __Release Date__ | __Releases__ |
 |--------------|------------|------------------|--------------|
-|zippy v0.1.0  | Current - Latest features | 2023-12-01 | [Releases](./releases.md) |
-|zippy v0.0.3  | LTS - Recommended for most users | 2023-12-01 | [Releases](./releases.md) |
-|zippy v0.0.2  | Not maintained - unstable | 2023-11-23 | [Releases](./releases.md) |
+| v1.0.0  | LTS - Recommended for most users | 2023-12-15 | [Releases](./releases.md) |
+<!-- | v0.0.3  |  Current - Latest features | 2023-12-01 | [Releases](./releases.md) | -->
+<!-- | v0.0.2  | Not maintained - obsolete | 2023-11-23 | [Releases](./releases.md) | -->
 
 To get all previous releases, go to [Releases](./releases.md)
 
@@ -46,11 +46,21 @@ Replace `<Your-Username>` with your username.
 
 
 ### Testing
-Testing if zippy is configured correctly. Open `cmd` then type `zippy` press enter.
+Testing if zippy is configured correctly. Open `cmd` then type `zippy --help` press enter.
 You will get 
 ```bash
-Problem parsing arguments: Enter path 
-example: zippy /home/username/Desktop/static
+A simple http server for static files.
+
+Usage: zippy [OPTIONS] [COMMAND]
+
+Commands:
+  serve  Serves a specific folder
+  help   Print this message or the help of the given subcommand(s)
+
+Options:
+  -r, --root <PATH>  Path to the folder you want to serve
+  -h, --help         Print help
+  -V, --version      Print version
 ```
 This means it's correctly installed and configure.
 
@@ -58,10 +68,10 @@ This means it's correctly installed and configure.
 ## Usage 
 Use it to serve static files from a folder, example serving a website locally.
 ```bash
-zippy /path-to-static-folder
+zippy serve /path-to-static-folder
 ```
 Example: to serve your current directory.
 ```bash
-zippy ./
+zippy serve ./
 ```
 zippy will look for the root `index.html` and serve it or it will provide a list of files and folders in that directory you are serving if it doesn't find `index.html`.
