@@ -16,6 +16,7 @@ use actix_files::{
     Files,
     NamedFile
 };
+use colored::Colorize;
 use std::{
     thread,
     env::{
@@ -54,16 +55,15 @@ async fn main() -> Result<(),std::io::Error> {
     let args = Args::parse();
 
     if let Some(ip) = args.ip.as_deref() {
-        println!("Value for ip: {ip}");
+        println!(" Value for ip: {ip}");
         let my_local_ip = local_ip().unwrap();
-        println!("This is my local IP address: {:?}", my_local_ip);
+        println!(" This is my local IP address: {:?}", my_local_ip);
     }
 
 
     thread::spawn(||{
         async_std::task::spawn(async move {
-            // launching browser
-            launch_browser("http://localhost:8080").await.unwrap_or_else(|err| println!("{}",err));
+            launch_browser("http://localhost:8080/").await.unwrap_or_else(|err| println!(" {} {}"," ERROR ".on_red().color("white"),err));
         });
     });
 
@@ -75,8 +75,8 @@ async fn main() -> Result<(),std::io::Error> {
             if let Some(path) = path.as_deref() {
                 serve_me(path.to_string()).await;
             }else {
-                println!("Specify a path to serve.");
-                println!("hint: To serve the current folder - 'zippy serve ./'.");
+                println!(" {} Specify a path to serve."," ERROR ".on_red().color("white"));
+                println!(" {}",format!("HINT: To serve the current folder - 'zippy serve ./'.").cyan());
             }
 
         }
