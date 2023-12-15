@@ -2,7 +2,6 @@ use clap::{
     Parser,
     Subcommand,
 };
-use local_ip_address::local_ip;
 use actix_web::{
     HttpServer,
     App,
@@ -34,10 +33,6 @@ struct Args {
     #[arg(short, long, value_name= "PATH")]
     root: Option<String>,
 
-    /// Get local IpAddr v4
-    #[arg(short, long)]
-    ip:Option<String>,
-
     #[command(subcommand)]
     command: Option<Commands>,
 }
@@ -54,22 +49,18 @@ enum Commands {
 async fn main() -> Result<(),std::io::Error> {
     let args = Args::parse();
 
-    if let Some(ip) = args.ip.as_deref() {
-        println!(" Value for ip: {ip}");
-        let my_local_ip = local_ip().unwrap();
-        println!(" This is my local IP address: {:?}", my_local_ip);
-    }
-
-
     thread::spawn(||{
         async_std::task::spawn(async move {
             launch_browser("http://localhost:8080/").await.unwrap_or_else(|err| println!(" {} {}"," ERROR ".on_red().color("white"),err));
         });
     });
 
+    if let Some(path) = args.root.as_deref() {
+        serve_me(path.to_string()).await;
+    }
+    
     // You can check for the existence of subcommands, and if found use their
     // matches just as you would the top level cmd
-   
     match &args.command {
         Some(Commands::Serve { path }) => {
             if let Some(path) = path.as_deref() {
@@ -82,11 +73,6 @@ async fn main() -> Result<(),std::io::Error> {
         }
         None => {}
     }
-
-    // if let Some(path) = args.root.as_deref() {
-    //     println!("gt {path}");
-    // }
-    
     Ok(())
 }
 
