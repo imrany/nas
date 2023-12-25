@@ -15,7 +15,6 @@ use actix_files::{
     Files,
     NamedFile
 };
-use colored::Colorize;
 use std::{
     thread,
     env::{
@@ -25,6 +24,9 @@ use std::{
 };
 mod launch;
 use launch::launch_browser;
+
+#[cfg(target_os="linux")]
+use colored::Colorize;
 
 #[derive(Parser)]
 #[command(author="Imran <imranmat254@gmail.com>", version, about="A simple http server for static files.", long_about = None)]
@@ -51,7 +53,13 @@ async fn main() -> Result<(),std::io::Error> {
 
     thread::spawn(||{
         async_std::task::spawn(async move {
-            launch_browser("http://localhost:8080/").await.unwrap_or_else(|err| println!(" {} {}"," ERROR ".on_red().color("white"),err));
+            launch_browser("http://localhost:8080/").await.unwrap_or_else(|err| {
+                #[cfg(target_os="linux")]
+                println!(" {} {}"," ERROR ".on_red().color("white"),err);
+
+                #[cfg(target_os="windows")]
+                println!(" ERROR  {err}");
+            });
         });
     });
 
@@ -66,8 +74,13 @@ async fn main() -> Result<(),std::io::Error> {
             if let Some(path) = path.as_deref() {
                 serve_me(path.to_string()).await;
             }else {
+                #[cfg(target_os="linux")]
                 println!(" {} Specify a path to serve."," ERROR ".on_red().color("white"));
                 println!(" {}",format!("HINT: To serve the current folder - 'zippy serve ./'.").cyan());
+
+                #[cfg(target_os="windows")]
+                println!("  ERROR Specify a path to serve.");
+                println!(" {}",format!("HINT: To serve the current folder - 'zippy serve ./'."));
             }
 
         }
