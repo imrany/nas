@@ -4,7 +4,8 @@ __Zippy__ is an opensource, cross-platform http server for static files.
 
 | __Zippy versions__ | __Status__ | __Release Date__ | __Releases__ |
 |--------------------|------------|------------------|--------------|
-| v1.0.1 | LTS - Recommended for most users | 2023-12-16 | [Releases](./releases.md) |
+| v1.0.2 | LTS - Recommended for most users | 2023-12-25 | [Releases](./releases.md) |
+| v1.0.1 | Not Maintained - Obsolete | 2023-12-16 | [Releases](./releases.md) |
 | v1.0.0 | Not maintained - Obsolete | 2023-12-15 | [Releases](./releases.md) |
 
 To get all previous releases, go to [Releases](./releases.md)
