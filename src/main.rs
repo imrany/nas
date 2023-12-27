@@ -16,14 +16,20 @@ use actix_files::{
     NamedFile
 };
 use std::{
-    thread,
     env::{
         current_exe
     },
     path::{Path,PathBuf}
 };
+use local_ip_address::local_ip;
 mod launch;
 use launch::launch_browser;
+
+#[path="./routes.rs"]
+mod routes;
+use routes::{
+    get_index_page,
+};
 
 #[cfg(target_os="linux")]
 use colored::Colorize;
@@ -51,18 +57,6 @@ enum Commands {
 async fn main() -> Result<(),std::io::Error> {
     let args = Args::parse();
 
-    thread::spawn(||{
-        async_std::task::spawn(async move {
-            launch_browser("http://localhost:8080/").await.unwrap_or_else(|err| {
-                #[cfg(target_os="linux")]
-                println!(" {} {}"," ERROR ".on_red().color("white"),err);
-
-                #[cfg(target_os="windows")]
-                println!(" ERROR  {err}");
-            });
-        });
-    });
-
     if let Some(path) = args.root.as_deref() {
         serve_me(path.to_string()).await;
     }
@@ -77,20 +71,60 @@ async fn main() -> Result<(),std::io::Error> {
                 #[cfg(target_os="linux")]
                 {
                     println!(" {} Specify a path to serve."," ERROR ".on_red().color("white"));
-                    println!(" {}",format!("HINT: To serve the current folder - 'zippy serve ./'.").cyan());
+                    println!(" {}",format!(" HINT: To serve the current folder - 'zippy serve ./'.").cyan());
                 }
 
                 #[cfg(target_os="windows")]
                 {
                     println!("  ERROR Specify a path to serve.");
-                    println!(" {}",format!("HINT: To serve the current folder - 'zippy serve ./'."));
+                    println!(" {}",format!(" HINT: To serve the current folder - 'zippy serve ./'."));
                 }
             }
 
         }
-        None => {}
+        None => {
+            serve_zippy().await;
+        }
     }
     Ok(())
+}
+
+async fn serve_zippy(){
+    let server=HttpServer::new(move ||
+        App::new()
+            .service(get_index_page)
+    )
+    .bind(("0.0.0.0",8000));
+    match server {
+        Ok(server) => {
+            let port:i32=8000;
+            let url=format!("http://localhost:{port}/");
+            match launch_browser(port).await {
+                Ok(_) => {
+                   #[cfg(not(target_os="windows"))]
+                   {
+                    println!(" {} Launching zippy...",format!(" INFO ").on_cyan().color("white"));
+                    println!(" Open {url}");
+                   }
+          
+                   #[cfg(target_os="windows")]
+                   {
+                    println!(" INFO: Launching zippy...");
+                    println!(" INFO: Open {url}");
+                   }
+                },
+                Err(e) => {
+                   #[cfg(not(target_os="windows"))]
+                   println!(" {} An error occurred when opening {} {e}", " ERROR ".on_red().color("white"),format!("{url}").cyan());
+          
+                   #[cfg(target_os="windows")]
+                   println!(" ERROR: An error occurred when opening {url} {e}");
+                }
+             };
+            server.run().await.unwrap_or_else(|err| println!(" {err} "));
+        },
+        Err(e) =>  println!(" {} ",e)
+    }
 }
 
 async fn serve_me(path: String) {
@@ -109,8 +143,44 @@ async fn serve_me(path: String) {
     .bind(("0.0.0.0",8080));
     match server {
         Ok(serve) => {
-            serve.run().await.unwrap_or_else(|err| println!("{}",err));
+            let port:i32=8080;
+            let url=format!("http://localhost:{port}/");
+            match launch_browser(port).await {
+                Ok(_) => {
+                   let my_local_ip = local_ip();
+                   #[cfg(target_os="linux")]
+                   println!(" Local: {}",format!("{url}").cyan());
+          
+                   #[cfg(target_os="windows")]
+                   println!(" Local: {url}");
+                   
+                   match my_local_ip {
+                      Ok(ip) => {
+                         #[cfg(target_os="linux")]
+                         println!(" Network: {}",format!("http://{ip}:{port}/").cyan());
+          
+                         #[cfg(target_os="windows")]
+                         println!(" Network: {}",format!("http://{ip}:{port}/"));
+                      },
+                      Err(e) => {
+                         #[cfg(target_os="linux")]
+                         println!(" {} {}.", format!(" WARNING ").on_yellow().color("white"),e );
+          
+                         #[cfg(target_os="windows")]
+                         println!(" {} {}.", format!(" WARNING "),e );
+                      }
+                   }
+                },
+                Err(_) => {
+                   #[cfg(target_os="linux")]
+                   println!(" {} An error occurred when opening {}", " ERROR ".on_red().color("white"),format!("{url}").cyan());
+          
+                   #[cfg(target_os="windows")]
+                   println!(" ERROR An error occurred when opening {url}");
+                }
+             };
+            serve.run().await.unwrap_or_else(|err| println!(" {} ",err));
         },
-        Err(e) =>  println!("{}",e)
+        Err(e) =>  println!(" {} ",e)
     }
 }
