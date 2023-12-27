@@ -1,6 +1,5 @@
 use open::that;
 
-pub async fn launch_browser(port:i32)->Result<(),std::io::Error>{
-   let url=format!("http://localhost:{port}/");
+pub async fn launch_browser(url:&String)->Result<(),std::io::Error>{
    that(&url)
 }
