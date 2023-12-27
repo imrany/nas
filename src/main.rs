@@ -30,6 +30,7 @@ use launch::launch_browser;
 mod routes;
 use routes::{
     index,
+    hello_world,
 };
 
 #[cfg(target_os="linux")]
@@ -62,14 +63,12 @@ async fn main() -> Result<(),std::io::Error> {
         serve_me(path.to_string()).await;
     }
     
-    // You can check for the existence of subcommands, and if found use their
-    // matches just as you would the top level cmd
     match &args.command {
         Some(Commands::Serve { path }) => {
             if let Some(path) = path.as_deref() {
                 serve_me(path.to_string()).await;
             }else {
-                #[cfg(target_os="linux")]
+                #[cfg(not(target_os="windows"))]
                 {
                     println!(" {} Specify a path to serve."," ERROR ".on_red().color("white"));
                     println!(" {}",format!(" HINT: To serve the current folder - 'zippy serve ./'.").cyan());
@@ -91,33 +90,20 @@ async fn main() -> Result<(),std::io::Error> {
 }
 
 async fn serve_zippy(){
-    // let static_files=Path::new(PathBuf::from(current_exe().unwrap()).parent().unwrap()).join("static_files");
-    let static_files=Path::new("./static_files");
     let server=HttpServer::new(move ||
         App::new()
-            .service(
-                web::scope("/app")
-                .service(Files::new("/", &static_files).index_file("index.html")
-                    .default_handler(fn_service(|req: ServiceRequest| async {
-                        let (req, _) = req.into_parts();
-                        let current_exe_path=PathBuf::from(current_exe().unwrap());
-                        let file = NamedFile::open_async(Path::new(current_exe_path.parent().unwrap()).join("static_files/404.html")).await?;
-                        let res = file.into_response(&req);
-                        Ok(ServiceResponse::new(req, res))
-                    }))
-                )
-            )
+            .service(index)
             .service(
                 web::scope("/api")
-                    .route("", web::get().to(index))
-                    .route("/get", web::get().to(index))
+                    .route("", web::get().to(hello_world))
+                    .route("/get", web::get().to(hello_world))
             )
     )
     .bind(("0.0.0.0",8000));
     match server {
         Ok(server) => {
             let port:i32=8000;
-            let url=format!("http://localhost:{port}/app");
+            let url=format!("http://localhost:{port}/");
             match launch_browser(&url).await {
                 Ok(_) => {
                    #[cfg(not(target_os="windows"))]
