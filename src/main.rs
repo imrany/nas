@@ -28,7 +28,7 @@ use launch::launch_browser;
 #[path="./routes.rs"]
 mod routes;
 use routes::{
-    get_index_page,
+    index,
 };
 
 #[cfg(target_os="linux")]
@@ -92,7 +92,14 @@ async fn main() -> Result<(),std::io::Error> {
 async fn serve_zippy(){
     let server=HttpServer::new(move ||
         App::new()
-            .service(get_index_page)
+            .service(index)
+            // .route("/hey", web::get().to(manual_hello))
+            // .service(
+            //     // prefixes all resources and routes attached to it...
+            //     web::scope("/api")
+            //     // ...so this handles requests for `GET /app/index.html`
+            //     .route("/index.html", web::get().to(index)),
+            // )
     )
     .bind(("0.0.0.0",8000));
     match server {
