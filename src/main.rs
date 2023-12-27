@@ -9,7 +9,8 @@ use actix_web::{
         ServiceRequest, 
         ServiceResponse, 
         fn_service
-    }
+    },
+    web,
 };
 use actix_files::{
     Files,
@@ -90,16 +91,26 @@ async fn main() -> Result<(),std::io::Error> {
 }
 
 async fn serve_zippy(){
+    let static_files=Path::new(PathBuf::from(current_exe().unwrap()).parent().unwrap()).join("static_files");
+    // let static_files=Path::new("./static_files");
     let server=HttpServer::new(move ||
         App::new()
-            .service(index)
+            .service(Files::new("/", &static_files).index_file("index.html")
+                .default_handler(fn_service(|req: ServiceRequest| async {
+                    let (req, _) = req.into_parts();
+                    let current_exe_path=PathBuf::from(current_exe().unwrap());
+                    let file = NamedFile::open_async(Path::new(current_exe_path.parent().unwrap()).join("static_files/404.html")).await?;
+                    let res = file.into_response(&req);
+                    Ok(ServiceResponse::new(req, res))
+                }))
+            )
             // .route("/hey", web::get().to(manual_hello))
-            // .service(
-            //     // prefixes all resources and routes attached to it...
-            //     web::scope("/api")
-            //     // ...so this handles requests for `GET /app/index.html`
-            //     .route("/index.html", web::get().to(index)),
-            // )
+            .service(
+                // prefixes all resources and routes attached to it...
+                web::scope("/api")
+                // ...so this handles requests for `GET /app/index.html`
+                .route("/", web::get().to(index)),
+            )
     )
     .bind(("0.0.0.0",8000));
     match server {
