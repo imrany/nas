@@ -90,13 +90,27 @@ async fn main() -> Result<(),std::io::Error> {
 }
 
 async fn serve_zippy(){
+    // let path: PathBuf = Path::new(PathBuf::from(current_exe().unwrap()).parent().unwrap()).join("static_files");
+    let path =Path::new("./static_files");
     let server=HttpServer::new(move ||
         App::new()
-            .service(index)
             .service(
                 web::scope("/api")
                     .route("", web::get().to(hello_world))
                     .route("/get", web::get().to(hello_world))
+                    .service(index)
+            )
+            .service(
+                web::scope("/*")
+                    .service(Files::new("/", &path).index_file("index.html")
+                        .default_handler(fn_service(|req: ServiceRequest| async {
+                            let (req, _) = req.into_parts();
+                            // let current_exe_path=PathBuf::from(current_exe().unwrap());
+                            let file = NamedFile::open_async(Path::new("./static_files/index.html")).await?;
+                            let res = file.into_response(&req);
+                            Ok(ServiceResponse::new(req, res))
+                        }))
+                    )
             )
     )
     .bind(("0.0.0.0",8000));
