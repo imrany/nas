@@ -28,13 +28,20 @@ pub fn Home() -> impl IntoView {
                         <p>EXPLORER</p>
                     </div>
                     <div class="flex flex-col">
-                        <p class="text-[#e5e5e5] text-[11px] uppercase py-1">zippy info</p>
+                        <p class="text-[#e5e5e5] text-[11px] uppercase py-1"> ">" zippy info</p>
                     </div>
                     <div class="flex flex-col">
-                        <p class="text-[#e5e5e5] text-[11px] uppercase py-1">Telegram</p>
+                        <p class="text-[#e5e5e5] text-[11px] uppercase py-1"
+                        on:click=move |_| println!("hry")
+                        > ">" Telegram</p>
                         <div class="pl-[8px] flex flex-col">
-                            <p>Imran</p>
+                            <a href="/docs"> ">" Documentation</a>
                         </div>
+                        <summary class="ml-3">My name</summary>
+                        <details>
+                            <p>My name is imran</p>
+                            <p>My name is imran</p>
+                        </details>
                     </div>
                 </div>
             </div>

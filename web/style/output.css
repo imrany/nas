@@ -580,6 +580,10 @@ video {
   margin-bottom: 0px;
 }
 
+.ml-3{
+  margin-left: 0.75rem;
+}
+
 .flex{
   display: flex;
 }
