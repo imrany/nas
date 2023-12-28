@@ -3,25 +3,22 @@ use leptos_meta::*;
 
 #[component]
 pub fn Home() -> impl IntoView {
-    let (count, set_count) = create_signal(0);
-
     view! {
         <Title text="Welcome"/>
-        <div class="my-0 mx-auto max-w-3xl text-center">
-            <h2 class="p-6 text-4xl">"Welcome to Leptos with Tailwind"</h2>
-            <p class="px-10 pb-10 text-left">"Tailwind will scan your Rust files for Tailwind class names and compile them into a CSS file."</p>
-            <button
-                class="bg-amber-600 hover:bg-sky-700 px-5 py-3 text-white rounded-lg"
-                on:click=move |_| set_count.update(|count| *count += 1)
-            >
-                "Something's here | "
-                {move || if count() == 0 {
-                    "Click me!".to_string()
-                } else {
-                    count().to_string()
-                }}
-                " | Some more text"
-            </button>
+        <div class="min-h-[100vh]">
+            <nav class="bg-[#151515] font-semibold text-[13px] px-[12px] flex justify-between items-center text-white min-h-[48px]">
+                <div>
+                    <a href="/">Zippy</a>
+                </div>
+                <div class="text-[#C2C2C2] flex min-w-[10%] justify-around">
+                    <p class="font-medium">Downloads/Telegram</p>
+                </div>
+                <div class="text-[#C2C2C2] flex min-w-[10%] justify-around">
+                    <a href="/" class="hover:text-white active:text-white focus:text-white">Share</a>
+                    <a href="/" class="hover:text-white active:text-white focus:text-white">Sign in</a>
+                    <a></a>
+                </div>
+            </nav>
         </div>
     }
 }
