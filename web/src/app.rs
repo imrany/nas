@@ -10,6 +10,10 @@ use home::Home;
 mod docs;
 use docs::Docs;
 
+#[path="./routes/error_page.rs"]
+mod error_page;
+use error_page::Error_page;
+
 #[component]
 pub fn App() -> impl IntoView {
     provide_meta_context();
@@ -27,7 +31,7 @@ pub fn App() -> impl IntoView {
                 <Route path="/" view=  move || view! { <Home/> }/>
                 <Route path="/docs" view=Docs/>
                 // <Route path="/users/:id" view=UserProfile/>
-                <Route path="/*any" view=|| view! { <h1>"Not Found"</h1> }/>
+                <Route path="/*any" view=|| view! { <Error_page/> }/>
             </Routes>
         </Router>
     }
