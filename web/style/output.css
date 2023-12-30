@@ -894,9 +894,9 @@ video {
   background-color: rgb(153 153 153 / var(--tw-bg-opacity));
 }
 
-.hover\:bg-\[\#ffcc00\]:hover{
+.hover\:bg-\[\#EDFFA1\]:hover{
   --tw-bg-opacity: 1;
-  background-color: rgb(255 204 0 / var(--tw-bg-opacity));
+  background-color: rgb(237 255 161 / var(--tw-bg-opacity));
 }
 
 .hover\:text-white:hover{
