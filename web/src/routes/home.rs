@@ -1,14 +1,14 @@
 use leptos::*;
 use leptos_meta::*;
-// use leptos_icons::{
-//     OcIcon::*,
-//     FaIcon::*,
-//     ImIcon::*,
-//     BsIcon::*,
-//     BiIcon::*,
-//     AiIcon::*,
-//     Icon,
-// };
+use leptos_icons::{
+    OcIcon::*,
+    FaIcon::*,
+    // ImIcon::*,
+    BsIcon::*,
+    BiIcon::*,
+    AiIcon::*,
+    Icon,
+};
 
 #[path="../components/nav.rs"]
 mod nav;
@@ -51,12 +51,12 @@ pub fn Home() -> impl IntoView {
                     </details>
                 </div>
 
-                // <Icon icon=Icon::from(AiCarryOutTwotone) style="color: green" />
-                // <Icon icon=Icon::from(BiGraphql) width="2em" height="2em" style="color: green"/>
-                // <Icon icon=Icon::from(BiGraphql) style=ORANGE_ICON/>
-                // <Icon icon=Icon::from(FaBarsSolid) />
-                // <Icon icon=Icon::from(OcAlertSm) />
-                // <Icon icon=Icon::from(leptos_icons::OcIcon::OcAlertLg) />
+                <Icon icon=Icon::from(AiCarryOutTwotone) style="color: green" />
+                <Icon icon=Icon::from(BiGraphql) width="2em" height="2em" style="color: green"/>
+                <Icon icon=Icon::from(BiGraphql) style=ORANGE_ICON/>
+                <Icon icon=Icon::from(FaBarsSolid) />
+                <Icon icon=Icon::from(BsFolder) />
+                <Icon icon=Icon::from(OcAlertSm) />
             </div>
         </div>
     }
