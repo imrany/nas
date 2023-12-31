@@ -566,6 +566,14 @@ video {
   left: 0px;
 }
 
+.right-0{
+  right: 0px;
+}
+
+.top-0{
+  top: 0px;
+}
+
 .top-12{
   top: 3rem;
 }
@@ -590,12 +598,20 @@ video {
   margin-bottom: 0.75rem;
 }
 
+.mb-\[13px\]{
+  margin-bottom: 13px;
+}
+
 .mb-\[24px\]{
   margin-bottom: 24px;
 }
 
 .mb-\[8px\]{
   margin-bottom: 8px;
+}
+
+.ml-auto{
+  margin-left: auto;
 }
 
 .mr-\[12px\]{
@@ -614,6 +630,14 @@ video {
   margin-top: 24px;
 }
 
+.mt-\[4px\]{
+  margin-top: 4px;
+}
+
+.block{
+  display: block;
+}
+
 .flex{
   display: flex;
 }
@@ -624,6 +648,14 @@ video {
 
 .h-\[100vh\]{
   height: 100vh;
+}
+
+.h-\[162px\]{
+  height: 162px;
+}
+
+.h-\[22px\]{
+  height: 22px;
 }
 
 .h-\[28px\]{
@@ -638,6 +670,10 @@ video {
   min-height: 48px;
 }
 
+.w-\[100px\]{
+  width: 100px;
+}
+
 .w-\[100vw\]{
   width: 100vw;
 }
@@ -648,6 +684,14 @@ video {
 
 .w-\[200px\]{
   width: 200px;
+}
+
+.w-\[452px\]{
+  width: 452px;
+}
+
+.w-\[70px\]{
+  width: 70px;
 }
 
 .min-w-\[10\%\]{
@@ -680,6 +724,10 @@ video {
 
 .items-center{
   align-items: center;
+}
+
+.justify-end{
+  justify-content: flex-end;
 }
 
 .justify-center{
@@ -723,6 +771,11 @@ video {
   border-color: rgb(52 52 52 / var(--tw-border-opacity));
 }
 
+.border-violet-300{
+  --tw-border-opacity: 1;
+  border-color: rgb(196 181 253 / var(--tw-border-opacity));
+}
+
 .bg-\[\#0E0E0E\]{
   --tw-bg-opacity: 1;
   background-color: rgb(14 14 14 / var(--tw-bg-opacity));
@@ -731,6 +784,10 @@ video {
 .bg-\[\#151515\]{
   --tw-bg-opacity: 1;
   background-color: rgb(21 21 21 / var(--tw-bg-opacity));
+}
+
+.bg-\[\#151515\]\/70{
+  background-color: rgb(21 21 21 / 0.7);
 }
 
 .bg-\[\#1d1d1d\]{
@@ -789,8 +846,16 @@ video {
   padding-bottom: 4px;
 }
 
+.pb-\[24px\]{
+  padding-bottom: 24px;
+}
+
 .pb-\[46px\]{
   padding-bottom: 46px;
+}
+
+.pb-\[4px\]{
+  padding-bottom: 4px;
 }
 
 .pl-6{
@@ -824,6 +889,11 @@ video {
 
 .text-\[32px\]{
   font-size: 32px;
+}
+
+.text-base{
+  font-size: 1rem;
+  line-height: 1.5rem;
 }
 
 .font-medium{
@@ -871,8 +941,28 @@ video {
   text-decoration-line: underline;
 }
 
+.opacity-\[0\.9\]{
+  opacity: 0.9;
+}
+
+.duration-1000{
+  transition-duration: 1000ms;
+}
+
+.ease-in-out{
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 * {
   font-family: 'Inter', sans-serif;
+}
+
+.none{
+  display: none;
+}
+
+.block{
+  display:block;
 }
 
 .hover\:bg-\[\#292d39\]:hover{

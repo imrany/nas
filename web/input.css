@@ -5,3 +5,9 @@
 * {
     font-family: 'Inter', sans-serif;
 }
+.none{
+    display: none;
+}
+.block{
+    display:block;
+}

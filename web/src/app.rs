@@ -14,25 +14,32 @@ use docs::Docs;
 mod error_page;
 use error_page::Error_page;
 
+#[path="./components/dialog.rs"]
+mod dialog;
+use dialog::Dialog;
+
 #[component]
 pub fn App() -> impl IntoView {
     provide_meta_context();
 
     view! {
-        <main>
-            <Title formatter=|text| format!("Zippy • {text}")/>
-            <Stylesheet id="leptos" href="/pkg/tailwind.css"/>
-            <Link rel="shortcut icon" type_="image/ico" href="/favicon.ico"/>
-            <Meta charset="utf-8"/>
-            <Meta name="description" content="Zippy is an opensource, cross-platform http server."/>
-        </main>
-        <Router>
-            <Routes>
-                <Route path="/" view=  move || view! { <Home/> }/>
-                <Route path="/docs" view=Docs/>
-                // <Route path="/users/:id" view=UserProfile/>
-                <Route path="/*any" view=|| view! { <Error_page/> }/>
-            </Routes>
-        </Router>
+        <>
+            <main>
+                <Title formatter=|text| format!("Zippy • {text}")/>
+                <Stylesheet id="leptos" href="/pkg/tailwind.css"/>
+                <Link rel="shortcut icon" type_="image/ico" href="/favicon.ico"/>
+                <Meta charset="utf-8"/>
+                <Meta name="description" content="Zippy is an opensource, cross-platform http server."/>
+            </main>
+            <Router>
+                <Routes>
+                    <Route path="/" view=  move || view! { <Home/> }/>
+                    <Route path="/docs" view=Docs/>
+                    // <Route path="/users/:id" view=UserProfile/>
+                    <Route path="/*any" view=|| view! { <Error_page/> }/>
+                </Routes>
+            </Router>
+            <Dialog/>
+        </>
     }
 }

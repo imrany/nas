@@ -2,23 +2,23 @@ use leptos::*;
 use leptos_meta::*;
 use web_sys::{
     window,
-    console,
+    // console,
     // Window,
 };
-use js_sys::{
-    Array
-};
+// use js_sys::{
+//     Array
+// };
 
 #[component]
 pub fn Error_page()->impl IntoView{
     let window=window().unwrap();
-    let reload=move|_| {
-        let array = Array::new();
-        array.push(&"Hello Console Log".into());
-        console::log(&array);
-        console::log_2(&"Hello World Gloo :%s".into(),
-									&"WebAssemblyMan".into());
-    };
+    // let reload=move|_| {
+    //     let array = Array::new();
+    //     array.push(&"Hello Console Log".into());
+    //     console::log(&array);
+    //     console::log_2(&"Hello World Gloo :%s".into(),
+	// 								&"WebAssemblyMan".into());
+    // };
 
     view! {
         <Title text="Something went wrong"/>
@@ -56,12 +56,12 @@ pub fn Error_page()->impl IntoView{
                     </div>
                 </details>
                 <div class="flex items-center mt-[24px]">
-                    <button on:click=reload class="mr-[12px] py-[4px] px-[16px] hover:bg-[#EDFFA1] border-none font-semibold h-[28px] w-[119px] text-[13px] text-[#1D1D1D] rounded-sm bg-[#EDFFA5]">
-                        Reload page
+                    <button on:click=move|_|window.location().reload().unwrap() class="mr-[12px] py-[4px] px-[16px] hover:bg-[#EDFFA1] border-none font-semibold h-[28px] w-[119px] text-[13px] text-[#1D1D1D] rounded-sm bg-[#EDFFA5]">
+                        Refresh page
                     </button>
-                    <button on:click=move|_|window.alert_with_message("hey").unwrap() class="mr-[12px] py-[4px] px-[16px] border-[1px] border-[#343434] font-semibold hover:bg-[#292d39]  hover:text-white h-[28px] w-[119px] text-[13px] text-[#C2C2C2] rounded-sm bg-[#252525]">
+                    <a href="/" class="mr-[12px] py-[4px] px-[16px] border-[1px] border-[#343434] font-semibold hover:bg-[#292d39]  hover:text-white h-[28px] w-[119px] text-[13px] text-[#C2C2C2] rounded-sm bg-[#252525]">
                         Back Home
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>

@@ -600,6 +600,91 @@ dependencies = [
 ]
 
 [[package]]
+name = "icondata"
+version = "0.0.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f41f2deec9249d16ef6b1a8442fbe16013f67053797052aa0b7d2f5ebd0f0098"
+dependencies = [
+ "icondata_ai",
+ "icondata_bi",
+ "icondata_bs",
+ "icondata_core",
+ "icondata_fa",
+ "icondata_im",
+ "icondata_io",
+ "icondata_oc",
+]
+
+[[package]]
+name = "icondata_ai"
+version = "0.0.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5c8fe5fa2eed7715d5388e046d97f09d3baddd155b487454eb9cda3168c79d4b"
+dependencies = [
+ "icondata_core",
+]
+
+[[package]]
+name = "icondata_bi"
+version = "0.0.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c0953768d0b9cdd2da0b85b5ef44a0b43078d59411282b8da8fe6c13b123e01f"
+dependencies = [
+ "icondata_core",
+]
+
+[[package]]
+name = "icondata_bs"
+version = "0.0.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3a1eeaedae6788b08308e1b050eeddaffa62dd5f2368469ef980c8e0e75837e3"
+dependencies = [
+ "icondata_core",
+]
+
+[[package]]
+name = "icondata_core"
+version = "0.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1640a4c1d5ddd08ab1d9854ffa7a2fa3dc52339492676b6d3031e77ca579f434"
+
+[[package]]
+name = "icondata_fa"
+version = "0.0.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a515ecda53468cf4a383409da1708da2e4c00253561873c46304cd7f412e9414"
+dependencies = [
+ "icondata_core",
+]
+
+[[package]]
+name = "icondata_im"
+version = "0.0.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7819397102c0d80a4ad7514e704e06c9c4a43a87007ea523c21ef62e11e31b2b"
+dependencies = [
+ "icondata_core",
+]
+
+[[package]]
+name = "icondata_io"
+version = "0.0.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "134d9fb91cdd0e7ac971199e2c8c8eb917a975faeeee54b227a0068c4f70c886"
+dependencies = [
+ "icondata_core",
+]
+
+[[package]]
+name = "icondata_oc"
+version = "0.0.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "667cb0b74516ec3d4ce357b9ec94189eab6e1bfe5a4a28b5e36579028a8075b1"
+dependencies = [
+ "icondata_core",
+]
+
+[[package]]
 name = "idna"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -755,6 +840,17 @@ dependencies = [
  "serde",
  "syn 2.0.39",
  "walkdir",
+]
+
+[[package]]
+name = "leptos_icons"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8b3fad7820b18b983d49ff4262df88de94dc8fd993278937979cc0dd188868e5"
+dependencies = [
+ "icondata",
+ "leptos",
+ "tracing",
 ]
 
 [[package]]
@@ -2020,10 +2116,11 @@ checksum = "1367295b8f788d371ce2dbc842c7b709c73ee1364d30351dd300ec2203b12377"
 
 [[package]]
 name = "zippy"
-version = "0.1.0"
+version = "1.0.2"
 dependencies = [
  "js-sys",
  "leptos",
+ "leptos_icons",
  "leptos_meta",
  "leptos_router",
  "web-sys",
