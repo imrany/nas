@@ -970,18 +970,8 @@ video {
   background-color: rgb(41 45 57 / var(--tw-bg-opacity));
 }
 
-.hover\:bg-\[\#37373D\]:hover{
-  --tw-bg-opacity: 1;
-  background-color: rgb(55 55 61 / var(--tw-bg-opacity));
-}
-
 .hover\:bg-\[\#3c3c3c\]\/35:hover{
   background-color: rgb(60 60 60 / 0.35);
-}
-
-.hover\:bg-\[\#999999\]:hover{
-  --tw-bg-opacity: 1;
-  background-color: rgb(153 153 153 / var(--tw-bg-opacity));
 }
 
 .hover\:bg-\[\#EDFFA1\]:hover{
