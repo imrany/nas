@@ -1,14 +1,14 @@
 use leptos::*;
 use leptos_meta::*;
-// use leptos_icons::{
-//     OcIcon::*,
+use leptos_icons::{
+    OcIcon::*,
 //     FaIcon::*,
 //     // ImIcon::*,
-//     BsIcon::*,
-//     BiIcon::*,
-//     AiIcon::*,
-//     Icon,
-// };
+    BsIcon::*,
+    BiIcon::*,
+    // AiIcon::*,
+    Icon,
+};
 
 #[path="../components/nav.rs"]
 mod nav;
@@ -26,8 +26,13 @@ pub fn Home() -> impl IntoView {
             <Nav/>
             <div class="overflow-hidden fixed bottom-0 left-0 w-[200px] top-12 text-[13px] text-[#999999] bg-[#151515]">
                 <div class="flex flex-col my-3">
-                    <div class="text-[#e5e5e5] text-[11px] uppercase p-3">
-                        <p>EXPLORER</p>
+                    <div class="h-[33px] flex items-center uppercase pl-[12px] pr-[8px]">
+                        <Icon icon=Icon::from(BsFolder) width="2em" height="2em" class="active:text-[#e5e5e5] cursor-pointer hover:text-[#e5e5e5] focus:text-[#e5e5e5] p-[4px]"/>
+                        <Icon icon=Icon::from(BiGraphql) width="2em" height="2em" class="active:text-[#e5e5e5] cursor-pointer hover:text-[#e5e5e5] focus:text-[#e5e5e5]  p-[4px] ml-[4px]"/>
+                        <Icon icon=Icon::from(OcAlertSm) width="2em" height="2em" class="active:text-[#e5e5e5] cursor-pointer hover:text-[#e5e5e5] focus:text-[#e5e5e5]  p-[4px]"/>
+                    </div>
+                    <div class="flex items-center text-[#e5e5e5] text-[11px] uppercase px-[8px] h-[35px]">
+                        <p class="pl-[12px]">EXPLORER</p>
                     </div>
                     <details class="flex flex-col">
                         <summary class="text-[#e5e5e5] mx-[1px] px-3 text-[11px] uppercase py-1 cursor-pointer hover:text-white active:text-white focus:text-white focus:ring-1 focus:ring-violet-300">Zippy info</summary>
@@ -51,12 +56,21 @@ pub fn Home() -> impl IntoView {
                     </details>
                 </div>
 
-                // <Icon icon=Icon::from(AiCarryOutTwotone) style="color: green" />
-                // <Icon icon=Icon::from(BiGraphql) width="2em" height="2em" style="color: green"/>
-                // <Icon icon=Icon::from(BiGraphql) style=ORANGE_ICON/>
+            
                 // <Icon icon=Icon::from(FaBarsSolid) />
                 // <Icon icon=Icon::from(BsFolder) />
                 // <Icon icon=Icon::from(OcAlertSm) />
+            </div>
+
+            <div class="fixed bottom-0 h-[22px] py-[2px] bg-[#151515] px-[7px] left-0 right-0">
+                <div class="flex text-[12px] text-[#808080]">
+                    <p>bottom bar</p>
+                    <div class="flex ml-auto text-[12px]">
+                        <a href="/" class="mx-[3px] px-[5px]">File: 49</a>
+                        <a href="/" class="mx-[3px] px-[5px]">UTF-8</a>
+                        <a href="/" class="mx-[3px] px-[5px]">Shared folders: 10</a>
+                    </div>
+                </div>
             </div>
         </div>
     }

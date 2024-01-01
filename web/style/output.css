@@ -583,6 +583,11 @@ video {
   margin-right: 1px;
 }
 
+.mx-\[3px\]{
+  margin-left: 3px;
+  margin-right: 3px;
+}
+
 .mx-auto{
   margin-left: auto;
   margin-right: auto;
@@ -608,6 +613,10 @@ video {
 
 .mb-\[8px\]{
   margin-bottom: 8px;
+}
+
+.ml-\[4px\]{
+  margin-left: 4px;
 }
 
 .ml-auto{
@@ -660,6 +669,14 @@ video {
 
 .h-\[28px\]{
   height: 28px;
+}
+
+.h-\[33px\]{
+  height: 33px;
+}
+
+.h-\[35px\]{
+  height: 35px;
 }
 
 .min-h-\[100vh\]{
@@ -805,16 +822,16 @@ video {
   background-color: rgb(237 255 165 / var(--tw-bg-opacity));
 }
 
-.p-3{
-  padding: 0.75rem;
-}
-
 .p-6{
   padding: 1.5rem;
 }
 
 .p-\[24px\]{
   padding: 24px;
+}
+
+.p-\[4px\]{
+  padding: 4px;
 }
 
 .p-\[91px\]{
@@ -836,9 +853,29 @@ video {
   padding-right: 16px;
 }
 
+.px-\[5px\]{
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.px-\[7px\]{
+  padding-left: 7px;
+  padding-right: 7px;
+}
+
+.px-\[8px\]{
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
 .py-1{
   padding-top: 0.25rem;
   padding-bottom: 0.25rem;
+}
+
+.py-\[2px\]{
+  padding-top: 2px;
+  padding-bottom: 2px;
 }
 
 .py-\[4px\]{
@@ -862,8 +899,16 @@ video {
   padding-left: 1.5rem;
 }
 
+.pl-\[12px\]{
+  padding-left: 12px;
+}
+
 .pr-3{
   padding-right: 0.75rem;
+}
+
+.pr-\[8px\]{
+  padding-right: 8px;
 }
 
 .text-center{
@@ -877,6 +922,10 @@ video {
 
 .text-\[11px\]{
   font-size: 11px;
+}
+
+.text-\[12px\]{
+  font-size: 12px;
 }
 
 .text-\[13px\]{
@@ -915,6 +964,11 @@ video {
 .text-\[\#1D1D1D\]{
   --tw-text-opacity: 1;
   color: rgb(29 29 29 / var(--tw-text-opacity));
+}
+
+.text-\[\#808080\]{
+  --tw-text-opacity: 1;
+  color: rgb(128 128 128 / var(--tw-text-opacity));
 }
 
 .text-\[\#999999\]{
@@ -979,6 +1033,11 @@ video {
   background-color: rgb(237 255 161 / var(--tw-bg-opacity));
 }
 
+.hover\:text-\[\#e5e5e5\]:hover{
+  --tw-text-opacity: 1;
+  color: rgb(229 229 229 / var(--tw-text-opacity));
+}
+
 .hover\:text-white:hover{
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity));
@@ -987,6 +1046,11 @@ video {
 .focus\:bg-\[\#37373D\]:focus{
   --tw-bg-opacity: 1;
   background-color: rgb(55 55 61 / var(--tw-bg-opacity));
+}
+
+.focus\:text-\[\#e5e5e5\]:focus{
+  --tw-text-opacity: 1;
+  color: rgb(229 229 229 / var(--tw-text-opacity));
 }
 
 .focus\:text-white:focus{
@@ -1008,6 +1072,11 @@ video {
 .active\:bg-\[\#37373D\]:active{
   --tw-bg-opacity: 1;
   background-color: rgb(55 55 61 / var(--tw-bg-opacity));
+}
+
+.active\:text-\[\#e5e5e5\]:active{
+  --tw-text-opacity: 1;
+  color: rgb(229 229 229 / var(--tw-text-opacity));
 }
 
 .active\:text-white:active{
