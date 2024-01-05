@@ -28,8 +28,7 @@ pub fn Dialog()->impl IntoView{
             <div class="flex flex-col justify-center items-center h-[100vh]">
                 <div id="dialog" class="text-white items-center flex flex-col bg-[#252525] justify-center p-[24px] focus:ring-1 focus:ring-violet-300">
                     <div class="flex ml-auto mb-[8px] justify-end h-[22px] pb-[4px] text-white">
-                        <div class="cursor-pointer" on:click=close_dialog.clone()></div>
-                        <img src="/assets/icons/times.svg"/>
+                        <span on:click=close_dialog.clone() class="material-symbols-outlined md-16 cursor-pointer">close</span>
                     </div>
                     <div class="w-[452px] h-[162px]"> 
                         <h2 class="text-white font-medium text-base">Lost Connection</h2>

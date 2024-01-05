@@ -615,10 +615,6 @@ video {
   margin-bottom: 8px;
 }
 
-.ml-\[4px\]{
-  margin-left: 4px;
-}
-
 .ml-auto{
   margin-left: auto;
 }
@@ -667,6 +663,10 @@ video {
   height: 22px;
 }
 
+.h-\[25px\]{
+  height: 25px;
+}
+
 .h-\[28px\]{
   height: 28px;
 }
@@ -701,6 +701,10 @@ video {
 
 .w-\[200px\]{
   width: 200px;
+}
+
+.w-\[30px\]{
+  width: 30px;
 }
 
 .w-\[452px\]{
@@ -1017,6 +1021,10 @@ video {
 
 .block{
   display:block;
+}
+
+.material-symbols-outlined.md-16 {
+  font-size: 16px;
 }
 
 .hover\:bg-\[\#292d39\]:hover{
