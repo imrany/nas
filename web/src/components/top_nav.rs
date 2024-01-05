@@ -4,7 +4,7 @@ use web_sys::{
 };
 
 #[component]
-pub fn Nav()-> impl IntoView{
+pub fn Topnav()-> impl IntoView{
     let window=window().unwrap();
     let document=window.document().unwrap();
 
@@ -17,8 +17,8 @@ pub fn Nav()-> impl IntoView{
         // console::log_1(&"dblclick on dialog bg".into());
     };
     view!{
-        <nav class="fixed inset-0">
-            <div class="bg-[#151515] font-semibold text-[13px] px-[12px] flex justify-between items-center text-white min-h-[48px]">
+        <nav class="fixed bg-[#151515] px-[12px] top-0 left-0 right-0">
+            <div class="font-semibold text-[13px] flex justify-between min-h-[48px] items-center text-white">
                 <div>
                     <a href="/">Zippy</a>
                 </div>

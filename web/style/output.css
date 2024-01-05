@@ -554,10 +554,6 @@ video {
   position: fixed;
 }
 
-.inset-0{
-  inset: 0px;
-}
-
 .bottom-0{
   bottom: 0px;
 }
@@ -607,12 +603,20 @@ video {
   margin-bottom: 13px;
 }
 
+.mb-\[22px\]{
+  margin-bottom: 22px;
+}
+
 .mb-\[24px\]{
   margin-bottom: 24px;
 }
 
 .mb-\[8px\]{
   margin-bottom: 8px;
+}
+
+.ml-\[200px\]{
+  margin-left: 200px;
 }
 
 .ml-auto{
@@ -633,6 +637,10 @@ video {
 
 .mt-\[24px\]{
   margin-top: 24px;
+}
+
+.mt-\[48px\]{
+  margin-top: 48px;
 }
 
 .mt-\[4px\]{
