@@ -23,10 +23,6 @@ use functions::{
     open_dialog,
 };
 
-#[path="../components/dialog.rs"]
-mod dialog;
-use dialog::Dialog;
-
 // const ORANGE_ICON:&str =r#"
 //     color: orange
 // "#;
@@ -34,26 +30,19 @@ use dialog::Dialog;
 #[component]
 pub fn Home() -> impl IntoView {
     let window=window().expect("Failed to get Window");
-    let document=window.document().expect("Failed to get Document");
+    // let document=window.document().expect("Failed to get Document");
     let navigator=window.navigator();
+    // window.alert_with_message(format!("Not online, {}",navigator.on_line()).as_str()).unwrap();
 
-    // open_dialog();
-    let open=move||{
-        let dialog_bg=document.get_element_by_id("dialog_bg").expect("Failed to get element by id 'dialog_bg'");
-        dialog_bg.class_list().add_1("ease-in-out").unwrap();
-        dialog_bg.class_list().add_1("block").unwrap();
-        dialog_bg.class_list().add_1("duration-1000").unwrap();
-        dialog_bg.class_list().add_1("delay-2000").unwrap(); 
-    };
     if !navigator.on_line() {
-        // window.alert_with_message(format!("Not online, {}",navigator.on_line()).as_str()).unwrap();
-        open();
         let closure: Closure<dyn FnMut()> = Closure::new(move|| {
-            web_sys::console::log_1(&"Timeout".into());
+            open_dialog();
         });
+        
         window.set_timeout_with_callback_and_timeout_and_arguments_0(
             closure.as_ref().unchecked_ref()
-        ,500).unwrap();
+        ,300).unwrap();
+        closure.forget();
     }
 
 
@@ -68,7 +57,6 @@ pub fn Home() -> impl IntoView {
             </div>
 
             <Bottomnav/>
-            <Dialog/>
         </div>
     }
 }
