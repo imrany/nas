@@ -19,8 +19,8 @@ pub fn Sidenav()->impl IntoView{
                     <details>
                         <summary class="hover:bg-[#3c3c3c]/35 pl-6 pr-3 mx-[1px] cursor-pointer text-[#999999] active:bg-[#37373D] hover:text-white active:text-white focus:text-white focus:bg-[#37373D] focus:ring-1 focus:ring-violet-300">Music</summary>
                         <div class="mt-[1px] flex flex-col text-[13px] text-[#999999]">
-                            <p class="hover:bg-[#3c3c3c]/35 ml-[32px] mr-[2px] cursor-pointer active:bg-[#37373D] hover:text-white active:text-white focus:text-white focus:bg-[#37373D] focus:ring-1 focus:ring-violet-300">Don Toliver</p>
-                            <p class="hover:bg-[#3c3c3c]/35 ml-[32px] mr-[2px] cursor-pointer active:bg-[#37373D] hover:text-white active:text-white focus:text-white focus:bg-[#37373D] focus:ring-1 focus:ring-violet-300">New playlist</p>
+                            <p class="hover:bg-[#3c3c3c]/35 pl-[32px] pr-[2px] mx-[1px] cursor-pointer active:bg-[#37373D] hover:text-white active:text-white focus:text-white focus:bg-[#37373D] focus:ring-1 focus:ring-violet-300">Don Toliver</p>
+                            <p class="hover:bg-[#3c3c3c]/35 pl-[32px] pr-[2px] mx-[1px] cursor-pointer active:bg-[#37373D] hover:text-white active:text-white focus:text-white focus:bg-[#37373D] focus:ring-1 focus:ring-violet-300">New playlist</p>
                         </div>
                     </details>
                 </details>
@@ -29,8 +29,8 @@ pub fn Sidenav()->impl IntoView{
                     <details>
                         <summary class="hover:bg-[#3c3c3c]/35 pl-6 pr-3 mx-[1px] cursor-pointer text-[#999999] active:bg-[#37373D] hover:text-white active:text-white focus:text-white focus:bg-[#37373D] focus:ring-1 focus:ring-violet-300">Movies</summary>
                         <div class="mt-[1px] flex flex-col text-[13px] text-[#999999]">
-                            <p class="hover:bg-[#3c3c3c]/35 ml-[32px] mr-[2px] cursor-pointer active:bg-[#37373D] hover:text-white active:text-white focus:text-white focus:bg-[#37373D] focus:ring-1 focus:ring-violet-300">videos</p>
-                            <p class="hover:bg-[#3c3c3c]/35 ml-[32px] mr-[2px] cursor-pointer active:bg-[#37373D] hover:text-white active:text-white focus:text-white focus:bg-[#37373D] focus:ring-1 focus:ring-violet-300">Photos</p>
+                            <p class="hover:bg-[#3c3c3c]/35 pl-[32px] pr-[2px] mx-[1px] cursor-pointer active:bg-[#37373D] hover:text-white active:text-white focus:text-white focus:bg-[#37373D] focus:ring-1 focus:ring-violet-300">videos</p>
+                            <p class="hover:bg-[#3c3c3c]/35 pl-[32px] pr-[2px] mx-[1px] cursor-pointer active:bg-[#37373D] hover:text-white active:text-white focus:text-white focus:bg-[#37373D] focus:ring-1 focus:ring-violet-300">Photos</p>
                         </div>
                     </details>
                 </details>
