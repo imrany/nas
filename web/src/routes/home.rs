@@ -53,33 +53,41 @@ pub fn Home() -> impl IntoView {
             <Sidenav/>
 
             <div class="ml-[200px] mt-[48px] mb-[22px] text-[#999999]">
-                <div>
-                    <div class="flex w-full h-[35px] bg-[#151515]">
-                        <div class="bg-[#1d1d1d] hover:bg-[#3c3c3c]/55 cursor-pointer pl-[10px] pr-[3px] min-w-[106px] h-[35px] flex items-center">
-                            <span class="material-symbols-outlined md-16 w-[16px] mr-[5px]">folder_open</span>
-                            <p class="text-[#E5E5E5] text-[13px]">main.rs</p>
-                            <span class="material-symbols-outlined md-16 w-[22px] ml-[3px] p-[3px] hover:bg-gray-500 rounded-sm hover:text-white">close</span>
+                // folder view
+                <div id="folder_view">
+                    // folder view nav
+                    <div id="folder_view_nav">
+                        <div class="flex w-full h-[35px] bg-[#151515]">
+                            <div class="bg-[#1d1d1d] hover:bg-[#3c3c3c]/55 cursor-pointer pl-[10px] pr-[3px] min-w-[106px] h-[35px] flex items-center">
+                                <span class="material-symbols-outlined md-16 w-[16px] mr-[5px]">folder_open</span>
+                                <p class="text-[#E5E5E5] text-[13px]">Downloads</p>
+                                <span class="material-symbols-outlined md-16 w-[22px] ml-[3px] p-[3px] hover:bg-gray-500 rounded-sm hover:text-white">close</span>
+                            </div>
+
+                            <div class="active:bg-[#1d1d1d] hover:bg-[#3c3c3c]/55 cursor-pointer pl-[10px] pr-[3px] min-w-[106px] h-[35px] flex items-center">
+                                <span class="material-symbols-outlined md-16 w-[16px] mr-[5px]">folder</span>
+                                <p class="text-[#E5E5E5] text-[13px]">telegram-desktop</p>
+                                <span class="material-symbols-outlined md-16 w-[22px] p-[3px] ml-[3px] hover:bg-gray-500 rounded-sm hover:text-white">close</span>
+                            </div>
                         </div>
 
-                        <div class="active:bg-[#1d1d1d] hover:bg-[#3c3c3c]/55 cursor-pointer pl-[10px] pr-[3px] min-w-[106px] h-[35px] flex items-center">
-                            <span class="material-symbols-outlined md-16 w-[16px] mr-[5px]">folder_open</span>
-                            <p class="text-[#E5E5E5] text-[13px]">telegram-desktop</p>
-                            <span class="material-symbols-outlined md-16 w-[22px] p-[3px] ml-[3px] hover:bg-gray-500 rounded-sm hover:text-white">close</span>
+                        <div class="w-full flex items-center h-[22px] text-[13px] text-[#999999] px-[16px]">
+                            <p>src</p>
+                            <span class="material-symbols-outlined md-16 w-[22px] p-[3px] hover:bg-gray-500 rounded-sm hover:text-white">chevron_right</span>
+                            <p>telegram-desktop</p>
                         </div>
                     </div>
 
-                    <div class="w-full flex items-center h-[22px] text-[13px] text-[#999999] px-[16px]">
-                        <p>src</p>
-                        <span class="material-symbols-outlined md-16 w-[22px] p-[3px] hover:bg-gray-500 rounded-sm hover:text-white">chevron_right</span>
-                        <p>telegram-desktop</p>
-                        <span class="material-symbols-outlined md-16 w-[22px] p-[3px] hover:bg-gray-500 rounded-sm hover:text-white">chevron_right</span>
-                        <p>main.rs</p>
+                    //folder view body 
+                    <div class="w-full flex" id="folder_view_body">
+                        <div class="flex bg-green-500 px-[25px] py-[10px]">
+                            <p>heykkkk</p>
+                        </div>
                     </div>
                 </div>
 
-                <div>
-                    <p>heykkkk</p>
-                </div>
+                // share tab
+                <div id="share_tab"></div>
             </div>
 
             <Bottomnav/>
