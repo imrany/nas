@@ -619,12 +619,20 @@ video {
   margin-left: 200px;
 }
 
+.ml-\[3px\]{
+  margin-left: 3px;
+}
+
 .ml-auto{
   margin-left: auto;
 }
 
 .mr-\[12px\]{
   margin-right: 12px;
+}
+
+.mr-\[5px\]{
+  margin-right: 5px;
 }
 
 .mt-\[16px\]{
@@ -707,8 +715,16 @@ video {
   width: 119px;
 }
 
+.w-\[16px\]{
+  width: 16px;
+}
+
 .w-\[200px\]{
   width: 200px;
+}
+
+.w-\[22px\]{
+  width: 22px;
 }
 
 .w-\[30px\]{
@@ -723,8 +739,16 @@ video {
   width: 70px;
 }
 
+.w-full{
+  width: 100%;
+}
+
 .min-w-\[10\%\]{
   min-width: 10%;
+}
+
+.min-w-\[106px\]{
+  min-width: 106px;
 }
 
 .max-w-3xl{
@@ -842,6 +866,10 @@ video {
   padding: 24px;
 }
 
+.p-\[3px\]{
+  padding: 3px;
+}
+
 .p-\[4px\]{
   padding: 4px;
 }
@@ -911,12 +939,20 @@ video {
   padding-left: 1.5rem;
 }
 
+.pl-\[10px\]{
+  padding-left: 10px;
+}
+
 .pl-\[12px\]{
   padding-left: 12px;
 }
 
 .pr-3{
   padding-right: 0.75rem;
+}
+
+.pr-\[3px\]{
+  padding-right: 3px;
 }
 
 .pr-\[8px\]{
@@ -993,6 +1029,11 @@ video {
   color: rgb(194 194 194 / var(--tw-text-opacity));
 }
 
+.text-\[\#E5E5E5\]{
+  --tw-text-opacity: 1;
+  color: rgb(229 229 229 / var(--tw-text-opacity));
+}
+
 .text-\[\#e5e5e5\]{
   --tw-text-opacity: 1;
   color: rgb(229 229 229 / var(--tw-text-opacity));
@@ -1035,6 +1076,14 @@ video {
   font-size: 16px;
 }
 
+.material-symbols-outlined.md-17 {
+  font-size: 17px;
+}
+
+.material-symbols-outlined.md-18 {
+  font-size: 18px;
+}
+
 .hover\:bg-\[\#292d39\]:hover{
   --tw-bg-opacity: 1;
   background-color: rgb(41 45 57 / var(--tw-bg-opacity));
@@ -1044,9 +1093,18 @@ video {
   background-color: rgb(60 60 60 / 0.35);
 }
 
+.hover\:bg-\[\#3c3c3c\]\/55:hover{
+  background-color: rgb(60 60 60 / 0.55);
+}
+
 .hover\:bg-\[\#EDFFA1\]:hover{
   --tw-bg-opacity: 1;
   background-color: rgb(237 255 161 / var(--tw-bg-opacity));
+}
+
+.hover\:bg-gray-500:hover{
+  --tw-bg-opacity: 1;
+  background-color: rgb(107 114 128 / var(--tw-bg-opacity));
 }
 
 .hover\:text-\[\#e5e5e5\]:hover{
@@ -1083,6 +1141,11 @@ video {
 .focus\:ring-violet-300:focus{
   --tw-ring-opacity: 1;
   --tw-ring-color: rgb(196 181 253 / var(--tw-ring-opacity));
+}
+
+.active\:bg-\[\#1d1d1d\]:active{
+  --tw-bg-opacity: 1;
+  background-color: rgb(29 29 29 / var(--tw-bg-opacity));
 }
 
 .active\:bg-\[\#37373D\]:active{

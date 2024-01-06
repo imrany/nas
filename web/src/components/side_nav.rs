@@ -6,9 +6,9 @@ pub fn Sidenav()->impl IntoView{
         <div class="overflow-hidden fixed bottom-0 left-0 w-[200px] top-12 text-[13px] text-[#999999] bg-[#151515]">
             <div class="flex flex-col my-3">
                 <div class="h-[33px] flex items-center text-[#999999] uppercase pl-[12px] pr-[8px]">
-                    <span class="material-symbols-outlined md-16 active:text-[#e5e5e5] cursor-pointer hover:text-[#e5e5e5] focus:text-[#e5e5e5]  p-[4px]">draft</span>
-                    <span class="material-symbols-outlined md-16 active:text-[#e5e5e5] cursor-pointer hover:text-[#e5e5e5] focus:text-[#e5e5e5]  p-[4px]">search</span>
-                    <span class="material-symbols-outlined md-16 active:text-[#e5e5e5] cursor-pointer hover:text-[#e5e5e5] focus:text-[#e5e5e5]  p-[4px]">refresh</span>
+                    <span class="material-symbols-outlined md-18 active:text-[#e5e5e5] cursor-pointer hover:text-[#e5e5e5] focus:text-[#e5e5e5]  p-[4px]">draft</span>
+                    <span class="material-symbols-outlined md-18 active:text-[#e5e5e5] cursor-pointer hover:text-[#e5e5e5] focus:text-[#e5e5e5]  p-[4px]">search</span>
+                    <span class="material-symbols-outlined md-18 active:text-[#e5e5e5] cursor-pointer hover:text-[#e5e5e5] focus:text-[#e5e5e5]  p-[4px]">refresh</span>
                 </div>
                 <div class="flex items-center text-[#e5e5e5] text-[11px] uppercase px-[8px] h-[35px]">
                     <p class="pl-[12px]">EXPLORER</p>
