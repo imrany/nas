@@ -9,9 +9,9 @@ use web_sys::{
 mod top_nav;
 use top_nav::Topnav;
 
-// #[path="../components/side_nav.rs"]
-// mod side_nav;
-// use side_nav::Sidenav;
+#[path="../components/side_nav.rs"]
+mod side_nav;
+use side_nav::Sidenav;
 
 #[path="../components/bottom_nav.rs"]
 mod bottom_nav;
@@ -50,7 +50,7 @@ pub fn Home() -> impl IntoView {
         <Title text="Welcome"/>
         <div class="min-h-[100vh] bg-[#1d1d1d]">
             <Topnav/>
-            // <Sidenav/>
+            <Sidenav/>
 
             <div class="ml-[200px] mt-[48px] mb-[22px] text-[#999999]">
                 // folder view

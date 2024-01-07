@@ -1,7 +1,7 @@
 use leptos::*;
 use web_sys::{
     window,
-    // Event,
+    Event,
 };
 use wasm_bindgen::prelude::*;
 
@@ -12,14 +12,12 @@ pub fn Topnav()-> impl IntoView{
     
     // Close the dropdown if the user clicks outside of it
     let document_ref=document.clone();
-    let click_handler: Closure<dyn FnMut()> = Closure::new(move|| {
+    let click_handler: Closure<dyn FnMut(_)> = Closure::new(move|e: Event| {
         let dropdowns=document_ref.get_elements_by_class_name("dropdown-content");
-        let dropdowns_items=document_ref.get_elements_by_class_name("dropdown-content");
-        // web_sys::console::log_2(&dropdowns.clone().length().into(),&dropdowns.clone());
+        web_sys::console::log_1(&e.target().into());
 
-        for i in 0..dropdowns_items.length(){
+        for i in 0..dropdowns.clone().length(){
             let open_dropdown=dropdowns.get_with_index(i);
-            web_sys::console::log_2(&open_dropdown.clone().unwrap().class_list().contains("block").into(),&open_dropdown.clone().into());
             if open_dropdown.clone().unwrap().class_list().contains("block") {
                 open_dropdown.clone().unwrap().class_list().remove_1("block").unwrap();
             }
@@ -27,19 +25,7 @@ pub fn Topnav()-> impl IntoView{
     });
     window.set_onclick(Some(click_handler.as_ref().unchecked_ref()));
     click_handler.forget();
-    // window.onclick = function(event) {
-    //     if (!event.target.matches('.dropbtn')) {
-    //     var dropdowns = document.getElementsByClassName("dropdown-content");
-    //     var i;
-    //     for (i = 0; i < dropdowns.length; i++) {
-    //         var openDropdown = dropdowns[i];
-    //         if (openDropdown.classList.contains('show')) {
-    //         openDropdown.classList.remove('show');
-    //         }
-    //     }
-    //     }
-    // }
-
+    
     let document_ref_0=document.clone();
     let open_share_dialog=move|_|{
         let dialog_bg=document_ref_0.get_element_by_id("dialog_bg").unwrap();
@@ -55,14 +41,14 @@ pub fn Topnav()-> impl IntoView{
         dropdown_list.class_list().toggle("block").unwrap();
     };
     view!{
-        <nav class="fixed bg-[#151515] px-[12px] top-0 left-0 right-0">
+        <nav class="fixed bg-[#151515] px-[12px] top-0 left-0 right-0 z-10">
             <div class="font-semibold text-[13px] flex justify-between min-h-[48px] items-center text-white">
                 <div style="position:relative; display:inline-block;">
                     <button on:click=show_dropdown_menu class="flex justify-center items-center py-[4px] px-[12px] cursor-pointer h-[24px]">
                         <p>Zippy</p>
                         <span class="material-symbols-outlined md-18 p-[3px]">expand_more</span>
                     </button>
-                    <div id="dropdown_list" style="box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2);" class="z-20 py-[4px] dropdown-content none absolute bg-[#252525] min-w-[180px] rounded-[4px] text-white text-[13px]">
+                    <div id="dropdown_list" style="box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2);" class="z-10 py-[4px] dropdown-content none absolute bg-[#252525] min-w-[180px] rounded-[4px] text-white text-[13px]">
                         <div class="px-[12px] py-[8px] flex items-center">
                             <p>Documentation</p>
                         </div>
