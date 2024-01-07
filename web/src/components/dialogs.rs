@@ -22,7 +22,7 @@ pub fn Connection_dialog()->impl IntoView{
     };
     view!{
         <div id="connection_dialog" 
-            class="fixed top-0 bottom-0 left-0 right-0 z-4 opacity-[0.9] bg-[#151515]/70 none"
+            class="fixed top-0 bottom-0 left-0 right-0 z-20 bg-[#151515]/70 none"
         >
             <div class="flex flex-col justify-center items-center h-[100vh]">
                 <div id="dialog" class="text-white items-center flex flex-col bg-[#252525] justify-center p-[24px] focus:ring-1 focus:ring-violet-300">

@@ -80,8 +80,69 @@ pub fn Home() -> impl IntoView {
 
                     //folder view body 
                     <div class="w-full flex" id="folder_view_body">
-                        <div class="flex bg-green-500 px-[25px] py-[10px]">
-                            <p>heykkkk</p>
+                        <div class="flex grid max-sm:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 w-full gap-4 px-[25px] py-[10px]">
+                            <a href="/" class="flex flex-col items-center justify-center text-[12px] max-w-[150px] hover:text-white active:text-white focus:text-white">
+                                <img src="/assets/icons/file.png" alt="file" class="w-[75px] h-[75px]"/>
+                                <div>
+                                    <p class="text-center">"y2mate.com - Gunna  COOLER THAN A BITCH feat Roddy Rich Official Audio.mp3"</p>
+                                </div>
+                            </a>
+
+                            <a href="/" class="flex flex-col items-center justify-center text-[12px] max-w-[150px] hover:text-white active:text-white focus:text-white">
+                                <img src="/assets/icons/file.png" alt="file" class="w-[75px] h-[75px]"/>
+                                <div>
+                                    <p class="text-center">"y2mate.com - Gunna  COOLER THAN A BITCH feat Roddy Rich Official Audio.mp3"</p>
+                                </div>
+                            </a>
+
+                            <a href="/" class="flex flex-col items-center justify-center text-[12px] max-w-[150px] hover:text-white active:text-white focus:text-white">
+                                <img src="/assets/icons/file.png" alt="file" class="w-[75px] h-[75px]"/>
+                                <div>
+                                    <p class="text-center">"y2mate.com - Gunna  COOLER THAN A BITCH feat Roddy Rich Official Audio.mp3"</p>
+                                </div>
+                            </a>
+
+                            <a href="/" class="flex flex-col items-center justify-center text-[12px] max-w-[150px] hover:text-white active:text-white focus:text-white">
+                                <img src="/assets/icons/file.png" alt="file" class="w-[75px] h-[75px]"/>
+                                <div>
+                                    <p class="text-center">"y2mate.com - Gunna  COOLER THAN A BITCH feat Roddy Rich Official Audio.mp3"</p>
+                                </div>
+                            </a>
+
+                            <a href="/" class="flex flex-col items-center justify-center text-[12px] max-w-[150px] hover:text-white active:text-white focus:text-white">
+                                <img src="/assets/icons/file.png" alt="file" class="w-[75px] h-[75px]"/>
+                                <div>
+                                    <p class="text-center">"y2mate.com - Gunna  COOLER THAN A BITCH feat Roddy Rich Official Audio.mp3"</p>
+                                </div>
+                            </a>
+
+                            <a href="/" class="flex flex-col items-center justify-center text-[12px] max-w-[150px] hover:text-white active:text-white focus:text-white">
+                                <img src="/assets/icons/file.png" alt="file" class="w-[75px] h-[75px]"/>
+                                <div>
+                                    <p class="text-center">"y2mate.com - Gunna  COOLER THAN A BITCH feat Roddy Rich Official Audio.mp3"</p>
+                                </div>
+                            </a>
+
+                            <a href="/" class="flex flex-col items-center justify-center text-[12px] max-w-[150px] hover:text-white active:text-white focus:text-white">
+                                <img src="/assets/icons/file.png" alt="file" class="w-[75px] h-[75px]"/>
+                                <div>
+                                    <p class="text-center">"y2mate.com - Gunna  COOLER THAN A BITCH feat Roddy Rich Official Audio.mp3"</p>
+                                </div>
+                            </a>
+
+                            <a href="/" class="flex flex-col items-center justify-center text-[12px] max-w-[150px] hover:text-white active:text-white focus:text-white">
+                                <img src="/assets/icons/file.png" alt="file" class="w-[75px] h-[75px]"/>
+                                <div>
+                                    <p class="text-center">"y2mate.com - Gunna  COOLER THAN A BITCH feat Roddy Rich Official Audio.mp3"</p>
+                                </div>
+                            </a>
+
+                            <a href="/" class="flex flex-col items-center justify-center text-[12px] max-w-[150px] hover:text-white active:text-white focus:text-white">
+                                <img src="/assets/icons/file.png" alt="file" class="w-[75px] h-[75px]"/>
+                                <div>
+                                    <p class="text-center">"y2mate.com - Gunna  COOLER THAN A BITCH feat Roddy Rich Official Audio.mp3"</p>
+                                </div>
+                            </a>
                         </div>
                     </div>
                 </div>

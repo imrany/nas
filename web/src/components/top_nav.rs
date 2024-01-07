@@ -61,7 +61,7 @@ pub fn Topnav()-> impl IntoView{
                             <span class="material-symbols-outlined md-16 pr-[6px]">dns</span>
                             <p>Version 1.0.2</p>
                         </div>
-                        <div class="px-[12px] py-[8px] flex items-center border-t-[1px] border-bg-[#3c3c3c] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
+                        <div class="px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
                             <span class="material-symbols-outlined md-16 pr-[6px]">login</span>
                             <p>"Sign in"</p>
                         </div>
@@ -70,14 +70,14 @@ pub fn Topnav()-> impl IntoView{
                 <div class="text-[#C2C2C2] flex min-w-[10%] justify-around">
                     <p class="font-medium">Downloads/Telegram</p>
                 </div>
-                <div class="text-[#C2C2C2] flex min-w-[10%] justify-around">
+                <div class="text-[#C2C2C2] flex min-w-[10vw] justify-around">
                     <button 
                         on:click=open_share_dialog
                         class="hover:text-white active:text-white focus:text-white"
                     >
                         Share
                     </button>
-                    <a href="/" class="hover:text-white active:text-white focus:text-white">Sign in</a>
+                    <a href="/" class="hover:text-white ml-[10px] active:text-white focus:text-white">Sign in</a>
                 </div>
             </div>
         </nav>
