@@ -14,9 +14,11 @@ use docs::Docs;
 mod error_page;
 use error_page::Error_page;
 
-#[path="./components/dialog.rs"]
-mod dialog;
-use dialog::Dialog;
+#[path="./components/dialogs.rs"]
+mod dialogs;
+use dialogs::{
+    Connection_dialog,
+};
 
 #[component]
 pub fn App() -> impl IntoView {
@@ -39,7 +41,7 @@ pub fn App() -> impl IntoView {
                     <Route path="/*any" view=|| view! { <Error_page/> }/>
                 </Routes>
             </Router>
-            <Dialog/>
+            <Connection_dialog/>
         </>
     }
 }
