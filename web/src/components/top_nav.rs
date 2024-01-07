@@ -48,14 +48,21 @@ pub fn Topnav()-> impl IntoView{
                         <p>Zippy</p>
                         <span class="material-symbols-outlined md-18 p-[3px]">expand_more</span>
                     </button>
-                    <div id="dropdown_list" style="box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2);" class="z-10 py-[4px] dropdown-content none absolute bg-[#252525] min-w-[180px] rounded-[4px] text-white text-[13px]">
-                        <div class="px-[12px] py-[8px] flex items-center">
+                    <div id="dropdown_list" style="box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2);" class="font-normal z-10 py-[4px] dropdown-content none absolute bg-[#252525] min-w-[180px] rounded-[4px] text-white text-[13px]">
+                        <div class="px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
+                            <span class="material-symbols-outlined md-16 pr-[6px]">content_copy</span>
                             <p>Documentation</p>
                         </div>
-                        <div class="px-[12px] py-[8px] flex items-center">
+                        <div class="px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
+                            <span class="material-symbols-outlined md-16 pr-[6px]">edit</span>
+                            <p>Customize</p>
+                        </div>
+                        <div class="px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
+                            <span class="material-symbols-outlined md-16 pr-[6px]">dns</span>
                             <p>Version 1.0.2</p>
                         </div>
-                        <div class="px-[12px] py-[8px] flex items-center">
+                        <div class="px-[12px] py-[8px] flex items-center border-t-[1px] border-bg-[#3c3c3c] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
+                            <span class="material-symbols-outlined md-16 pr-[6px]">login</span>
                             <p>"Sign in"</p>
                         </div>
                     </div>
