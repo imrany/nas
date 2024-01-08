@@ -13,15 +13,25 @@ pub fn Topnav()-> impl IntoView{
     // Close the dropdown if the user clicks outside of it
     let document_ref=document.clone();
     let click_handler: Closure<dyn FnMut(_)> = Closure::new(move|e: Event| {
-        let dropdowns=document_ref.get_elements_by_class_name("dropdown-content");
-        web_sys::console::log_1(&e.target().into());
-
-        for i in 0..dropdowns.clone().length(){
-            let open_dropdown=dropdowns.get_with_index(i);
-            if open_dropdown.clone().unwrap().class_list().contains("block") {
-                open_dropdown.clone().unwrap().class_list().remove_1("block").unwrap();
+        // check the windows if the onclick target is a button equal to the buttom with the btn_more class, 
+        // then it doesnt close the dropdown
+        let btns_more=document_ref.get_elements_by_class_name("btn_more");
+        for i in 0..btns_more.clone().length(){
+            let btn_more=&btns_more.get_with_index(i);
+            let elem_match=e.target().unwrap().to_string()==btn_more.clone().unwrap().to_string();
+            web_sys::console::log_2(&e.target().unwrap().into(),&btn_more.as_deref().into());
+            web_sys::console::log_1(&elem_match.into());
+            if !elem_match {
+                let dropdowns=document_ref.get_elements_by_class_name("dropdown-content");
+                for i in 0..dropdowns.clone().length(){
+                    let open_dropdown=dropdowns.get_with_index(i);
+                    if open_dropdown.clone().unwrap().class_list().contains("block") {
+                        open_dropdown.clone().unwrap().class_list().remove_1("block").unwrap();
+                    }
+                }
             }
         }
+
     });
     window.set_onclick(Some(click_handler.as_ref().unchecked_ref()));
     click_handler.forget();
