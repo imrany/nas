@@ -27,6 +27,11 @@ pub fn Topnav()-> impl IntoView{
                     let open_dropdown=dropdowns.get_with_index(i);
                     if open_dropdown.clone().unwrap().class_list().contains("block") {
                         open_dropdown.clone().unwrap().class_list().remove_1("block").unwrap();
+                        let context_more_share=document_ref.get_elements_by_class_name("context-more-share");
+                        for i in 0..context_more_share.clone().length(){
+                            let open_context_more_share=context_more_share.get_with_index(i);
+                            open_context_more_share.clone().unwrap().class_list().remove_1("block").unwrap();
+                        }
                     }
                 }
             }
