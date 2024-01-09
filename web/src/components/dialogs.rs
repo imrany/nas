@@ -1,7 +1,6 @@
 use leptos::*;
 use web_sys::{
     window,
-    // console,
 };
 // use js_sys::{
 //     Array
@@ -18,7 +17,6 @@ pub fn Connection_dialog()->impl IntoView{
         dialog_bg.class_list().remove_1("block").unwrap();
         dialog_bg.class_list().add_1("duration-1000").unwrap();
         dialog_bg.class_list().add_1("delay-2000").unwrap();
-        // console::log_1(&"dblclick on dialog bg".into());
     };
     view!{
         <div id="connection_dialog" 
@@ -59,7 +57,6 @@ pub fn op_dialog()->impl IntoView{
         dialog_bg.class_list().remove_1("block").unwrap();
         dialog_bg.class_list().add_1("duration-1000").unwrap();
         dialog_bg.class_list().add_1("delay-2000").unwrap();
-        // console::log_1(&"dblclick on dialog bg".into());
     };
     view!{
         <div id="op_dialog" 

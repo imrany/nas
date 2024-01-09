@@ -46,6 +46,7 @@ pub fn Topnav()-> impl IntoView{
         let dialog_bg=document_ref_0.get_element_by_id("dialog_bg").unwrap();
         dialog_bg.class_list().add_1("ease-in-out").unwrap();
         dialog_bg.class_list().add_1("block").unwrap();
+        // dialog_bg.style().set_property("display", "block").unwrap();
         dialog_bg.class_list().add_1("duration-1000").unwrap();
         dialog_bg.class_list().add_1("delay-2000").unwrap();
     };

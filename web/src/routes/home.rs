@@ -1,8 +1,19 @@
 use leptos::*;
 use leptos_meta::*;
 use wasm_bindgen::prelude::*;
+use js_sys::{
+    Array,
+};
 use web_sys::{
  window,
+ Request, 
+ RequestInit, 
+//  RequestMode, 
+ Response
+};
+use wasm_bindgen_futures::JsFuture;
+use serde::{
+    Deserialize, Serialize
 };
 
 #[path="../components/top_nav.rs"]
@@ -27,12 +38,54 @@ use functions::{
 //     color: orange
 // "#;
 
+#[derive(Serialize, Deserialize)]
+struct File {
+    filename: String,
+    type: &str,
+    size:&str,
+    path:&str,
+}
+
+async fn fetch_data() ->JsValue {
+    let window=window().expect("Failed to get Window");
+    let mut opts = RequestInit::new();
+    opts.method("GET");
+    // opts.mode(RequestMode::Cors);
+    let url=format!("/assets/json/data.json");
+    let request = Request::new_with_str_and_init(&url, &opts).unwrap();
+    request
+        .headers()
+        .set("content-type", "application/json").unwrap();
+    let resp_value = JsFuture::from(window.fetch_with_request(&request)).await;
+    let resp: Response = resp_value.unwrap().into();
+
+    // Convert this other `Promise` into a rust `Future`.
+    let json = JsFuture::from(resp.json().unwrap()).await.unwrap();
+   // Send the JSON response back to JS.
+//    web_sys::console::log_1(&json.clone().into());
+   json
+}
+
 #[component]
 pub fn Home() -> impl IntoView {
     let window=window().expect("Failed to get Window");
     let document=window.document().expect("Failed to get Document");
     let navigator=window.navigator();
     // window.alert_with_message(format!("Not online, {}",navigator.on_line()).as_str()).unwrap();
+
+    let data=create_resource(|| (), |_| async move { 
+        let res=Array::from(&fetch_data().await);
+        // web_sys::console::log_2(&res.at(0).into(),&res.at(0).js_typeof().into());
+        let dom_elem=web_sys::window().unwrap().document().unwrap().get_element_by_id("test").unwrap();
+        for i in res.clone() {  
+            web_sys::console::log_1(&i.clone().into());
+            let p:File = serde_json::from_str(&i.as_string().unwrap()).unwrap();
+            let item=format!("<h1>
+                {}
+            </h1>",&p["filename"]); 
+            dom_elem.set_inner_html(&item);
+        }
+     });
 
     if !navigator.on_line() {
         let closure: Closure<dyn FnMut()> = Closure::new(move|| {
@@ -45,9 +98,9 @@ pub fn Home() -> impl IntoView {
         closure.forget();
     }
 
-    let document_ref_1=document.clone();
+    let document_ref_2=document.clone();
     let show_context_menu=move|_|{
-        let context_list=document_ref_1.get_element_by_id("context_list").unwrap();
+        let context_list=document_ref_2.get_element_by_id("context_list").unwrap();
         context_list.class_list().toggle("block").unwrap();
     };
 
@@ -89,6 +142,11 @@ pub fn Home() -> impl IntoView {
                         </div>
                     </div>
 
+                    {move || match data.get() {
+                        None => view! { <p>"Loading..."</p> }.into_view(),
+                        Some(data) =>view! { <p>{data} "This is the data"</p> }.into_view()
+                    }}
+                    <div id="test"></div>
                     //folder view body 
                     <div class="w-full flex flex-wrap" id="folder_view_body">
                         <div class="flex grid max-sm:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 w-full gap-4 px-[25px] py-[10px]">
@@ -135,183 +193,6 @@ pub fn Home() -> impl IntoView {
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="flex">
-                                <button on:click=show_context_menu.clone() class="flex flex-col items-center justify-center text-[12px] max-w-[150px] hover:text-white active:text-white focus:text-white">
-                                    <img src="/assets/icons/file.png" alt="file" class="w-[75px] h-[75px]"/>
-                                    <div>
-                                        <p class="text-center">"y2mate.com - Gunna  COOLER THAN A BITCH feat Roddy Rich Official Audio.mp3"</p>
-                                    </div>
-                                </button>
-                                <div id="context_list" style="box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2);" class="font-normal ml-[80px] mt-[40px] z-5 py-[4px] dropdown-content absolute none bg-[#252525] min-w-[180px] rounded-[4px] text-white text-[13px]">
-                                    <div class="px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
-                                        <span class="material-symbols-outlined md-16 pr-[6px]">open_in_new</span>
-                                        <p>Open</p>
-                                    </div>
-                                    <div class="px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
-                                        <span class="material-symbols-outlined md-16 pr-[6px]">open_with</span>
-                                        <p>Open with media player</p>
-                                    </div>
-                                    <div>
-                                        <button on:click=open_more_menu.clone() class="btn_more pl-[12px] pr-[5px] py-[8px] w-full flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
-                                            <span class="material-symbols-outlined md-16 pr-[6px]">share</span>
-                                            <p>Share</p>
-                                            <span class="material-symbols-outlined md-16 ml-auto">chevron_right</span>
-                                        </button>
-                                        <div id="context_more_share" style="box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2);" class="font-normal ml-[191px] -mt-[10px] z-5 py-[4px] context-more-share absolute none bg-[#252525] min-w-[180px] rounded-[4px] text-white text-[13px]">
-                                            <div class="px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
-                                                <span class="material-symbols-outlined md-16 pr-[6px]">bluetooth</span>
-                                                <p>Bluetooth</p>
-                                            </div>
-                                            <div class="px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
-                                                <span class="material-symbols-outlined md-16 pr-[6px]">rss_feed</span>
-                                                <p>"Send to"</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
-                                        <span class="material-symbols-outlined md-16 pr-[6px]">edit</span>
-                                        <p>Rename</p>
-                                    </div>
-                                    <div class="px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
-                                        <span class="material-symbols-outlined md-16 pr-[6px]">delete</span>
-                                        <p>Delete</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flex">
-                                <button on:click=show_context_menu.clone() class="flex flex-col items-center justify-center text-[12px] max-w-[150px] hover:text-white active:text-white focus:text-white">
-                                    <img src="/assets/icons/file.png" alt="file" class="w-[75px] h-[75px]"/>
-                                    <div>
-                                        <p class="text-center">"y2mate.com - Gunna  COOLER THAN A BITCH feat Roddy Rich Official Audio.mp3"</p>
-                                    </div>
-                                </button>
-                                <div id="context_list" style="box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2);" class="font-normal ml-[80px] mt-[40px] z-5 py-[4px] dropdown-content absolute none bg-[#252525] min-w-[180px] rounded-[4px] text-white text-[13px]">
-                                    <div class="px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
-                                        <span class="material-symbols-outlined md-16 pr-[6px]">open_in_new</span>
-                                        <p>Open</p>
-                                    </div>
-                                    <div class="px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
-                                        <span class="material-symbols-outlined md-16 pr-[6px]">open_with</span>
-                                        <p>Open with media player</p>
-                                    </div>
-                                    <div>
-                                        <button on:click=open_more_menu.clone() class="btn_more pl-[12px] pr-[5px] py-[8px] w-full flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
-                                            <span class="material-symbols-outlined md-16 pr-[6px]">share</span>
-                                            <p>Share</p>
-                                            <span class="material-symbols-outlined md-16 ml-auto">chevron_right</span>
-                                        </button>
-                                        <div id="context_more_share" style="box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2);" class="font-normal ml-[191px] -mt-[10px] z-5 py-[4px] context-more-share absolute none bg-[#252525] min-w-[180px] rounded-[4px] text-white text-[13px]">
-                                            <div class="px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
-                                                <span class="material-symbols-outlined md-16 pr-[6px]">bluetooth</span>
-                                                <p>Bluetooth</p>
-                                            </div>
-                                            <div class="px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
-                                                <span class="material-symbols-outlined md-16 pr-[6px]">rss_feed</span>
-                                                <p>"Send to"</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
-                                        <span class="material-symbols-outlined md-16 pr-[6px]">edit</span>
-                                        <p>Rename</p>
-                                    </div>
-                                    <div class="px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
-                                        <span class="material-symbols-outlined md-16 pr-[6px]">delete</span>
-                                        <p>Delete</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flex">
-                                <button on:click=show_context_menu.clone() class="flex flex-col items-center justify-center text-[12px] max-w-[150px] hover:text-white active:text-white focus:text-white">
-                                    <img src="/assets/icons/file.png" alt="file" class="w-[75px] h-[75px]"/>
-                                    <div>
-                                        <p class="text-center">"y2mate.com - Gunna  COOLER THAN A BITCH feat Roddy Rich Official Audio.mp3"</p>
-                                    </div>
-                                </button>
-                                <div id="context_list" style="box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2);" class="font-normal ml-[80px] mt-[40px] z-5 py-[4px] dropdown-content absolute none bg-[#252525] min-w-[180px] rounded-[4px] text-white text-[13px]">
-                                    <div class="px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
-                                        <span class="material-symbols-outlined md-16 pr-[6px]">open_in_new</span>
-                                        <p>Open</p>
-                                    </div>
-                                    <div class="px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
-                                        <span class="material-symbols-outlined md-16 pr-[6px]">open_with</span>
-                                        <p>Open with media player</p>
-                                    </div>
-                                    <div>
-                                        <button on:click=open_more_menu.clone() class="btn_more pl-[12px] pr-[5px] py-[8px] w-full flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
-                                            <span class="material-symbols-outlined md-16 pr-[6px]">share</span>
-                                            <p>Share</p>
-                                            <span class="material-symbols-outlined md-16 ml-auto">chevron_right</span>
-                                        </button>
-                                        <div id="context_more_share" style="box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2);" class="font-normal ml-[191px] -mt-[10px] z-5 py-[4px] context-more-share absolute none bg-[#252525] min-w-[180px] rounded-[4px] text-white text-[13px]">
-                                            <div class="px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
-                                                <span class="material-symbols-outlined md-16 pr-[6px]">bluetooth</span>
-                                                <p>Bluetooth</p>
-                                            </div>
-                                            <div class="px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
-                                                <span class="material-symbols-outlined md-16 pr-[6px]">rss_feed</span>
-                                                <p>"Send to"</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
-                                        <span class="material-symbols-outlined md-16 pr-[6px]">edit</span>
-                                        <p>Rename</p>
-                                    </div>
-                                    <div class="px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
-                                        <span class="material-symbols-outlined md-16 pr-[6px]">delete</span>
-                                        <p>Delete</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flex">
-                                <button on:click=show_context_menu.clone() class="flex flex-col items-center justify-center text-[12px] max-w-[150px] hover:text-white active:text-white focus:text-white">
-                                    <img src="/assets/icons/file.png" alt="file" class="w-[75px] h-[75px]"/>
-                                    <div>
-                                        <p class="text-center">"y2mate.com - Gunna  COOLER THAN A BITCH feat Roddy Rich Official Audio.mp3"</p>
-                                    </div>
-                                </button>
-                                <div id="context_list" style="box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2);" class="font-normal ml-[80px] mt-[40px] z-5 py-[4px] dropdown-content absolute none bg-[#252525] min-w-[180px] rounded-[4px] text-white text-[13px]">
-                                    <div class="px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
-                                        <span class="material-symbols-outlined md-16 pr-[6px]">open_in_new</span>
-                                        <p>Open</p>
-                                    </div>
-                                    <div class="px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
-                                        <span class="material-symbols-outlined md-16 pr-[6px]">open_with</span>
-                                        <p>Open with media player</p>
-                                    </div>
-                                    <div>
-                                        <button on:click=open_more_menu.clone() class="btn_more pl-[12px] pr-[5px] py-[8px] w-full flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
-                                            <span class="material-symbols-outlined md-16 pr-[6px]">share</span>
-                                            <p>Share</p>
-                                            <span class="material-symbols-outlined md-16 ml-auto">chevron_right</span>
-                                        </button>
-                                        <div id="context_more_share" style="box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2);" class="font-normal ml-[191px] -mt-[10px] z-5 py-[4px] context-more-share absolute none bg-[#252525] min-w-[180px] rounded-[4px] text-white text-[13px]">
-                                            <div class="px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
-                                                <span class="material-symbols-outlined md-16 pr-[6px]">bluetooth</span>
-                                                <p>Bluetooth</p>
-                                            </div>
-                                            <div class="px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
-                                                <span class="material-symbols-outlined md-16 pr-[6px]">rss_feed</span>
-                                                <p>"Send to"</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
-                                        <span class="material-symbols-outlined md-16 pr-[6px]">edit</span>
-                                        <p>Rename</p>
-                                    </div>
-                                    <div class="px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
-                                        <span class="material-symbols-outlined md-16 pr-[6px]">delete</span>
-                                        <p>Delete</p>
-                                    </div>
-                                </div>
-                            </div>
-                            
                         </div>
                     </div>
                 </div>
