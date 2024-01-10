@@ -39,11 +39,11 @@ use functions::{
 // "#;
 
 #[derive(Serialize, Deserialize)]
-struct File {
+struct FileItem {
     filename: String,
-    type: &str,
-    size:&str,
-    path:&str,
+    // type: String,
+    size: String,
+    path: String
 }
 
 async fn fetch_data() ->JsValue {
@@ -79,7 +79,7 @@ pub fn Home() -> impl IntoView {
         let dom_elem=web_sys::window().unwrap().document().unwrap().get_element_by_id("test").unwrap();
         for i in res.clone() {  
             web_sys::console::log_1(&i.clone().into());
-            let p:File = serde_json::from_str(&i.as_string().unwrap()).unwrap();
+            let p:FileItem = serde_json::from_str(&i.as_string().unwrap()).unwrap();
             let item=format!("<h1>
                 {}
             </h1>",&p["filename"]); 
