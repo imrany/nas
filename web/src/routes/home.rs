@@ -9,7 +9,8 @@ use web_sys::{
  Request, 
  RequestInit, 
 //  RequestMode, 
- Response
+ Response,
+ Node,
 };
 use wasm_bindgen_futures::JsFuture;
 use serde::{
@@ -74,6 +75,8 @@ pub fn Home() -> impl IntoView {
 
     let data=create_resource(|| (), |_| async move { 
         let res=Array::from(&fetch_data().await);
+        web_sys::console::log_1(&res.get(0).clone().into());
+
         let dom_elem=web_sys::window().unwrap().document().unwrap().get_element_by_id("test").unwrap();
         for i in res.clone() {  
             web_sys::console::log_1(&i.clone().into());
@@ -95,11 +98,27 @@ pub fn Home() -> impl IntoView {
             let size_str = size.as_string().unwrap_or_default();
             let path_str = path.as_string().unwrap_or_default();
 
-            let item=format!("<h1>
-                {filename_str}
-            </h1>"); 
-            dom_elem.set_inner_html(&item);
+            let item=format!("
+            <button id='file_item_btn' class='flex flex-col items-center justify-center text-[12px] max-w-[150px] hover:text-white active:text-white focus:text-white'>
+                <img src='/assets/icons/file.png' alt='file' class='w-[75px] h-[75px]'/>
+                <div>
+                    <p class='text-center'>{filename_str}</p>
+                </div>
+            </button>
+            "); 
+            let item_element =web_sys::window().unwrap().document().unwrap().create_element("div").unwrap();
+            item_element.set_class_name("flex");
+            item_element.set_inner_html(&item);
 
+            dom_elem.append_child(&Node::from(item_element)).unwrap();
+            let show_context_menu: Closure<dyn FnMut()> = Closure::new(move|| {
+                // let context_list=web_sys::window().unwrap().document().unwrap().get_element_by_id("context_list").unwrap();
+                // context_list.class_list().toggle("block").unwrap();
+                web_sys::console::log_1(&"clicked me".into());
+            });
+            
+            web_sys::window().unwrap().document().unwrap().get_element_by_id("file_item_btn").unwrap().add_event_listener_with_callback("click", &show_context_menu.as_ref().unchecked_ref()).unwrap();
+            show_context_menu.forget();
         }
      });
 
@@ -162,10 +181,10 @@ pub fn Home() -> impl IntoView {
                         None => view! { <p>"Loading..."</p> }.into_view(),
                         Some(data) =>view! { <p>{data} "This is the data"</p> }.into_view()
                     }}
-                    <div id="test"></div>
+
                     //folder view body 
                     <div class="w-full flex flex-wrap" id="folder_view_body">
-                        <div class="flex grid max-sm:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 w-full gap-4 px-[25px] py-[10px]">
+                        <div id="test" class="flex grid max-sm:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 w-full gap-4 px-[25px] py-[10px]">
                             <div class="flex">
                                 <button on:click=show_context_menu.clone() class="flex flex-col items-center justify-center text-[12px] max-w-[150px] hover:text-white active:text-white focus:text-white">
                                     <img src="/assets/icons/file.png" alt="file" class="w-[75px] h-[75px]"/>
