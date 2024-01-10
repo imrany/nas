@@ -62,7 +62,6 @@ async fn fetch_data() ->JsValue {
     // Convert this other `Promise` into a rust `Future`.
     let json = JsFuture::from(resp.json().unwrap()).await.unwrap();
    // Send the JSON response back to JS.
-//    web_sys::console::log_1(&json.clone().into());
    json
 }
 
@@ -75,15 +74,32 @@ pub fn Home() -> impl IntoView {
 
     let data=create_resource(|| (), |_| async move { 
         let res=Array::from(&fetch_data().await);
-        // web_sys::console::log_2(&res.at(0).into(),&res.at(0).js_typeof().into());
         let dom_elem=web_sys::window().unwrap().document().unwrap().get_element_by_id("test").unwrap();
         for i in res.clone() {  
             web_sys::console::log_1(&i.clone().into());
-            let p:FileItem = serde_json::from_str(&i.as_string().unwrap()).unwrap();
+            let elem=&i;
+
+            let filename = js_sys::Reflect::get(&elem, &JsValue::from_str("filename"))
+            .map_err(|_| JsValue::from_str("Failed to access filename property")).unwrap();
+            let file_type = js_sys::Reflect::get(&elem, &JsValue::from_str("type"))
+            .map_err(|_| JsValue::from_str("Failed to access type property")).unwrap();
+            let size = js_sys::Reflect::get(&elem, &JsValue::from_str("size"))
+            .map_err(|_| JsValue::from_str("Failed to access size property")).unwrap();
+            let path = js_sys::Reflect::get(&elem, &JsValue::from_str("path"))
+            .map_err(|_| JsValue::from_str("Failed to access path property")).unwrap();
+
+
+            // Convert the filename to a Rust String
+            let filename_str = filename.as_string().unwrap_or_default();
+            let type_str = file_type.as_string().unwrap_or_default();
+            let size_str = size.as_string().unwrap_or_default();
+            let path_str = path.as_string().unwrap_or_default();
+
             let item=format!("<h1>
-                {}
-            </h1>",&p["filename"]); 
+                {filename_str}
+            </h1>"); 
             dom_elem.set_inner_html(&item);
+
         }
      });
 
