@@ -11,11 +11,9 @@ use web_sys::{
 //  RequestMode, 
  Response,
  Node,
+ Event,
 };
 use wasm_bindgen_futures::JsFuture;
-use serde::{
-    Deserialize, Serialize
-};
 
 #[path="../components/top_nav.rs"]
 mod top_nav;
@@ -39,13 +37,7 @@ use functions::{
 //     color: orange
 // "#;
 
-#[derive(Serialize, Deserialize)]
-struct FileItem {
-    filename: String,
-    // type: String,
-    size: String,
-    path: String
-}
+
 
 async fn fetch_data() ->JsValue {
     let window=window().expect("Failed to get Window");
@@ -79,7 +71,6 @@ pub fn Home() -> impl IntoView {
 
         let dom_elem=web_sys::window().unwrap().document().unwrap().get_element_by_id("test").unwrap();
         for i in res.clone() {  
-            web_sys::console::log_1(&i.clone().into());
             let elem=&i;
 
             let filename = js_sys::Reflect::get(&elem, &JsValue::from_str("filename"))
@@ -99,25 +90,68 @@ pub fn Home() -> impl IntoView {
             let path_str = path.as_string().unwrap_or_default();
 
             let item=format!("
-            <button id='file_item_btn' class='flex flex-col items-center justify-center text-[12px] max-w-[150px] hover:text-white active:text-white focus:text-white'>
-                <img src='/assets/icons/file.png' alt='file' class='w-[75px] h-[75px]'/>
-                <div>
-                    <p class='text-center'>{filename_str}</p>
+                <button id='{filename_str}' class='flex flex-col items-center justify-center text-[12px] max-w-[150px] hover:text-white active:text-white focus:text-white dropdown_btn'>
+                    <img src='/assets/icons/file.png' alt='file' class='w-[75px] h-[75px]'/>
+                    <div>
+                        <p class='text-center'>{filename_str}</p>
+                    </div>
+                </button>
+                <div id='context_list_{filename_str}' style='box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2);' class='font-normal ml-[80px] mt-[40px] z-5 py-[4px] dropdown-content absolute none bg-[#252525] min-w-[180px] rounded-[4px] text-white text-[13px]'>
+                    <div class='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
+                        <span class='material-symbols-outlined md-16 pr-[6px]'>open_in_new</span>
+                        <p>Open</p>
+                    </div>
+                    <div class='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
+                        <span class='material-symbols-outlined md-16 pr-[6px]'>open_with</span>
+                        <p>Open with media player</p>
+                    </div>
+                    <div>
+                        <button on:click=open_more_menu.clone() class='btn_more pl-[12px] pr-[5px] py-[8px] w-full flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
+                            <span class='material-symbols-outlined md-16 pr-[6px]'>share</span>
+                            <p>Share</p>
+                            <span class='material-symbols-outlined md-16 ml-auto'>chevron_right</span>
+                        </button>
+                        <div id='context_more_share' style='box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2);' class='font-normal ml-[191px] -mt-[10px] z-5 py-[4px] context-more-share absolute none bg-[#252525] min-w-[180px] rounded-[4px] text-white text-[13px]'>
+                            <div class='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
+                                <span class='material-symbols-outlined md-16 pr-[6px]'>bluetooth</span>
+                                <p>Bluetooth</p>
+                            </div>
+                            <div class='px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
+                                <span class='material-symbols-outlined md-16 pr-[6px]'>rss_feed</span>
+                                <p>Send to</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
+                        <span class='material-symbols-outlined md-16 pr-[6px]'>edit</span>
+                        <p>Rename</p>
+                    </div>
+                    <div class='px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
+                        <span class='material-symbols-outlined md-16 pr-[6px]'>delete</span>
+                        <p>Delete</p>
+                    </div>
                 </div>
-            </button>
             "); 
             let item_element =web_sys::window().unwrap().document().unwrap().create_element("div").unwrap();
             item_element.set_class_name("flex");
             item_element.set_inner_html(&item);
 
             dom_elem.append_child(&Node::from(item_element)).unwrap();
-            let show_context_menu: Closure<dyn FnMut()> = Closure::new(move|| {
-                // let context_list=web_sys::window().unwrap().document().unwrap().get_element_by_id("context_list").unwrap();
-                // context_list.class_list().toggle("block").unwrap();
-                web_sys::console::log_1(&"clicked me".into());
+            let filename_str_copy=filename_str.clone();
+            let show_context_menu: Closure<dyn FnMut(_)> = Closure::new(move|e:Event| {
+                e.prevent_default();
+                let value=e;
+                let context_list=web_sys::window().unwrap().document().unwrap().get_element_by_id(&format!("context_list_{}",filename_str_copy.as_str())).unwrap();
+                // context_list.class_list().replace("none","block").unwrap();
+                context_list.class_list().toggle("block").unwrap();
+                let arr=Array::new();
+                arr.push(&context_list.into());
+                arr.push(&"clicked".into());
+                arr.push(&value.clone().into());
+                web_sys::console::log(&arr.into());
             });
             
-            web_sys::window().unwrap().document().unwrap().get_element_by_id("file_item_btn").unwrap().add_event_listener_with_callback("click", &show_context_menu.as_ref().unchecked_ref()).unwrap();
+            web_sys::window().unwrap().document().unwrap().get_element_by_id(&filename_str.as_str()).unwrap().add_event_listener_with_callback("contextmenu", &show_context_menu.as_ref().unchecked_ref()).unwrap();
             show_context_menu.forget();
         }
      });
@@ -133,17 +167,17 @@ pub fn Home() -> impl IntoView {
         closure.forget();
     }
 
-    let document_ref_2=document.clone();
-    let show_context_menu=move|_|{
-        let context_list=document_ref_2.get_element_by_id("context_list").unwrap();
-        context_list.class_list().toggle("block").unwrap();
-    };
+    // let document_ref_2=document.clone();
+    // let show_context_menu=move|_|{
+    //     let context_list=document_ref_2.get_element_by_id("context_list").unwrap();
+    //     context_list.class_list().toggle("block").unwrap();
+    // };
 
-    let document_ref_2=document.clone();
-    let open_more_menu=move|_|{
-        let context_list=document_ref_2.get_element_by_id("context_more_share").unwrap();
-        context_list.class_list().toggle("block").unwrap();
-    };
+    // let document_ref_2=document.clone();
+    // let open_more_menu=move|_|{
+    //     let context_list=document_ref_2.get_element_by_id("context_more_share").unwrap();
+    //     context_list.class_list().toggle("block").unwrap();
+    // };
 
     view! {
         <Title text="Welcome"/>
@@ -185,49 +219,49 @@ pub fn Home() -> impl IntoView {
                     //folder view body 
                     <div class="w-full flex flex-wrap" id="folder_view_body">
                         <div id="test" class="flex grid max-sm:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 w-full gap-4 px-[25px] py-[10px]">
-                            <div class="flex">
-                                <button on:click=show_context_menu.clone() class="flex flex-col items-center justify-center text-[12px] max-w-[150px] hover:text-white active:text-white focus:text-white">
-                                    <img src="/assets/icons/file.png" alt="file" class="w-[75px] h-[75px]"/>
-                                    <div>
-                                        <p class="text-center">"y2mate.com - Gunna  COOLER THAN A BITCH feat Roddy Rich Official Audio.mp3"</p>
-                                    </div>
-                                </button>
-                                <div id="context_list" style="box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2);" class="font-normal ml-[80px] mt-[40px] z-5 py-[4px] dropdown-content absolute none bg-[#252525] min-w-[180px] rounded-[4px] text-white text-[13px]">
-                                    <div class="px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
-                                        <span class="material-symbols-outlined md-16 pr-[6px]">open_in_new</span>
-                                        <p>Open</p>
-                                    </div>
-                                    <div class="px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
-                                        <span class="material-symbols-outlined md-16 pr-[6px]">open_with</span>
-                                        <p>Open with media player</p>
-                                    </div>
-                                    <div>
-                                        <button on:click=open_more_menu.clone() class="btn_more pl-[12px] pr-[5px] py-[8px] w-full flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
-                                            <span class="material-symbols-outlined md-16 pr-[6px]">share</span>
-                                            <p>Share</p>
-                                            <span class="material-symbols-outlined md-16 ml-auto">chevron_right</span>
-                                        </button>
-                                        <div id="context_more_share" style="box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2);" class="font-normal ml-[191px] -mt-[10px] z-5 py-[4px] context-more-share absolute none bg-[#252525] min-w-[180px] rounded-[4px] text-white text-[13px]">
-                                            <div class="px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
-                                                <span class="material-symbols-outlined md-16 pr-[6px]">bluetooth</span>
-                                                <p>Bluetooth</p>
-                                            </div>
-                                            <div class="px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
-                                                <span class="material-symbols-outlined md-16 pr-[6px]">rss_feed</span>
-                                                <p>"Send to"</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
-                                        <span class="material-symbols-outlined md-16 pr-[6px]">edit</span>
-                                        <p>Rename</p>
-                                    </div>
-                                    <div class="px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
-                                        <span class="material-symbols-outlined md-16 pr-[6px]">delete</span>
-                                        <p>Delete</p>
-                                    </div>
-                                </div>
-                            </div>
+                            // <div class="flex">
+                            //     <button on:click=show_context_menu.clone() class="flex flex-col items-center justify-center text-[12px] max-w-[150px] hover:text-white active:text-white focus:text-white">
+                            //         <img src="/assets/icons/file.png" alt="file" class="w-[75px] h-[75px]"/>
+                            //         <div>
+                            //             <p class="text-center">"y2mate.com - Gunna  COOLER THAN A BITCH feat Roddy Rich Official Audio.mp3"</p>
+                            //         </div>
+                            //     </button>
+                            //     <div id="context_list" style="box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2);" class="font-normal ml-[80px] mt-[40px] z-5 py-[4px] dropdown-content absolute none bg-[#252525] min-w-[180px] rounded-[4px] text-white text-[13px]">
+                            //         <div class="px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
+                            //             <span class="material-symbols-outlined md-16 pr-[6px]">open_in_new</span>
+                            //             <p>Open</p>
+                            //         </div>
+                            //         <div class="px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
+                            //             <span class="material-symbols-outlined md-16 pr-[6px]">open_with</span>
+                            //             <p>Open with media player</p>
+                            //         </div>
+                            //         <div>
+                            //             <button on:click=open_more_menu.clone() class="btn_more pl-[12px] pr-[5px] py-[8px] w-full flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
+                            //                 <span class="material-symbols-outlined md-16 pr-[6px]">share</span>
+                            //                 <p>Share</p>
+                            //                 <span class="material-symbols-outlined md-16 ml-auto">chevron_right</span>
+                            //             </button>
+                            //             <div id="context_more_share" style="box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2);" class="font-normal ml-[191px] -mt-[10px] z-5 py-[4px] context-more-share absolute none bg-[#252525] min-w-[180px] rounded-[4px] text-white text-[13px]">
+                            //                 <div class="px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
+                            //                     <span class="material-symbols-outlined md-16 pr-[6px]">bluetooth</span>
+                            //                     <p>Bluetooth</p>
+                            //                 </div>
+                            //                 <div class="px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
+                            //                     <span class="material-symbols-outlined md-16 pr-[6px]">rss_feed</span>
+                            //                     <p>"Send to"</p>
+                            //                 </div>
+                            //             </div>
+                            //         </div>
+                            //         <div class="px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
+                            //             <span class="material-symbols-outlined md-16 pr-[6px]">edit</span>
+                            //             <p>Rename</p>
+                            //         </div>
+                            //         <div class="px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
+                            //             <span class="material-symbols-outlined md-16 pr-[6px]">delete</span>
+                            //             <p>Delete</p>
+                            //         </div>
+                            //     </div>
+                            // </div>
                         </div>
                     </div>
                 </div>

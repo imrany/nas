@@ -18,14 +18,14 @@ pub fn Topnav()-> impl IntoView{
         let btns_more=document_ref.get_elements_by_class_name("btn_more");
         for i in 0..btns_more.clone().length(){
             let btn_more=&btns_more.get_with_index(i);
-            let elem_match=e.target().unwrap().to_string()==btn_more.clone().unwrap().to_string();
-            web_sys::console::log_2(&e.target().unwrap().into(),&btn_more.as_deref().into());
-            web_sys::console::log_1(&elem_match.into());
-            if !elem_match {
+            let e_match_btn_more=e.target().unwrap().to_string()==btn_more.clone().unwrap().to_string();
+            // web_sys::console::log_2(&e.target().unwrap().into(),&btn_more.as_deref().into());
+            // web_sys::console::log_1(&elem_match.into());
+            if !e_match_btn_more {
                 let dropdowns=document_ref.get_elements_by_class_name("dropdown-content");
                 for i in 0..dropdowns.clone().length(){
                     let open_dropdown=dropdowns.get_with_index(i);
-                    if open_dropdown.clone().unwrap().class_list().contains("block") {
+                    if open_dropdown.clone().unwrap().class_list().contains("block"){
                         open_dropdown.clone().unwrap().class_list().remove_1("block").unwrap();
                         let context_more_share=document_ref.get_elements_by_class_name("context-more-share");
                         for i in 0..context_more_share.clone().length(){
