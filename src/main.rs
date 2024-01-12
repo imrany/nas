@@ -29,12 +29,10 @@ use launch::launch_browser;
 #[path="./routes.rs"]
 mod routes;
 use routes::{
-    index,
+    AppState,
+    directory_content,
     hello_world,
 };
-
-#[cfg(target_os="linux")]
-use colored::Colorize;
 
 #[derive(Parser)]
 #[command(author="Imran <imranmat254@gmail.com>", version, about="A simple http server for static files.", long_about = None)]
@@ -55,10 +53,31 @@ enum Commands {
     },
 }
 
-#[actix_web::main]
-async fn main() -> Result<(),std::io::Error> {
-    let args = Args::parse();
+fn get_root_directory() -> Option<PathBuf> {
+    // On Unix-like systems (Linux, macOS), the root directory is "/"
+    #[cfg(unix)]
+    {
+        Some(PathBuf::from("/"))
+    }
 
+    // On Windows, the root directory is "C:\" or another drive letter
+    #[cfg(windows)]
+    {
+        Some(PathBuf::from(r"C:\"))
+    }
+
+    // Add more platform-specific cases as needed
+
+    // For unsupported platforms, return None
+    #[cfg(not(any(unix, windows)))]
+    {
+        None
+    }
+}
+
+#[actix_web::main]
+async fn main(){
+    let args = Args::parse();
     if let Some(path) = args.root.as_deref() {
         serve_me(path.to_string()).await;
     }
@@ -68,17 +87,8 @@ async fn main() -> Result<(),std::io::Error> {
             if let Some(path) = path.as_deref() {
                 serve_me(path.to_string()).await;
             }else {
-                #[cfg(not(target_os="windows"))]
-                {
-                    println!(" {} Specify a path to serve."," ERROR ".on_red().color("white"));
-                    println!(" {}",format!(" HINT: To serve the current folder - 'zippy serve ./'.").cyan());
-                }
-
-                #[cfg(target_os="windows")]
-                {
-                    println!("  ERROR Specify a path to serve.");
-                    println!(" {}",format!(" HINT: To serve the current folder - 'zippy serve ./'."));
-                }
+                println!("  ERROR Specify a path to serve.");
+                println!(" {}",format!(" HINT: To serve the current folder - 'zippy serve ./'."));
             }
 
         }
@@ -86,19 +96,26 @@ async fn main() -> Result<(),std::io::Error> {
             serve_zippy().await;
         }
     }
-    Ok(())
 }
 
 async fn serve_zippy(){
     // let path: PathBuf = Path::new(PathBuf::from(current_exe().unwrap()).parent().unwrap()).join("static_files");
+    
+    // Create the application with the shared state
+    let app_state = web::Data::new(AppState {
+        root_dir: get_root_directory().unwrap(),
+    });
+    let port= 8000;
     let path =Path::new("./static_files");
-    let server=HttpServer::new(move ||
+    let server=HttpServer::new(move ||{
+        // Clone the shared state for each worker thread
+        let app_state = app_state.clone();
         App::new()
+            .app_data(app_state.clone()) 
             .service(
                 web::scope("/api")
                     .route("", web::get().to(hello_world))
-                    .route("/get", web::get().to(hello_world))
-                    .service(index)
+                    .service(directory_content)
             )
             .service(
                 web::scope("/*")
@@ -112,35 +129,18 @@ async fn serve_zippy(){
                         }))
                     )
             )
-    )
-    .bind(("0.0.0.0",8000));
+    })
+    .bind(("0.0.0.0",port));
     match server {
         Ok(server) => {
-            let port:i32=8000;
             let url=format!("http://localhost:{port}/");
-            match launch_browser(&url).await {
-                Ok(_) => {
-                   #[cfg(not(target_os="windows"))]
-                   {
-                    println!(" {} Launching zippy...",format!(" INFO ").on_cyan().color("white"));
-                    println!(" Open {url}");
-                   }
-          
-                   #[cfg(target_os="windows")]
-                   {
-                    println!(" INFO: Launching zippy...");
-                    println!(" INFO: Open {url}");
-                   }
-                },
-                Err(e) => {
-                   #[cfg(not(target_os="windows"))]
-                   println!(" {} An error occurred when opening {} {e}", " ERROR ".on_red().color("white"),format!("{url}").cyan());
-          
-                   #[cfg(target_os="windows")]
-                   println!(" ERROR: An error occurred when opening {url} {e}");
-                }
-             };
-            server.run().await.unwrap_or_else(|err| println!(" {err} "));
+            if let Err(e)= launch_browser(&url).await{
+                println!(" ERROR: An error occurred when opening {url} {e}");
+            }else {
+                println!(" INFO: Launching zippy...");
+                println!(" INFO: Open {url}");
+            }
+            server.run().await.unwrap_or_else(|err| println!(" ERROR: {err} "));
         },
         Err(e) =>  println!(" {} ",e)
     }
@@ -167,34 +167,18 @@ async fn serve_me(path: String) {
             match launch_browser(&url).await {
                 Ok(_) => {
                    let my_local_ip = local_ip();
-                   #[cfg(target_os="linux")]
-                   println!(" Local: {}",format!("{url}").cyan());
-          
-                   #[cfg(target_os="windows")]
                    println!(" Local: {url}");
                    
                    match my_local_ip {
                       Ok(ip) => {
-                         #[cfg(target_os="linux")]
-                         println!(" Network: {}",format!("http://{ip}:{port}/").cyan());
-          
-                         #[cfg(target_os="windows")]
-                         println!(" Network: {}",format!("http://{ip}:{port}/"));
+                        println!(" Network: {}",format!("http://{ip}:{port}/"));
                       },
                       Err(e) => {
-                         #[cfg(target_os="linux")]
-                         println!(" {} {}.", format!(" WARNING ").on_yellow().color("white"),e );
-          
-                         #[cfg(target_os="windows")]
-                         println!(" {} {}.", format!(" WARNING "),e );
+                        println!(" {} {}.", format!(" WARNING "),e );
                       }
                    }
                 },
                 Err(_) => {
-                   #[cfg(target_os="linux")]
-                   println!(" {} An error occurred when opening {}", " ERROR ".on_red().color("white"),format!("{url}").cyan());
-          
-                   #[cfg(target_os="windows")]
                    println!(" ERROR An error occurred when opening {url}");
                 }
              };
