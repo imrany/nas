@@ -140,26 +140,34 @@ pub async fn open_file_by_name_local(req: HttpRequest) -> impl Responder {
 
 #[get("/get_ip_address")]
 pub async fn get_ip_address()-> impl Responder {
-    // Make a request to httpbin to get the external IP address
-    if let Ok(response) = reqwest::get("https://httpbin.org/ip").await{
-        // Parse the JSON response to extract the IP address
-        let ip_address: serde_json::Value = response.json().await.unwrap();
-        let ip_external = ip_address["origin"].as_str().unwrap_or("Unknown");
-        let ip=Ip{
-            internal: local_ip().unwrap().to_string(),
-            external: ip_external.to_string()
+    if let Ok(internal_ip) = local_ip() {
+        // Make a request to httpbin to get the external IP address
+        if let Ok(response) = reqwest::get("https://httpbin.org/ip").await{
+            // Parse the JSON response to extract the IP address
+            let ip_address: serde_json::Value = response.json().await.unwrap();
+            let ip_external = ip_address["origin"].as_str().unwrap_or("Unknown");
+            let ip=Ip{
+                internal: internal_ip.to_string(),
+                external: ip_external.to_string()
+            };
+            println!("External IP Address: {}", ip.external);
+            let json_response=serde_json::to_string(&ip).unwrap();
+            return HttpResponse::Ok().json(json_response);
+        }else {
+            let ip=Ip{
+                internal: internal_ip.to_string(),
+                external: "Failed to get external IP Address".to_string()
+            };
+            let json_response = serde_json::to_string(&ip).unwrap();
+            return HttpResponse::Ok().json(json_response);
         };
-        println!("External IP Address: {}", ip.external);
-        let json_response=serde_json::to_string(&ip).unwrap();
-        return HttpResponse::Ok().json(json_response);
     }else {
         let err_message=ErrorMessage{
-            message:"Failed to get external IP Address".to_string(),
+            message: "Failed to get local IP Address".to_string()
         };
-        // Convert the struct to JSON
         let json_response = serde_json::to_string(&err_message).unwrap();
-        return HttpResponse::NotFound().json(json_response);
-    };
+        return HttpResponse::InternalServerError().json(json_response);
+    }
 }
 
 pub async fn hello_world() -> impl Responder { 
