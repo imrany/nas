@@ -12,6 +12,7 @@ use std::{
     path,
 };
 use serde::Serialize;
+use std::process::Command;
 
 #[derive(Serialize)]
 struct DirectoryObject {
@@ -87,15 +88,38 @@ pub async fn open_file_by_name(req: HttpRequest) -> Result<NamedFile> {
     Ok(NamedFile::open(path)?)
 }
 
-#[get("/local/{filename:.*}")]
+
+#[get("/{filename:.*}")]
 pub async fn open_file_by_name_local(req: HttpRequest) -> impl Responder {
-    let path: path::PathBuf = req.match_info().query("filename").parse().unwrap();
-    if let Ok(file) = fs::File::open(path) {
-        println!("{:?}", file);
-        return HttpResponse::Ok().json("Hello world!");
-    }else {
-        return HttpResponse::InternalServerError().json("Failed to open file");
-    };
+    let file_path: path::PathBuf = req.match_info().query("filename").parse().unwrap();
+    // On Windows, use the "start" command to open the file with the default program
+    #[cfg(target_os="windows")]
+    {
+        let open_cmd=Command::new("cmd")
+            .args(&["/C", "start", "", &file_path])
+            .spawn();
+
+        if let Ok(file) = open_cmd {
+            println!("{:?}", file);
+            return HttpResponse::Ok().json("File opened");
+        }else {
+            return HttpResponse::InternalServerError().json("Failed to open file");
+        };
+    }
+    // On Linux or macOS, use "xdg-open" to open the file with the default program
+    #[cfg(not(target_os="windows"))]
+    {
+        let open_cmd=Command::new("xdg-open")
+            .arg(&file_path)
+            .spawn();
+            
+        if let Ok(file) = open_cmd {
+            println!("{:?}", file);
+            return HttpResponse::Ok().json("File opened");
+        }else {
+            return HttpResponse::InternalServerError().json("Failed to open file");
+        };
+    }
 }
 
 pub async fn hello_world() -> impl Responder { 
