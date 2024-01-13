@@ -13,9 +13,10 @@ use std::{
 };
 use serde::{
     Serialize,
-    Deserialize,
+    // Deserialize,
 };
 use std::process::Command;
+use local_ip_address::local_ip;
 use reqwest;
 
 #[derive(Serialize)]
@@ -41,9 +42,10 @@ struct ErrorMessage{
     message: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize)]
 struct Ip {
-    origin: String,
+    internal: String,
+    external: String,
 }
 
 
@@ -136,16 +138,20 @@ pub async fn open_file_by_name_local(req: HttpRequest) -> impl Responder {
     }
 }
 
-#[get("/get_external_ip")]
-pub async fn get_external_ip()-> impl Responder {
+#[get("/get_ip_address")]
+pub async fn get_ip_address()-> impl Responder {
     // Make a request to httpbin to get the external IP address
     if let Ok(response) = reqwest::get("https://httpbin.org/ip").await{
         // Parse the JSON response to extract the IP address
-        // let ip_address: serde_json::Value = response.json().await.unwrap();
-        // let ip_str = ip_address["origin"].as_str().unwrap_or("Unknown");
-        let ip_address:Ip = response.json().await.unwrap();
-        println!("External IP Address: {}", ip_address.origin);
-        return HttpResponse::Ok().json(&ip_address);
+        let ip_address: serde_json::Value = response.json().await.unwrap();
+        let ip_external = ip_address["origin"].as_str().unwrap_or("Unknown");
+        let ip=Ip{
+            internal: local_ip().unwrap().to_string(),
+            external: ip_external.to_string()
+        };
+        println!("External IP Address: {}", ip.external);
+        let json_response=serde_json::to_string(&ip).unwrap();
+        return HttpResponse::Ok().json(json_response);
     }else {
         let err_message=ErrorMessage{
             message:"Failed to get external IP Address".to_string(),
