@@ -2,9 +2,11 @@ use actix_web::{
     HttpResponse,
     Responder,
     get,
-    // HttpRequest,
+    HttpRequest,
     web,
+    Result
 };
+use actix_files::NamedFile;
 use std::{
     fs,
     path,
@@ -77,6 +79,12 @@ pub async fn directory_content(state: web::Data<AppState>)-> HttpResponse{
         Ok(json_string) => HttpResponse::Ok().json(json_string),
         Err(_) => HttpResponse::InternalServerError().body("Failed to serialize to JSON"),
     }
+}
+
+#[get("/{filename:.*}")]
+pub async fn open_file_by_name(req: HttpRequest) -> Result<NamedFile> {
+    let path: path::PathBuf = req.match_info().query("filename").parse().unwrap();
+    Ok(NamedFile::open(path)?)
 }
 
 pub async fn hello_world() -> impl Responder { 

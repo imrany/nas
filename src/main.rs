@@ -34,6 +34,7 @@ use routes::{
     AppState,
     directory_content,
     hello_world,
+    open_file_by_name,
 };
 
 #[derive(Parser)]
@@ -102,16 +103,13 @@ async fn main(){
 
 async fn serve_zippy(){
     // let path: PathBuf = Path::new(PathBuf::from(current_exe().unwrap()).parent().unwrap()).join("static_files");
-    
-    // Create the application with the shared state
+    let path =Path::new("./static_files");
     let app_state = web::Data::new(AppState {
         root_dir: get_root_directory().unwrap(),
     });
     let port:u16=8000;
     let ipv4: (Ipv4Addr, u16)=("0.0.0.0".parse().unwrap(),port);
-    let path =Path::new("./static_files");
     let server=HttpServer::new(move ||{
-        // Clone the shared state for each worker thread
         let app_state = app_state.clone();
         App::new()
             .app_data(app_state.clone()) 
@@ -119,6 +117,7 @@ async fn serve_zippy(){
                 web::scope("/api")
                     .route("", web::get().to(hello_world))
                     .service(directory_content)
+                    .service(open_file_by_name)
             )
             .service(
                 web::scope("/*")
