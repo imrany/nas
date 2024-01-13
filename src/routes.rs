@@ -150,7 +150,6 @@ pub async fn get_ip_address()-> impl Responder {
                 internal: internal_ip.to_string(),
                 external: ip_external.to_string()
             };
-            println!("External IP Address: {}", ip.external);
             let json_response=serde_json::to_string(&ip).unwrap();
             return HttpResponse::Ok().json(json_response);
         }else {
