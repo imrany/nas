@@ -16,6 +16,12 @@ struct DirectoryObject {
     id: u32,
     name:String,
     path:path::PathBuf,
+    metadata:FileMeta
+}
+#[derive(Serialize)]
+struct FileMeta{
+    is_file:bool,
+    file_extension:Option<String>,
 }
 
 #[derive(Serialize)]
@@ -31,8 +37,8 @@ pub struct AppState {
 pub async fn directory_content(state: web::Data<AppState>)-> HttpResponse{
     let directory_path=path::Path::new("./resources");
 
-    let root_dir=&state.root_dir;
-    println!("{:?}", root_dir);
+    let root_dir=&state.root_dir.as_path();
+    println!("{}", root_dir.display());
     // Read the directory contents
     let contents = match fs::read_dir(directory_path) {
         Ok(entries) => {
@@ -40,10 +46,19 @@ pub async fn directory_content(state: web::Data<AppState>)-> HttpResponse{
             for entry in entries {
                 if let Ok(entry) = entry {
                     if let Some(file_name) = entry.file_name().to_str() {
+                        let metadata= FileMeta{
+                            is_file:directory_path.join(file_name.to_owned()).is_file(),
+                            file_extension: if directory_path.join(file_name.to_owned()).is_file() {
+                                Some(format!("{}",directory_path.join(file_name.to_owned()).extension().unwrap().to_str().unwrap()))
+                            }else{
+                                Some(String::from("Folder"))
+                            },
+                        };
                         let directory_object=DirectoryObject {
                             id:2,
                             name:file_name.to_owned(),
-                            path:directory_path.join(file_name.to_owned())
+                            path:directory_path.join(file_name.to_owned()),
+                            metadata
                         };
                         contents.push(directory_object);
                     }
