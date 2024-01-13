@@ -2,6 +2,7 @@ use clap::{
     Parser,
     Subcommand,
 };
+use rand::{thread_rng, Rng};
 use actix_web::{
     HttpServer,
     App,
@@ -20,6 +21,7 @@ use std::{
     env::{
         current_exe
     },
+    net::Ipv4Addr,
     path::{Path,PathBuf}
 };
 use local_ip_address::local_ip;
@@ -105,7 +107,8 @@ async fn serve_zippy(){
     let app_state = web::Data::new(AppState {
         root_dir: get_root_directory().unwrap(),
     });
-    let port= 8000;
+    let port:u16=8000;
+    let ipv4: (Ipv4Addr, u16)=("0.0.0.0".parse().unwrap(),port);
     let path =Path::new("./static_files");
     let server=HttpServer::new(move ||{
         // Clone the shared state for each worker thread
@@ -130,7 +133,7 @@ async fn serve_zippy(){
                     )
             )
     })
-    .bind(("0.0.0.0",port));
+    .bind(ipv4);
     match server {
         Ok(server) => {
             let url=format!("http://localhost:{port}/");
@@ -147,6 +150,8 @@ async fn serve_zippy(){
 }
 
 async fn serve_me(path: String) {
+    let port:u16=thread_rng().gen_range(3000..=8080);
+    let ipv4: (Ipv4Addr, u16)=("0.0.0.0".parse().unwrap(),port);
     let server=HttpServer::new(move ||
         App::new()
             .service(Files::new("/", path.clone()).show_files_listing().index_file("index.html")
@@ -159,30 +164,26 @@ async fn serve_me(path: String) {
                 }))
             )
     )
-    .bind(("0.0.0.0",8080));
+    .bind(ipv4);
     match server {
         Ok(serve) => {
-            let port:i32=8080;
             let url=format!("http://localhost:{port}/");
-            match launch_browser(&url).await {
-                Ok(_) => {
-                   let my_local_ip = local_ip();
-                   println!(" Local: {url}");
-                   
-                   match my_local_ip {
-                      Ok(ip) => {
+            if let Err(e) = launch_browser(&url).await {
+                println!(" ERROR An error occurred when opening {url} {e}");
+            }else{
+                let my_local_ip = local_ip();
+                println!(" Local: {url}");
+                
+                match my_local_ip {
+                    Ok(ip) => {
                         println!(" Network: {}",format!("http://{ip}:{port}/"));
-                      },
-                      Err(e) => {
+                    },
+                    Err(e) => {
                         println!(" {} {}.", format!(" WARNING "),e );
-                      }
-                   }
-                },
-                Err(_) => {
-                   println!(" ERROR An error occurred when opening {url}");
+                    }
                 }
-             };
-            serve.run().await.unwrap_or_else(|err| println!(" {} ",err));
+            };
+            serve.run().await.unwrap_or_else(|err| println!(" ERROR {} ",err));
         },
         Err(e) =>  println!(" {} ",e)
     }
