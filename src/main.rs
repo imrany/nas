@@ -35,7 +35,8 @@ use routes::{
     directory_content,
     hello_world,
     open_file_by_name,
-    open_file_by_name_local
+    open_file_by_name_local,
+    get_external_ip,
 };
 
 #[derive(Parser)]
@@ -118,6 +119,7 @@ async fn serve_zippy(){
                 web::scope("/api")
                     .route("", web::get().to(hello_world))
                     .service(directory_content)
+                    .service(get_external_ip)
                     .service(open_file_by_name)
             )
             .service(

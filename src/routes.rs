@@ -11,8 +11,12 @@ use std::{
     fs,
     path,
 };
-use serde::Serialize;
+use serde::{
+    Serialize,
+    Deserialize,
+};
 use std::process::Command;
+use reqwest;
 
 #[derive(Serialize)]
 struct DirectoryObject {
@@ -31,6 +35,17 @@ struct FileMeta{
 struct DirectoryContent {
     contents: Vec<DirectoryObject>,
 }
+
+#[derive(Serialize)]
+struct ErrorMessage{
+    message: String,
+}
+
+#[derive(Serialize, Deserialize)]
+struct Ip {
+    origin: String,
+}
+
 
 pub struct AppState {
     pub root_dir: path::PathBuf,
@@ -88,7 +103,6 @@ pub async fn open_file_by_name(req: HttpRequest) -> Result<NamedFile> {
     Ok(NamedFile::open(path)?)
 }
 
-
 #[get("/{filename:.*}")]
 pub async fn open_file_by_name_local(req: HttpRequest) -> impl Responder {
     let file_path: path::PathBuf = req.match_info().query("filename").parse().unwrap();
@@ -120,6 +134,26 @@ pub async fn open_file_by_name_local(req: HttpRequest) -> impl Responder {
             return HttpResponse::InternalServerError().json("Failed to open file");
         };
     }
+}
+
+#[get("/get_external_ip")]
+pub async fn get_external_ip()-> impl Responder {
+    // Make a request to httpbin to get the external IP address
+    if let Ok(response) = reqwest::get("https://httpbin.org/ip").await{
+        // Parse the JSON response to extract the IP address
+        // let ip_address: serde_json::Value = response.json().await.unwrap();
+        // let ip_str = ip_address["origin"].as_str().unwrap_or("Unknown");
+        let ip_address:Ip = response.json().await.unwrap();
+        println!("External IP Address: {}", ip_address.origin);
+        return HttpResponse::Ok().json(&ip_address);
+    }else {
+        let err_message=ErrorMessage{
+            message:"Failed to get external IP Address".to_string(),
+        };
+        // Convert the struct to JSON
+        let json_response = serde_json::to_string(&err_message).unwrap();
+        return HttpResponse::NotFound().json(json_response);
+    };
 }
 
 pub async fn hello_world() -> impl Responder { 
