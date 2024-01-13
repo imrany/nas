@@ -87,6 +87,17 @@ pub async fn open_file_by_name(req: HttpRequest) -> Result<NamedFile> {
     Ok(NamedFile::open(path)?)
 }
 
+#[get("/local/{filename:.*}")]
+pub async fn open_file_by_name_local(req: HttpRequest) -> impl Responder {
+    let path: path::PathBuf = req.match_info().query("filename").parse().unwrap();
+    if let Ok(file) = fs::File::open(path) {
+        println!("{:?}", file);
+        return HttpResponse::Ok().json("Hello world!");
+    }else {
+        return HttpResponse::InternalServerError().json("Failed to open file");
+    };
+}
+
 pub async fn hello_world() -> impl Responder { 
     HttpResponse::Ok().body("Hello world!")
 }
