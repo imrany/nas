@@ -155,14 +155,14 @@ pub async fn get_ip_address()-> impl Responder {
         }else {
             let ip=Ip{
                 internal: internal_ip.to_string(),
-                external: "Failed to get external IP Address".to_string()
+                external: "No internet".to_string()
             };
             let json_response = serde_json::to_string(&ip).unwrap();
             return HttpResponse::Ok().json(json_response);
         };
     }else {
         let err_message=ErrorMessage{
-            message: "Failed to get local IP Address".to_string()
+            message: "Connect to a wifi or hotspot".to_string()
         };
         let json_response = serde_json::to_string(&err_message).unwrap();
         return HttpResponse::InternalServerError().json(json_response);
