@@ -116,7 +116,7 @@ async fn serve_zippy(){
     let server=HttpServer::new(move ||{
         let app_state = app_state.clone();
         let cors=Cors::default()
-            .allowed_origin("http://localhost:8080") // Specify the allowed origin or for all us /"*"/
+            .allowed_origin("*") // Specify the allowed origin or for all us /"*"/
             .allowed_methods(vec!["GET", "POST","PATCH","PUT"])
             .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT, http::header::CONTENT_TYPE])
             .max_age(3600); // Set the maximum age of the preflight request in seconds
