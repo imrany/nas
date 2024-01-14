@@ -169,7 +169,7 @@ pub fn Home() -> impl IntoView {
 
                     let path_str_copy=path_str.clone();
                     let open_file: Closure<dyn FnMut()> = Closure::new(move|| {
-                        web_sys::window().unwrap().alert_with_message(path_str_copy.as_str()).unwrap();
+                        web_sys::window().unwrap().location().set_href(path_str_copy.as_str()).unwrap();
                     });
 
                     let image=web_sys::window().unwrap().document().unwrap().get_element_by_id(&format!("img_{}",name_str)).unwrap();
