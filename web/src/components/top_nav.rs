@@ -61,7 +61,7 @@ pub fn Topnav()-> impl IntoView{
             <div class="font-semibold text-[13px] flex justify-between min-h-[48px] items-center text-white">
                 <div style="position:relative; display:inline-block;">
                     <button on:click=show_dropdown_menu class="flex justify-center items-center py-[4px] px-[12px] cursor-pointer h-[24px]">
-                        <p>Zippy</p>
+                        <p>Anvel</p>
                         <span class="material-symbols-outlined md-18 p-[3px]">expand_more</span>
                     </button>
                     <div id="dropdown_list" style="box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2);" class="font-normal z-10 py-[4px] dropdown-content none absolute bg-[#252525] min-w-[180px] rounded-[4px] text-white text-[13px]">

@@ -106,7 +106,7 @@ pub fn Home() -> impl IntoView {
             
                     let item=format!("
                         <button id='{name_str}' class='flex flex-col items-center justify-center text-[12px] max-w-[150px] hover:text-white active:text-white focus:text-white dropdown_btn'>
-                            <img src='/assets/icons/file.png' alt='file' class='w-[75px] h-[75px]'/>
+                            <img id='img_{name_str}' alt='file' class='w-[75px] h-[75px]'/>
                             <div>
                                 <p class='text-center'>{name_str}</p>
                             </div>
@@ -147,6 +147,7 @@ pub fn Home() -> impl IntoView {
                             </div>
                         </div>
                     "); 
+                
                     let item_element =web_sys::window().unwrap().document().unwrap().create_element("div").unwrap();
                     item_element.set_class_name("flex");
                     item_element.set_inner_html(&item);
@@ -165,9 +166,26 @@ pub fn Home() -> impl IntoView {
                         let context_list=web_sys::window().unwrap().document().unwrap().get_element_by_id(format!("context_more_share_{}",&name_str_copy).as_str()).unwrap();
                         context_list.class_list().toggle("block").unwrap();
                     });
+
+                    let path_str_copy=path_str.clone();
+                    let open_file: Closure<dyn FnMut()> = Closure::new(move|| {
+                        web_sys::window().unwrap().alert_with_message(path_str_copy.as_str()).unwrap();
+                    });
+
+                    let image=web_sys::window().unwrap().document().unwrap().get_element_by_id(&format!("img_{}",name_str)).unwrap();
+                    if is_file.clone().as_bool().unwrap() {
+                        image.set_attribute("src", "/assets/icons/file.png").unwrap();
+                        image.set_attribute("alt", "File").unwrap();
+                    } else {
+                        image.set_attribute("src", "/assets/icons/folder.png").unwrap();
+                        image.set_attribute("alt", "Folder").unwrap();    
+                    }
                     
-                    web_sys::window().unwrap().document().unwrap().get_element_by_id(&name_str.as_str()).unwrap().add_event_listener_with_callback("contextmenu", &show_context_menu.as_ref().unchecked_ref()).unwrap();
+                    let btn=web_sys::window().unwrap().document().unwrap().get_element_by_id(&name_str.as_str()).unwrap();
+                    btn.add_event_listener_with_callback("dblclick", &open_file.as_ref().unchecked_ref()).unwrap();
+                    btn.add_event_listener_with_callback("contextmenu", &show_context_menu.as_ref().unchecked_ref()).unwrap();
                     show_context_menu.forget();
+                    open_file.forget();
     
                     web_sys::window().unwrap().document().unwrap().get_element_by_id(&format!("context_share_{}",&name_str.as_str())).unwrap().add_event_listener_with_callback("click", &context_share.as_ref().unchecked_ref()).unwrap();
                     context_share.forget();
