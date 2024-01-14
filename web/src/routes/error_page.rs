@@ -24,7 +24,7 @@ pub fn Error_page()->impl IntoView{
         <Title text="Something went wrong"/>
         <div class="flex flex-col w-[100vw] p-[91px] z-9 text-white h-[100vh] justify-center bg-[#0E0E0E]">
             <div class="mb-[8px] pb-[46px]">
-                <a href="/" class="font-semibold text-[25px]">Zippy {window.origin()}</a>
+                <a href="/" class="font-semibold text-[25px]">Anvel {window.origin()}</a>
             </div>
             <div class="max-w-[528px] flex flex-col">
                 <div class="mb-[24px]">

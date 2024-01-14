@@ -8,7 +8,7 @@ use web_sys::{
  window,
  Request, 
  RequestInit, 
-//  RequestMode, 
+ RequestMode, 
  Response,
  Node,
  Event,
@@ -33,129 +33,149 @@ use functions::{
     open_dialog,
 };
 
+// struct DirectoryObject {
+//     name:String,
+//     path:std::path::PathBuf,
+//     metadata:FileMeta
+// }
+// struct FileMeta{
+//     is_file:bool,
+//     file_extension:Option<String>,
+// }
+
 // const ORANGE_ICON:&str =r#"
 //     color: orange
 // "#;
 
 
 
-async fn fetch_data() ->JsValue {
+async fn fetch_data() ->Result<JsValue, JsValue> {
     let window=window().expect("Failed to get Window");
     let mut opts = RequestInit::new();
     opts.method("GET");
-    // opts.mode(RequestMode::Cors);
-    let url=format!("/assets/json/data.json");
+    opts.mode(RequestMode::Cors);
+    let url=format!("http://localhost:8000/api/directory_content");
     let request = Request::new_with_str_and_init(&url, &opts).unwrap();
     request
         .headers()
         .set("content-type", "application/json").unwrap();
     let resp_value = JsFuture::from(window.fetch_with_request(&request)).await;
-    let resp: Response = resp_value.unwrap().into();
-
-    // Convert this other `Promise` into a rust `Future`.
-    let json = JsFuture::from(resp.json().unwrap()).await.unwrap();
-   // Send the JSON response back to JS.
-   json
+    if let Ok(resp) =  resp_value {
+        let resp:Response=resp.into();
+        // Convert this other `Promise` into a rust `Future`.
+        let json = JsFuture::from(resp.json().unwrap()).await.unwrap();
+        // Send the JSON response back to JS.
+        Ok(json)
+    }else {
+        Err(JsValue::from_str("Failed to fetch data"))
+    }
 }
 
 #[component]
 pub fn Home() -> impl IntoView {
     let window=window().expect("Failed to get Window");
-    let document=window.document().expect("Failed to get Document");
+    let _document=window.document().expect("Failed to get Document");
     let navigator=window.navigator();
     // window.alert_with_message(format!("Not online, {}",navigator.on_line()).as_str()).unwrap();
 
     let data=create_resource(|| (), |_| async move { 
-        let res=Array::from(&fetch_data().await);
-        // web_sys::console::log_1(&res.get(0).clone().into());
+        match fetch_data().await {
+            Ok(data) => {
+                // web_sys::console::log_1(&data.clone().into());
+                let dom_elem=web_sys::window().unwrap().document().unwrap().get_element_by_id("test").unwrap();
+                let object_content = js_sys::Reflect::get(&data, &JsValue::from_str("contents"))
+                .map_err(|_| JsValue::from_str("Failed to access contents property")).unwrap();
 
-        let dom_elem=web_sys::window().unwrap().document().unwrap().get_element_by_id("test").unwrap();
-        for i in res.clone() {  
-            let elem=&i;
-
-            let filename = js_sys::Reflect::get(&elem, &JsValue::from_str("filename"))
-            .map_err(|_| JsValue::from_str("Failed to access filename property")).unwrap();
-            let file_type = js_sys::Reflect::get(&elem, &JsValue::from_str("type"))
-            .map_err(|_| JsValue::from_str("Failed to access type property")).unwrap();
-            let size = js_sys::Reflect::get(&elem, &JsValue::from_str("size"))
-            .map_err(|_| JsValue::from_str("Failed to access size property")).unwrap();
-            let path = js_sys::Reflect::get(&elem, &JsValue::from_str("path"))
-            .map_err(|_| JsValue::from_str("Failed to access path property")).unwrap();
-
-
-            // Convert the filename to a Rust String
-            let filename_str = filename.as_string().unwrap_or_default();
-            let type_str = file_type.as_string().unwrap_or_default();
-            let size_str = size.as_string().unwrap_or_default();
-            let path_str = path.as_string().unwrap_or_default();
-
-            let item=format!("
-                <button id='{filename_str}' class='flex flex-col items-center justify-center text-[12px] max-w-[150px] hover:text-white active:text-white focus:text-white dropdown_btn'>
-                    <img src='/assets/icons/file.png' alt='file' class='w-[75px] h-[75px]'/>
-                    <div>
-                        <p class='text-center'>{filename_str}</p>
-                    </div>
-                </button>
-                <div id='context_list_{filename_str}' style='box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2);' class='font-normal ml-[80px] mt-[40px] z-5 py-[4px] dropdown-content absolute none bg-[#252525] min-w-[180px] rounded-[4px] text-white text-[13px]'>
-                    <div class='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
-                        <span class='material-symbols-outlined md-16 pr-[6px]'>open_in_new</span>
-                        <p>Open</p>
-                    </div>
-                    <div class='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
-                        <span class='material-symbols-outlined md-16 pr-[6px]'>open_with</span>
-                        <p>Open with media player</p>
-                    </div>
-                    <div>
-                        <button id='context_share_{filename_str}' class='btn_more pl-[12px] pr-[5px] py-[8px] w-full flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
-                            <span class='material-symbols-outlined md-16 pr-[6px]'>share</span>
-                            <p>Share</p>
-                            <span class='material-symbols-outlined md-16 ml-auto'>chevron_right</span>
+                let contents=Array::from(&object_content);
+                for content in contents {
+                    let name = js_sys::Reflect::get(&content, &JsValue::from_str("name"))
+                    .map_err(|_| JsValue::from_str("Failed to access name property")).unwrap();
+                    let path = js_sys::Reflect::get(&content, &JsValue::from_str("path"))
+                    .map_err(|_| JsValue::from_str("Failed to access path property")).unwrap();
+                    // metadata content
+                    let metadata = js_sys::Reflect::get(&content, &JsValue::from_str("metadata"))
+                    .map_err(|_| JsValue::from_str("Failed to access metadata property")).unwrap();
+                    let is_file = js_sys::Reflect::get(&metadata, &JsValue::from_str("is_file"))
+                    .map_err(|_| JsValue::from_str("Failed to access is_file property")).unwrap();
+                    let file_extension=js_sys::Reflect::get(&metadata, &JsValue::from_str("file_extension"))
+                    .map_err(|_| JsValue::from_str("Failed to access file_extension property")).unwrap();
+    
+                    // Convert the filename to a Rust String
+                    let name_str = name.as_string().unwrap_or_default();
+                    let path_str = path.as_string().unwrap_or_default();
+            
+                    let item=format!("
+                        <button id='{name_str}' class='flex flex-col items-center justify-center text-[12px] max-w-[150px] hover:text-white active:text-white focus:text-white dropdown_btn'>
+                            <img src='/assets/icons/file.png' alt='file' class='w-[75px] h-[75px]'/>
+                            <div>
+                                <p class='text-center'>{name_str}</p>
+                            </div>
                         </button>
-                        <div id='context_more_share_{filename_str}' style='box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2);' class='font-normal ml-[191px] -mt-[10px] z-5 py-[4px] context-more-share absolute none bg-[#252525] min-w-[180px] rounded-[4px] text-white text-[13px]'>
+                        <div id='context_list_{name_str}' style='box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2);' class='font-normal ml-[80px] mt-[40px] z-5 py-[4px] dropdown-content absolute none bg-[#252525] min-w-[180px] rounded-[4px] text-white text-[13px]'>
                             <div class='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
-                                <span class='material-symbols-outlined md-16 pr-[6px]'>bluetooth</span>
-                                <p>Bluetooth</p>
+                                <span class='material-symbols-outlined md-16 pr-[6px]'>open_in_new</span>
+                                <p>Open</p>
+                            </div>
+                            <div class='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
+                                <span class='material-symbols-outlined md-16 pr-[6px]'>open_with</span>
+                                <p>Open with media player</p>
+                            </div>
+                            <div>
+                                <button id='context_share_{name_str}' class='btn_more pl-[12px] pr-[5px] py-[8px] w-full flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
+                                    <span class='material-symbols-outlined md-16 pr-[6px]'>share</span>
+                                    <p>Share</p>
+                                    <span class='material-symbols-outlined md-16 ml-auto'>chevron_right</span>
+                                </button>
+                                <div id='context_more_share_{name_str}' style='box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2);' class='font-normal ml-[191px] -mt-[10px] z-5 py-[4px] context-more-share absolute none bg-[#252525] min-w-[180px] rounded-[4px] text-white text-[13px]'>
+                                    <div class='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
+                                        <span class='material-symbols-outlined md-16 pr-[6px]'>bluetooth</span>
+                                        <p>Bluetooth</p>
+                                    </div>
+                                    <div class='px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
+                                        <span class='material-symbols-outlined md-16 pr-[6px]'>rss_feed</span>
+                                        <p>Send to</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
+                                <span class='material-symbols-outlined md-16 pr-[6px]'>edit</span>
+                                <p>Rename</p>
                             </div>
                             <div class='px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
-                                <span class='material-symbols-outlined md-16 pr-[6px]'>rss_feed</span>
-                                <p>Send to</p>
+                                <span class='material-symbols-outlined md-16 pr-[6px]'>delete</span>
+                                <p>Delete</p>
                             </div>
                         </div>
-                    </div>
-                    <div class='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
-                        <span class='material-symbols-outlined md-16 pr-[6px]'>edit</span>
-                        <p>Rename</p>
-                    </div>
-                    <div class='px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
-                        <span class='material-symbols-outlined md-16 pr-[6px]'>delete</span>
-                        <p>Delete</p>
-                    </div>
-                </div>
-            "); 
-            let item_element =web_sys::window().unwrap().document().unwrap().create_element("div").unwrap();
-            item_element.set_class_name("flex");
-            item_element.set_inner_html(&item);
-
-            dom_elem.append_child(&Node::from(item_element)).unwrap();
-            let filename_str_copy=filename_str.clone();
-            let show_context_menu: Closure<dyn FnMut(_)> = Closure::new(move|e:Event| {
-                e.prevent_default();
-                let context_list=web_sys::window().unwrap().document().unwrap().get_element_by_id(&format!("context_list_{}",filename_str_copy.as_str())).unwrap();
-                context_list.class_list().toggle("block").unwrap();
-            });
-
-            let filename_str_copy=filename_str.clone();
-            let context_share: Closure<dyn FnMut(_)> = Closure::new(move|e:Event| {
-                e.prevent_default();
-                let context_list=web_sys::window().unwrap().document().unwrap().get_element_by_id(format!("context_more_share_{}",&filename_str_copy).as_str()).unwrap();
-                context_list.class_list().toggle("block").unwrap();
-            });
-            
-            web_sys::window().unwrap().document().unwrap().get_element_by_id(&filename_str.as_str()).unwrap().add_event_listener_with_callback("contextmenu", &show_context_menu.as_ref().unchecked_ref()).unwrap();
-            show_context_menu.forget();
-
-            web_sys::window().unwrap().document().unwrap().get_element_by_id(&format!("context_share_{}",&filename_str.as_str())).unwrap().add_event_listener_with_callback("click", &context_share.as_ref().unchecked_ref()).unwrap();
-            context_share.forget();
+                    "); 
+                    let item_element =web_sys::window().unwrap().document().unwrap().create_element("div").unwrap();
+                    item_element.set_class_name("flex");
+                    item_element.set_inner_html(&item);
+    
+                    dom_elem.append_child(&Node::from(item_element)).unwrap();
+                    let name_str_copy=name_str.clone();
+                    let show_context_menu: Closure<dyn FnMut(_)> = Closure::new(move|e:Event| {
+                        e.prevent_default();
+                        let context_list=web_sys::window().unwrap().document().unwrap().get_element_by_id(&format!("context_list_{}",name_str_copy.as_str())).unwrap();
+                        context_list.class_list().toggle("block").unwrap();
+                    });
+    
+                    let name_str_copy=name_str.clone();
+                    let context_share: Closure<dyn FnMut(_)> = Closure::new(move|e:Event| {
+                        e.prevent_default();
+                        let context_list=web_sys::window().unwrap().document().unwrap().get_element_by_id(format!("context_more_share_{}",&name_str_copy).as_str()).unwrap();
+                        context_list.class_list().toggle("block").unwrap();
+                    });
+                    
+                    web_sys::window().unwrap().document().unwrap().get_element_by_id(&name_str.as_str()).unwrap().add_event_listener_with_callback("contextmenu", &show_context_menu.as_ref().unchecked_ref()).unwrap();
+                    show_context_menu.forget();
+    
+                    web_sys::window().unwrap().document().unwrap().get_element_by_id(&format!("context_share_{}",&name_str.as_str())).unwrap().add_event_listener_with_callback("click", &context_share.as_ref().unchecked_ref()).unwrap();
+                    context_share.forget();
+                }
+            }
+            Err(e) => { 
+                web_sys::console::error_1(&e.into());
+            }
         }
      });
 

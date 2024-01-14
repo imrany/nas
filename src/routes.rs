@@ -21,7 +21,6 @@ use reqwest;
 
 #[derive(Serialize)]
 struct DirectoryObject {
-    id: u32,
     name:String,
     path:path::PathBuf,
     metadata:FileMeta
@@ -75,7 +74,6 @@ pub async fn directory_content(state: web::Data<AppState>)-> HttpResponse{
                             },
                         };
                         let directory_object=DirectoryObject {
-                            id:2,
                             name:file_name.to_owned(),
                             path:directory_path.join(file_name.to_owned()),
                             metadata
@@ -87,16 +85,20 @@ pub async fn directory_content(state: web::Data<AppState>)-> HttpResponse{
             contents
         }
         Err(_) => {
-            return HttpResponse::InternalServerError().body("Failed to read directory");
+            let err_message=ErrorMessage{
+                message:"Failed to read directory".to_string()
+            };
+            return HttpResponse::InternalServerError().json(err_message);
         }
     };
 
      // Create a response containing the directory content as JSON
     let directory_content = DirectoryContent { contents };
-    match serde_json::to_string(&directory_content) {
-        Ok(json_string) => HttpResponse::Ok().json(json_string),
-        Err(_) => HttpResponse::InternalServerError().body("Failed to serialize to JSON"),
-    }
+    HttpResponse::Ok().json(&directory_content)
+//     match serde_json::to_string(&directory_content) {
+//         Ok(json_string) => HttpResponse::Ok().json(json_string),
+//         Err(_) => HttpResponse::InternalServerError().json("Failed to serialize to JSON"),
+//     }
 }
 
 #[get("/{filename:.*}")]

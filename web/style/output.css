@@ -698,6 +698,10 @@ video {
   display: grid;
 }
 
+.contents{
+  display: contents;
+}
+
 .h-\[100vh\]{
   height: 100vh;
 }
