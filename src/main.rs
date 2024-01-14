@@ -5,6 +5,7 @@ use clap::{
 use rand::{thread_rng, Rng};
 use actix_web::{
     HttpServer,
+    http,
     App,
     dev::{
         ServiceRequest, 
@@ -17,6 +18,7 @@ use actix_files::{
     Files,
     NamedFile
 };
+use actix_cors::Cors;
 use std::{
     env::{
         current_exe
@@ -113,7 +115,14 @@ async fn serve_zippy(){
     let ipv4: (Ipv4Addr, u16)=("0.0.0.0".parse().unwrap(),port);
     let server=HttpServer::new(move ||{
         let app_state = app_state.clone();
+        let cors=Cors::default()
+            .allowed_origin("http://localhost:8080") // Specify the allowed origin or for all us /"*"/
+            .allowed_methods(vec!["GET", "POST","PATCH","PUT"])
+            .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT, http::header::CONTENT_TYPE])
+            .max_age(3600); // Set the maximum age of the preflight request in seconds
+
         App::new()
+            .wrap(cors)
             .app_data(app_state.clone()) 
             .service(
                 web::scope("/api")
