@@ -84,45 +84,47 @@ pub fn Home() -> impl IntoView {
                                 <p class='text-center'>{name_str}</p>
                             </div>
                         </button>
-                        <div id='context_list_{name_str}' style='box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2);' class='font-normal ml-[80px] mt-[40px] z-5 py-[4px] dropdown-content absolute none bg-[#252525] min-w-[180px] rounded-[4px] text-white text-[13px]'>
-                            <div class='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
-                                <span class='material-symbols-outlined md-16 pr-[6px]'>open_in_new</span>
-                                <p>Open</p>
-                            </div>
-                            <div class='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
-                                <span class='material-symbols-outlined md-16 pr-[6px]'>open_with</span>
-                                <p>Open with media player</p>
-                            </div>
-                            <div>
-                                <button id='context_share_{name_str}' class='btn_more pl-[12px] pr-[5px] py-[8px] w-full flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
-                                    <span class='material-symbols-outlined md-16 pr-[6px]'>share</span>
-                                    <p>Share</p>
-                                    <span class='material-symbols-outlined md-16 ml-auto'>chevron_right</span>
-                                </button>
-                                <div id='context_more_share_{name_str}' style='box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2);' class='font-normal ml-[191px] -mt-[10px] z-5 py-[4px] context-more-share absolute none bg-[#252525] min-w-[180px] rounded-[4px] text-white text-[13px]'>
-                                    <div class='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
-                                        <span class='material-symbols-outlined md-16 pr-[6px]'>bluetooth</span>
-                                        <p>Bluetooth</p>
-                                    </div>
-                                    <div class='px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
-                                        <span class='material-symbols-outlined md-16 pr-[6px]'>rss_feed</span>
-                                        <p>Send to</p>
+                        <div id='context_list_{name_str}' class='flex z-5 absolute flex-wrap dropdown-content none w-[200px] -ml-[5px] max-lg:-ml-[27px]'>
+                            <div style='box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2);' class='font-normal mt-[40px]  py-[4px] absolute bg-[#252525] min-w-[180px] rounded-[4px] text-white text-[13px]'>
+                                <div class='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
+                                    <span class='material-symbols-outlined md-16 pr-[6px]'>open_in_new</span>
+                                    <p>Open</p>
+                                </div>
+                                <div class='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
+                                    <span class='material-symbols-outlined md-16 pr-[6px]'>open_with</span>
+                                    <p>Open with media player</p>
+                                </div>
+                                <div>
+                                    <button id='context_share_{name_str}' class='btn_more pl-[12px] pr-[5px] py-[8px] w-full flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
+                                        <span class='material-symbols-outlined md-16 pr-[6px]'>share</span>
+                                        <p>Share</p>
+                                        <span class='material-symbols-outlined md-16 ml-auto'>chevron_right</span>
+                                    </button>
+                                    <div id='context_more_share_{name_str}' style='box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2);' class='font-normal ml-[191px] -mt-[10px] z-5 py-[4px] context-more-share absolute none bg-[#252525] min-w-[180px] rounded-[4px] text-white text-[13px]'>
+                                        <div class='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
+                                            <span class='material-symbols-outlined md-16 pr-[6px]'>bluetooth</span>
+                                            <p>Bluetooth</p>
+                                        </div>
+                                        <div class='px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
+                                            <span class='material-symbols-outlined md-16 pr-[6px]'>rss_feed</span>
+                                            <p>Send to</p>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
-                                <span class='material-symbols-outlined md-16 pr-[6px]'>edit</span>
-                                <p>Rename</p>
-                            </div>
-                            <div class='px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
-                                <span class='material-symbols-outlined md-16 pr-[6px]'>delete</span>
-                                <p>Delete</p>
+                                <div class='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
+                                    <span class='material-symbols-outlined md-16 pr-[6px]'>edit</span>
+                                    <p>Rename</p>
+                                </div>
+                                <div class='px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
+                                    <span class='material-symbols-outlined md-16 pr-[6px]'>delete</span>
+                                    <p>Delete</p>
+                                </div>
                             </div>
                         </div>
                     "); 
                 
                     let item_element =web_sys::window().unwrap().document().unwrap().create_element("div").unwrap();
-                    item_element.set_class_name("flex");
+                    item_element.set_class_name("flex flex-wrap");
                     item_element.set_inner_html(&item);
     
                     dom_elem.append_child(&Node::from(item_element)).unwrap();
@@ -188,7 +190,7 @@ pub fn Home() -> impl IntoView {
             <div class="flex">
                 <Sidenav/>
 
-                <div class="mt-[48px] mb-[22px] text-[#999999]">
+                <div class="mt-[48px] flex-grow mb-[22px] text-[#999999]">
                     // folder view
                     <div id="folder_view">
                         // folder view nav

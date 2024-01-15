@@ -44,6 +44,8 @@ pub fn Sidenav()->impl IntoView{
                     let path_str = path.as_string().unwrap_or_default();
             
                     let item=format!("
+                        <div id='folders'></div>
+                        <div id='files'></div>
                         <details class='flex flex-col' id='folder_{name_str}'>
                             <summary class='text-[#e5e5e5] mx-[1px] px-3 text-[11px] uppercase py-1 cursor-pointer hover:text-white active:text-white focus:text-white focus:ring-1 focus:ring-violet-300'>{name_str}</summary>
                             <details>
@@ -92,7 +94,9 @@ pub fn Sidenav()->impl IntoView{
                 <div class="h-[33px] flex items-center text-[#999999] uppercase pl-[12px] pr-[8px]">
                     <button class="material-symbols-outlined md-18 focus:ring-1 focus:ring-violet-300 rounded-sm hover:bg-[#3c3c3c]/35 active:text-[#e5e5e5] cursor-pointer hover:text-[#e5e5e5] focus:text-[#e5e5e5]  p-[4px]">draft</button>
                     <button class="material-symbols-outlined md-18 focus:ring-1 focus:ring-violet-300 rounded-sm hover:bg-[#3c3c3c]/35 active:text-[#e5e5e5] cursor-pointer hover:text-[#e5e5e5] focus:text-[#e5e5e5]  p-[4px]">search</button>
-                    <button class="material-symbols-outlined md-18 focus:ring-1 focus:ring-violet-300 rounded-sm hover:bg-[#3c3c3c]/35 active:text-[#e5e5e5] cursor-pointer hover:text-[#e5e5e5] focus:text-[#e5e5e5]  p-[4px]">refresh</button>
+                    <button on:click=move|_|{
+                        web_sys::window().unwrap().location().reload().unwrap();
+                    } class="material-symbols-outlined md-18 focus:ring-1 focus:ring-violet-300 rounded-sm hover:bg-[#3c3c3c]/35 active:text-[#e5e5e5] cursor-pointer hover:text-[#e5e5e5] focus:text-[#e5e5e5]  p-[4px]">refresh</button>
                 </div>
                 //folders
                 <div id="folders" class="pb-[12px]">

@@ -56,6 +56,10 @@ pub fn Topnav()-> impl IntoView{
         let dropdown_list=document_ref_1.get_element_by_id("dropdown_list").unwrap();
         dropdown_list.class_list().toggle("block").unwrap();
     };
+    let context_version=move|_| {
+        let context_list=web_sys::window().unwrap().document().unwrap().get_element_by_id(format!("context_more_version").as_str()).unwrap();
+        context_list.class_list().toggle("block").unwrap();
+    };
     view!{
         <nav class="fixed bg-[#151515] px-[12px] top-0 left-0 right-0 z-10">
             <div class="font-semibold text-[13px] flex justify-between min-h-[48px] items-center text-white">
@@ -73,13 +77,18 @@ pub fn Topnav()-> impl IntoView{
                             <span class="material-symbols-outlined md-16 pr-[6px]">edit</span>
                             <p>Customize</p>
                         </div>
-                        <div class="px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
-                            <span class="material-symbols-outlined md-16 pr-[6px]">dns</span>
-                            <p>Version 0.1.0</p>
-                        </div>
-                        <div class="px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
-                            <span class="material-symbols-outlined md-16 pr-[6px]">upgrade</span>
-                            <p>Update</p>
+                        <div>
+                            <button on:click=context_version class="btn_more pl-[12px] pr-[5px] py-[8px] w-full flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
+                                <span class="material-symbols-outlined md-16 pr-[6px]">dns</span>
+                                <p>Version 0.1.0</p>
+                                <span class="material-symbols-outlined md-16 ml-auto">chevron_right</span>
+                            </button>
+                            <div id="context_more_version" style="box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2);" class="font-normal ml-[181px] -mt-[10px] z-5 py-[4px] context-more-share absolute none bg-[#252525] min-w-[180px] rounded-[4px] text-white text-[13px]">
+                                <div class="px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
+                                    <span class="material-symbols-outlined md-16 pr-[6px]">upgrade</span>
+                                    <p>Update</p>
+                                </div>
+                            </div>
                         </div>
                         <div class="px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
                             <span class="material-symbols-outlined md-16 pr-[6px]">login</span>
