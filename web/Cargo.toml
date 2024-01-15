@@ -2,8 +2,8 @@
 name = "anvel"
 version = "0.1.0"
 edition = "2021"
-description = "A networking software."
-license = "MIT/Apache-2.0"
+description = "Anvel is a productivity software that connects you to people in your network and enable file sharing and collaboration."
+license = "MIT"
 authors = [
     "imrany <imranmat254@gmail.com>",
 ]

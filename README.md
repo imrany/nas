@@ -1,4 +1,4 @@
-__Anvel__ is an opensource, cross-platform http server for static files.
+__Anvel__ is a productivity software that connects you to people in your network and enable file sharing and collaboration.
 
 ## Looking for latest release of a version branch?
 

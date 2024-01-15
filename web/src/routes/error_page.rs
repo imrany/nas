@@ -23,8 +23,11 @@ pub fn Error_page()->impl IntoView{
     view! {
         <Title text="Something went wrong"/>
         <div class="flex flex-col w-[100vw] p-[91px] z-9 text-white h-[100vh] justify-center bg-[#0E0E0E]">
-            <div class="mb-[8px] pb-[46px]">
-                <a href="/" class="font-semibold text-[25px]">Anvel {window.origin()}</a>
+            <div class="mb-[8px] pb-[18px]">
+                <a href="/" class="flex items-center font-semibold text-[25px]">
+                    <img src="/assets/icons/favicon.svg" style="width:25px; height:25px;"/>
+                    <span class="ml-1">Anvel</span>
+                </a>
             </div>
             <div class="max-w-[528px] flex flex-col">
                 <div class="mb-[24px]">
@@ -46,7 +49,7 @@ pub fn Error_page()->impl IntoView{
                         <div class="mt-[16px] grid grid-rows-2 gap-3">
                             <code class="grid grid-cols-2 gap-6">
                                 <span>"Version"</span> 
-                                <span>"1.0.2"</span>
+                                <span>"0.1.0"</span>
                             </code>
                             <code class="grid grid-cols-2 gap-6">
                                 <span>"Environment"</span>      

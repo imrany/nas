@@ -75,7 +75,11 @@ pub fn Topnav()-> impl IntoView{
                         </div>
                         <div class="px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
                             <span class="material-symbols-outlined md-16 pr-[6px]">dns</span>
-                            <p>Version 1.0.2</p>
+                            <p>Version 0.1.0</p>
+                        </div>
+                        <div class="px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
+                            <span class="material-symbols-outlined md-16 pr-[6px]">upgrade</span>
+                            <p>Update</p>
                         </div>
                         <div class="px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
                             <span class="material-symbols-outlined md-16 pr-[6px]">login</span>

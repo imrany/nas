@@ -6,14 +6,9 @@ use js_sys::{
 };
 use web_sys::{
  window,
- Request, 
- RequestInit, 
- RequestMode, 
- Response,
  Node,
  Event,
 };
-use wasm_bindgen_futures::JsFuture;
 
 #[path="../components/top_nav.rs"]
 mod top_nav;
@@ -31,6 +26,7 @@ use bottom_nav::Bottomnav;
 mod functions;
 use functions::{
     open_dialog,
+    fetch_data,
 };
 
 // struct DirectoryObject {
@@ -48,29 +44,6 @@ use functions::{
 // "#;
 
 
-
-async fn fetch_data() ->Result<JsValue, JsValue> {
-    let window=window().expect("Failed to get Window");
-    let mut opts = RequestInit::new();
-    opts.method("GET");
-    opts.mode(RequestMode::Cors);
-    let url=format!("http://localhost:8000/api/directory_content");
-    let request = Request::new_with_str_and_init(&url, &opts).unwrap();
-    request
-        .headers()
-        .set("content-type", "application/json").unwrap();
-    let resp_value = JsFuture::from(window.fetch_with_request(&request)).await;
-    if let Ok(resp) =  resp_value {
-        let resp:Response=resp.into();
-        // Convert this other `Promise` into a rust `Future`.
-        let json = JsFuture::from(resp.json().unwrap()).await.unwrap();
-        // Send the JSON response back to JS.
-        Ok(json)
-    }else {
-        Err(JsValue::from_str("Failed to fetch data"))
-    }
-}
-
 #[component]
 pub fn Home() -> impl IntoView {
     let window=window().expect("Failed to get Window");
@@ -79,7 +52,7 @@ pub fn Home() -> impl IntoView {
     // window.alert_with_message(format!("Not online, {}",navigator.on_line()).as_str()).unwrap();
 
     let data=create_resource(|| (), |_| async move { 
-        match fetch_data().await {
+        match fetch_data("http://localhost:8000/api/directory_content").await {
             Ok(data) => {
                 // web_sys::console::log_1(&data.clone().into());
                 let dom_elem=web_sys::window().unwrap().document().unwrap().get_element_by_id("test").unwrap();
@@ -195,7 +168,7 @@ pub fn Home() -> impl IntoView {
                 web_sys::console::error_1(&e.into());
             }
         }
-     });
+    });
 
     if !navigator.on_line() {
         let closure: Closure<dyn FnMut()> = Closure::new(move|| {
@@ -212,49 +185,51 @@ pub fn Home() -> impl IntoView {
         <Title text="Welcome"/>
         <div class="min-h-[100vh] bg-[#1d1d1d]">
             <Topnav/>
-            <Sidenav/>
+            <div class="flex">
+                <Sidenav/>
 
-            <div class="ml-[200px] mt-[48px] mb-[22px] text-[#999999]">
-                // folder view
-                <div id="folder_view">
-                    // folder view nav
-                    <div id="folder_view_nav">
-                        <div class="flex w-full h-[35px] bg-[#151515]">
-                            <div class="bg-[#1d1d1d] hover:bg-[#3c3c3c]/55 cursor-pointer pl-[10px] pr-[3px] min-w-[106px] h-[35px] flex items-center">
-                                <span class="material-symbols-outlined md-16 w-[16px] mr-[5px]">folder_open</span>
-                                <p class="text-[#E5E5E5] text-[13px]">Downloads</p>
-                                <span class="material-symbols-outlined md-16 w-[22px] ml-[3px] p-[3px] hover:bg-gray-500 rounded-sm hover:text-white">close</span>
+                <div class="mt-[48px] mb-[22px] text-[#999999]">
+                    // folder view
+                    <div id="folder_view">
+                        // folder view nav
+                        <div id="folder_view_nav">
+                            <div class="flex w-full h-[35px] bg-[#151515]">
+                                <div class="bg-[#1d1d1d] hover:bg-[#3c3c3c]/55 cursor-pointer pl-[10px] pr-[3px] min-w-[106px] h-[35px] flex items-center">
+                                    <span class="material-symbols-outlined md-16 w-[16px] mr-[5px]">folder_open</span>
+                                    <p class="text-[#E5E5E5] text-[13px]">Downloads</p>
+                                    <span class="material-symbols-outlined md-16 w-[22px] ml-[3px] p-[3px] hover:bg-gray-500 rounded-sm hover:text-white">close</span>
+                                </div>
+
+                                <div class="active:bg-[#1d1d1d] hover:bg-[#3c3c3c]/55 cursor-pointer pl-[10px] pr-[3px] min-w-[106px] h-[35px] flex items-center">
+                                    <span class="material-symbols-outlined md-16 w-[16px] mr-[5px]">folder</span>
+                                    <p class="text-[#E5E5E5] text-[13px]">telegram-desktop</p>
+                                    <span class="material-symbols-outlined md-16 w-[22px] p-[3px] ml-[3px] hover:bg-gray-500 rounded-sm hover:text-white">close</span>
+                                </div>
                             </div>
 
-                            <div class="active:bg-[#1d1d1d] hover:bg-[#3c3c3c]/55 cursor-pointer pl-[10px] pr-[3px] min-w-[106px] h-[35px] flex items-center">
-                                <span class="material-symbols-outlined md-16 w-[16px] mr-[5px]">folder</span>
-                                <p class="text-[#E5E5E5] text-[13px]">telegram-desktop</p>
-                                <span class="material-symbols-outlined md-16 w-[22px] p-[3px] ml-[3px] hover:bg-gray-500 rounded-sm hover:text-white">close</span>
+                            <div class="w-full flex items-center h-[22px] text-[13px] text-[#999999] px-[16px]">
+                                <p>src</p>
+                                <span class="material-symbols-outlined md-16 w-[22px] p-[3px] hover:bg-gray-500 rounded-sm hover:text-white">chevron_right</span>
+                                <p>telegram-desktop</p>
                             </div>
                         </div>
 
-                        <div class="w-full flex items-center h-[22px] text-[13px] text-[#999999] px-[16px]">
-                            <p>src</p>
-                            <span class="material-symbols-outlined md-16 w-[22px] p-[3px] hover:bg-gray-500 rounded-sm hover:text-white">chevron_right</span>
-                            <p>telegram-desktop</p>
+                        {move || match data.get() {
+                            None => view! { <p>"Loading..."</p> }.into_view(),
+                            Some(_) =>view! { 
+                            }.into_view()
+                        }}
+                        
+                        //folder view body 
+                        <div class="w-full flex flex-wrap" id="folder_view_body">
+                            <div id="test" class="flex grid max-sm:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 w-full gap-4 px-[25px] py-[10px]">
+                            </div>
                         </div>
                     </div>
 
-                    {move || match data.get() {
-                        None => view! { <p>"Loading..."</p> }.into_view(),
-                        Some(_) =>view! { 
-                        }.into_view()
-                    }}
-                    
-                    //folder view body 
-                    <div class="w-full flex flex-wrap" id="folder_view_body">
-                        <div id="test" class="flex grid max-sm:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 w-full gap-4 px-[25px] py-[10px]">
-                        </div>
-                    </div>
+                    // share tab
+                    <div id="share_tab"></div>
                 </div>
-
-                // share tab
-                <div id="share_tab"></div>
             </div>
 
             <Bottomnav/>

@@ -31,7 +31,7 @@ pub fn App() -> impl IntoView {
                 <Stylesheet id="leptos" href="/pkg/tailwind.css"/>
                 <Link rel="shortcut icon" type_="image/ico" href="/favicon.ico"/>
                 <Meta charset="utf-8"/>
-                <Meta name="description" content="Anvel is an opensource, cross-platform http server."/>
+                <Meta name="description" content="Anvel is a productivity software that connects you to people in your network and enable file sharing and collaboration."/>
             </main>
             <Router>
                 <Routes>
