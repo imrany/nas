@@ -17,7 +17,7 @@ use functions::{
 
 #[component]
 pub fn Sidenav()->impl IntoView{
-    let data=create_resource(|| (), |_| async move { 
+    create_resource(|| (), |_| async move { 
         match fetch_data("http://localhost:8000/api/directory_content").await {
             Ok(data) => {
                 // web_sys::console::log_1(&data.clone().into());
@@ -44,40 +44,26 @@ pub fn Sidenav()->impl IntoView{
                     let path_str = path.as_string().unwrap_or_default();
             
                     let item=format!("
-                        <div id='folders'></div>
-                        <div id='files'></div>
-                        <details class='flex flex-col' id='folder_{name_str}'>
-                            <summary class='text-[#e5e5e5] mx-[1px] px-3 text-[11px] uppercase py-1 cursor-pointer hover:text-white active:text-white focus:text-white focus:ring-1 focus:ring-violet-300'>{name_str}</summary>
-                            <details>
-                                <summary class='hover:bg-[#3c3c3c]/35 pl-6 pr-3 mx-[1px] cursor-pointer text-[#999999] active:bg-[#37373D] hover:text-white active:text-white focus:text-white focus:bg-[#37373D] focus:ring-1 focus:ring-violet-300'>Music</summary>
-                                <div class='mt-[1px] flex flex-col text-[13px] text-[#999999]'>
-                                    <p class='hover:bg-[#3c3c3c]/35 pl-[32px] pr-[2px] mx-[1px] cursor-pointer active:bg-[#37373D] hover:text-white active:text-white focus:text-white focus:bg-[#37373D] focus:ring-1 focus:ring-violet-300'>Don Toliver</p>
-                                    <p class='hover:bg-[#3c3c3c]/35 pl-[32px] pr-[2px] mx-[1px] cursor-pointer active:bg-[#37373D] hover:text-white active:text-white focus:text-white focus:bg-[#37373D] focus:ring-1 focus:ring-violet-300'>New playlist</p>
-                                </div>
-                            </details>
-                        </details>
+                        <a href='/' id='folders_{name_str}' class='flex items-center mx-[1px] px-3 py-1 cursor-pointer hover:text-white active:text-white focus:text-white focus:ring-1 focus:ring-violet-300'>
+                            <span class='material-symbols-outlined md-16 pr-[3px]'>folder</span>
+                            <p class='text-[#e5e5e5 text-[11px] uppercase'>{name_str}</p>
+                        </a>
                     "); 
+                    // <img src='/assets/icons/folder.png' alt='folder' class='w-[23px] h-[22px] pr-[5px]'/> 
                  
                     let item_element =web_sys::window().unwrap().document().unwrap().create_element("div").unwrap();
-                    // item_element.set_class_name("flex");
-                    item_element.set_inner_html(&item);
-                    dom_elem.append_child(&Node::from(item_element)).unwrap();
     
                     let path_str_copy=path_str.clone();
                     let open_file: Closure<dyn FnMut()> = Closure::new(move|| {
                         web_sys::window().unwrap().location().set_href(path_str_copy.as_str()).unwrap();
                     });
 
-                    let image=web_sys::window().unwrap().document().unwrap().get_element_by_id(&format!("img_{}",name_str)).unwrap();
-                    if is_file.clone().as_bool().unwrap() {
-                        image.set_attribute("src", "/assets/icons/file.png").unwrap();
-                        image.set_attribute("alt", "File").unwrap();
-                    } else {
-                        image.set_attribute("src", "/assets/icons/folder.png").unwrap();
-                        image.set_attribute("alt", "Folder").unwrap();    
+                    if !is_file.clone().as_bool().unwrap() {
+                        item_element.set_inner_html(&item);
+                        dom_elem.append_child(&Node::from(item_element)).unwrap();
                     }
                     
-                    let btn=web_sys::window().unwrap().document().unwrap().get_element_by_id(&name_str.as_str()).unwrap();
+                    let btn=web_sys::window().unwrap().document().unwrap().get_element_by_id(&format!("folders_{name_str}").as_str()).unwrap();
                     btn.add_event_listener_with_callback("dblclick", &open_file.as_ref().unchecked_ref()).unwrap();
                     open_file.forget();
                 }
@@ -104,11 +90,6 @@ pub fn Sidenav()->impl IntoView{
                         <p class="pl-[12px]">EXPLORER</p>
                         <span class="material-symbols-outlined md-16 text-[#999999] w-[30px] ml-auto h-[25px] active:text-[#e5e5e5] cursor-pointer hover:text-[#e5e5e5] focus:text-[#e5e5e5]  p-[4px]">more_horiz</span>
                     </div>
-                    {move || match data.get() {
-                        None => view! { <p>"Loading..."</p> }.into_view(),
-                        Some(_) =>view! { 
-                        }.into_view()
-                    }}
                 </div>
                 //search
                 <div id="search"></div>
