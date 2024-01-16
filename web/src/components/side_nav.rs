@@ -5,6 +5,7 @@ use js_sys::{
 };
 use web_sys::{
  Node,
+ window,
 };
 
 #[path="../lib/functions.rs"]
@@ -15,62 +16,72 @@ use functions::{
 
 #[component]
 pub fn Sidenav()->impl IntoView{
-    create_resource(|| (), |_| async move { 
-        match fetch_data("http://localhost:8000/api/directory_content").await {
-            Ok(data) => {
-                // web_sys::console::log_1(&data.clone().into());
-                let dom_elem=web_sys::window().unwrap().document().unwrap().get_element_by_id("folders").unwrap();
-                let object_content = js_sys::Reflect::get(&data, &JsValue::from_str("contents"))
-                .map_err(|_| JsValue::from_str("Failed to access contents property")).unwrap();
-
-                let contents=Array::from(&object_content);
-                for content in contents {
-                    let name = js_sys::Reflect::get(&content, &JsValue::from_str("name"))
-                    .map_err(|_| JsValue::from_str("Failed to access name property")).unwrap();
-                    let path = js_sys::Reflect::get(&content, &JsValue::from_str("path"))
-                    .map_err(|_| JsValue::from_str("Failed to access path property")).unwrap();
-                    // metadata content
-                    let metadata = js_sys::Reflect::get(&content, &JsValue::from_str("metadata"))
-                    .map_err(|_| JsValue::from_str("Failed to access metadata property")).unwrap();
-                    let is_file = js_sys::Reflect::get(&metadata, &JsValue::from_str("is_file"))
-                    .map_err(|_| JsValue::from_str("Failed to access is_file property")).unwrap();
-                    let file_extension=js_sys::Reflect::get(&metadata, &JsValue::from_str("file_extension"))
-                    .map_err(|_| JsValue::from_str("Failed to access file_extension property")).unwrap();
+    let window=window().unwrap();
+    let closure: Closure<dyn FnMut()> = Closure::new(move|| {
+        create_resource(|| (), |_| async move { 
+            match fetch_data("http://localhost:8000/api/directory_content").await {
+                Ok(data) => {
+                    // web_sys::console::log_1(&data.clone().into());
+                    let dom_elem=web_sys::window().unwrap().document().unwrap().get_element_by_id("folders").unwrap();
+                    let object_content = js_sys::Reflect::get(&data, &JsValue::from_str("contents"))
+                    .map_err(|_| JsValue::from_str("Failed to access contents property")).unwrap();
     
-                    // Convert the filename to a Rust String
-                    let name_str = name.as_string().unwrap_or_default();
-                    let path_str = path.as_string().unwrap_or_default();
-            
-                    let item=format!("
-                        <a href='/' id='folders_{name_str}' class='flex items-center mx-[1px] px-3 py-1 cursor-pointer hover:text-white active:text-white focus:text-white focus:ring-1 focus:ring-violet-300'>
-                            <span class='material-symbols-outlined md-16 pr-[3px]'>folder</span>
-                            <p class='text-[#e5e5e5 text-[11px] uppercase'>{name_str}</p>
-                        </a>
-                    "); 
-                    // <img src='/assets/icons/folder.png' alt='folder' class='w-[23px] h-[22px] pr-[5px]'/> 
-                 
-                    let item_element =web_sys::window().unwrap().document().unwrap().create_element("div").unwrap();
+                    let contents=Array::from(&object_content);
+                    for content in contents {
+                        let name = js_sys::Reflect::get(&content, &JsValue::from_str("name"))
+                        .map_err(|_| JsValue::from_str("Failed to access name property")).unwrap();
+                        let path = js_sys::Reflect::get(&content, &JsValue::from_str("path"))
+                        .map_err(|_| JsValue::from_str("Failed to access path property")).unwrap();
+                        // metadata content
+                        let metadata = js_sys::Reflect::get(&content, &JsValue::from_str("metadata"))
+                        .map_err(|_| JsValue::from_str("Failed to access metadata property")).unwrap();
+                        let is_file = js_sys::Reflect::get(&metadata, &JsValue::from_str("is_file"))
+                        .map_err(|_| JsValue::from_str("Failed to access is_file property")).unwrap();
+                        let file_extension=js_sys::Reflect::get(&metadata, &JsValue::from_str("file_extension"))
+                        .map_err(|_| JsValue::from_str("Failed to access file_extension property")).unwrap();
+        
+                        // Convert the filename to a Rust String
+                        let name_str = name.as_string().unwrap_or_default();
+                        let path_str = path.as_string().unwrap_or_default();
+                
+                        let item=format!("
+                            <a href='/' id='folders_{name_str}' class='flex items-center mx-[1px] px-3 py-1 cursor-pointer hover:text-white active:text-white focus:text-white focus:ring-1 focus:ring-violet-300'>
+                                <span class='material-symbols-outlined md-16 pr-[3px]'>folder</span>
+                                <p class='text-[#e5e5e5 text-[11px] uppercase'>{name_str}</p>
+                            </a>
+                        "); 
+                        // <img src='/assets/icons/folder.png' alt='folder' class='w-[23px] h-[22px] pr-[5px]'/> 
+                     
+                        let item_element =web_sys::window().unwrap().document().unwrap().create_element("div").unwrap();
+        
+                        let path_str_copy=path_str.clone();
+                        let open_file: Closure<dyn FnMut()> = Closure::new(move|| {
+                            web_sys::window().unwrap().location().set_href(path_str_copy.as_str()).unwrap();
+                        });
     
-                    let path_str_copy=path_str.clone();
-                    let open_file: Closure<dyn FnMut()> = Closure::new(move|| {
-                        web_sys::window().unwrap().location().set_href(path_str_copy.as_str()).unwrap();
-                    });
-
-                    if !is_file.clone().as_bool().unwrap() {
-                        item_element.set_inner_html(&item);
-                        dom_elem.append_child(&Node::from(item_element)).unwrap();
+                        if !is_file.clone().as_bool().unwrap() {
+                            item_element.set_inner_html(&item);
+                            dom_elem.append_child(&Node::from(item_element)).unwrap();
+                        }
+                        
+                        let btn=web_sys::window().unwrap().document().unwrap().get_element_by_id(&format!("folders_{name_str}").as_str()).unwrap();
+                        btn.add_event_listener_with_callback("dblclick", &open_file.as_ref().unchecked_ref()).unwrap();
+                        open_file.forget();
                     }
-                    
-                    let btn=web_sys::window().unwrap().document().unwrap().get_element_by_id(&format!("folders_{name_str}").as_str()).unwrap();
-                    btn.add_event_listener_with_callback("dblclick", &open_file.as_ref().unchecked_ref()).unwrap();
-                    open_file.forget();
+                }
+                Err(e) => { 
+                    web_sys::console::error_1(&e.into());
                 }
             }
-            Err(e) => { 
-                web_sys::console::error_1(&e.into());
-            }
-        }
+        });
     });
+    
+    window.set_timeout_with_callback_and_timeout_and_arguments_0(
+        closure.as_ref().unchecked_ref()
+    ,300).unwrap();
+    closure.forget();
+
+    
 
     view!{
         <div class="min-h-[100vh] pt-[45px] pb-[12px] left-0 w-[200px] top-12 text-[13px] text-[#999999] bg-[#151515]">

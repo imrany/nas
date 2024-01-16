@@ -49,7 +49,6 @@ pub fn Home() -> impl IntoView {
     let window=window().expect("Failed to get Window");
     let _document=window.document().expect("Failed to get Document");
     let navigator=window.navigator();
-    // window.alert_with_message(format!("Not online, {}",navigator.on_line()).as_str()).unwrap();
 
     let data=create_resource(|| (), |_| async move { 
         match fetch_data("http://localhost:8000/api/directory_content").await {
@@ -179,7 +178,7 @@ pub fn Home() -> impl IntoView {
                 }
             }
             Err(e) => { 
-                web_sys::window().unwrap().location().set_href(format!("/error_page?error={}",e.as_string().unwrap()).as_str()).unwrap();
+                // web_sys::window().unwrap().location().set_href(format!("/error_page?error={}",e.as_string().unwrap()).as_str()).unwrap();
                 web_sys::console::error_1(&e.into());
             }
         }

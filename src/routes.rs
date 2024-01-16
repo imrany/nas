@@ -54,10 +54,10 @@ pub struct AppState {
 
 #[get("/directory_content")]
 pub async fn directory_content(state: web::Data<AppState>)-> HttpResponse{
-    let directory_path=path::Path::new("./resources");
+    let directory_path=&state.root_dir;
+    // let directory_path=path::Path::new("./resources");
 
-    let root_dir=&state.root_dir.as_path();
-    println!("{}", root_dir.display());
+    println!("{}", directory_path.display());
     // Read the directory contents
     let contents = match fs::read_dir(directory_path) {
         Ok(entries) => {
@@ -67,11 +67,12 @@ pub async fn directory_content(state: web::Data<AppState>)-> HttpResponse{
                     if let Some(file_name) = entry.file_name().to_str() {
                         let metadata= FileMeta{
                             is_file:directory_path.join(file_name.to_owned()).is_file(),
-                            file_extension: if directory_path.join(file_name.to_owned()).is_file() {
-                                Some(format!("{}",directory_path.join(file_name.to_owned()).extension().unwrap().to_str().unwrap()))
-                            }else{
-                                Some(String::from("Folder"))
-                            },
+                            file_extension:Some(String::from("hey"))
+                            // file_extension: if directory_path.join(file_name.to_owned()).is_file() {
+                            //     Some(format!("{}",directory_path.join(file_name.to_owned()).extension().unwrap().to_str().unwrap()))
+                            // }else{
+                            //     Some(String::from("Folder"))
+                            // },
                         };
                         let directory_object=DirectoryObject {
                             name:file_name.to_owned(),
@@ -92,13 +93,8 @@ pub async fn directory_content(state: web::Data<AppState>)-> HttpResponse{
         }
     };
 
-     // Create a response containing the directory content as JSON
     let directory_content = DirectoryContent { contents };
     HttpResponse::Ok().json(&directory_content)
-//     match serde_json::to_string(&directory_content) {
-//         Ok(json_string) => HttpResponse::Ok().json(json_string),
-//         Err(_) => HttpResponse::InternalServerError().json("Failed to serialize to JSON"),
-//     }
 }
 
 #[get("/{filename:.*}")]
