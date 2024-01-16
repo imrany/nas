@@ -2,7 +2,6 @@ use actix_web::{
     HttpResponse,
     Responder,
     get,
-    HttpRequest,
     web,
     Result
 };
@@ -21,6 +20,7 @@ use reqwest;
 
 #[derive(Serialize)]
 struct DirectoryObject {
+    root:String,
     name:String,
     path:path::PathBuf,
     metadata:FileMeta
@@ -52,12 +52,21 @@ pub struct AppState {
     pub root_dir: path::PathBuf,
 }
 
-#[get("/directory_content")]
-pub async fn directory_content(state: web::Data<AppState>)-> HttpResponse{
-    let directory_path=&state.root_dir;
-    // let directory_path=path::Path::new("./resources");
-
-    println!("{}", directory_path.display());
+#[get("/directory_content/{root}")]
+pub async fn directory_content(state: web::Data<AppState>, path: web::Path<path::PathBuf>)-> HttpResponse{
+    let root =&state.root_dir;
+    let path_dir=path.into_inner();
+    let directory_path = match path_dir.clone().to_str().unwrap() {
+        "root" => {
+            println!("{}", root.to_str().unwrap());
+            root
+        },
+        _ => {
+            println!("{}", path_dir.to_str().unwrap());
+            &path_dir
+        }
+    };
+    
     // Read the directory contents
     let contents = match fs::read_dir(directory_path) {
         Ok(entries) => {
@@ -67,14 +76,14 @@ pub async fn directory_content(state: web::Data<AppState>)-> HttpResponse{
                     if let Some(file_name) = entry.file_name().to_str() {
                         let metadata= FileMeta{
                             is_file:directory_path.join(file_name.to_owned()).is_file(),
-                            file_extension:Some(String::from("hey"))
-                            // file_extension: if directory_path.join(file_name.to_owned()).is_file() {
-                            //     Some(format!("{}",directory_path.join(file_name.to_owned()).extension().unwrap().to_str().unwrap()))
-                            // }else{
-                            //     Some(String::from("Folder"))
-                            // },
+                            file_extension: Some(String::from("none"))
+                            // file_extension:match directory_path.join(file_name.to_owned()).is_file() {
+                            //     true => Some(format!("{}",directory_path.join(file_name.to_owned()).extension().unwrap().to_str().unwrap())),
+                            //     false => Some(String::from("Folder")),
+                            // }
                         };
                         let directory_object=DirectoryObject {
+                            root:String::from(""),
                             name:file_name.to_owned(),
                             path:directory_path.join(file_name.to_owned()),
                             metadata
@@ -87,7 +96,7 @@ pub async fn directory_content(state: web::Data<AppState>)-> HttpResponse{
         }
         Err(_) => {
             let err_message=ErrorMessage{
-                message:"Failed to read directory".to_string()
+                message:format!("Cannot find the folder named '{}'",directory_path.to_str().unwrap())
             };
             return HttpResponse::InternalServerError().json(err_message);
         }
@@ -97,20 +106,21 @@ pub async fn directory_content(state: web::Data<AppState>)-> HttpResponse{
     HttpResponse::Ok().json(&directory_content)
 }
 
-#[get("/{filename:.*}")]
-pub async fn open_file_by_name(req: HttpRequest) -> Result<NamedFile> {
-    let path: path::PathBuf = req.match_info().query("filename").parse().unwrap();
-    Ok(NamedFile::open(path)?)
+#[get("/{path}")]
+pub async fn open_file_by_name(path: web::Path<String>) -> Result<NamedFile> {
+    let file_path= path.into_inner();
+    // let path: path::PathBuf = req.match_info().query("filename").parse().unwrap();
+    Ok(NamedFile::open(file_path)?)
 }
 
-#[get("/{filename:.*}")]
-pub async fn open_file_by_name_local(req: HttpRequest) -> impl Responder {
-    let file_path: path::PathBuf = req.match_info().query("filename").parse().unwrap();
+#[get("/{path}")]
+pub async fn open_file_by_name_local(path: web::Path<String>) -> impl Responder {
+    let file_path= format!("/{}",path.into_inner());
     // On Windows, use the "start" command to open the file with the default program
     #[cfg(target_os="windows")]
     {
         let open_cmd=Command::new("cmd")
-            .args(&["/C", "start", "", &file_path])
+            .args(&["/C", "start", "", &file_path.as_str()])
             .spawn();
 
         if let Ok(file) = open_cmd {
@@ -124,7 +134,7 @@ pub async fn open_file_by_name_local(req: HttpRequest) -> impl Responder {
     #[cfg(not(target_os="windows"))]
     {
         let open_cmd=Command::new("xdg-open")
-            .arg(&file_path)
+            .arg(&file_path.as_str())
             .spawn();
             
         if let Ok(file) = open_cmd {
