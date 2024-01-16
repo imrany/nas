@@ -178,7 +178,7 @@ pub fn Home() -> impl IntoView {
                 }
             }
             Err(e) => { 
-                // web_sys::window().unwrap().location().set_href(format!("/error_page?error={}",e.as_string().unwrap()).as_str()).unwrap();
+                web_sys::window().unwrap().location().set_href(format!("/error_page?error={}",e.as_string().unwrap()).as_str()).unwrap();
                 web_sys::console::error_1(&e.into());
             }
         }
