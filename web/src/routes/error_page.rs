@@ -1,24 +1,80 @@
 use leptos::*;
 use leptos_meta::*;
+use leptos_router::*;
+use wasm_bindgen::prelude::*;
 use web_sys::{
     window,
-    // console,
-    // Window,
 };
-// use js_sys::{
-//     Array
-// };
+
+struct ErrorBody{
+    error_type:JsValue,
+    message:String,
+    solution:String,
+}
 
 #[component]
 pub fn Error_page()->impl IntoView{
     let window=window().unwrap();
-    // let reload=move|_| {
-    //     let array = Array::new();
-    //     array.push(&"Hello Console Log".into());
-    //     console::log(&array);
-    //     console::log_2(&"Hello World Gloo :%s".into(),
-	// 								&"WebAssemblyMan".into());
-    // };
+    let document=window.document().unwrap();
+
+    let query = use_query_map();
+    let error_params =move || query.with_untracked(|err| err.get("error").cloned().unwrap_or_default());
+
+    let a = Closure::<dyn Fn()>::new(move || {
+        let error_type_dom=document.get_element_by_id("error_type").expect("Failed to get error_type element"); 
+        let error_message_dom=document.get_element_by_id("error_message").expect("Failed to error_message element");
+        let solution_dom=document.get_element_by_id("solution").expect("Failed to get solution element");
+    
+        match error_params().clone().as_str() {
+            "not_supported" => {
+                let err=ErrorBody{
+                    error_type:JsValue::from_str("Not supported"),
+                    message:"This item or feature might not be supported on the current version, you can update to the lastest version.".to_string(),
+                    solution:"
+                    If the issue persists,
+                    <strong> please contact our support team at </strong>
+                    <a href='mailto:imranmat254@gmail.com' class='font-normal underline'>imranmat254@gmail.com</a>
+                    for further assistance, making sure to copy the error details below.
+                    ".to_string()
+                };
+                error_type_dom.set_text_content(Some(format!("TypeError: \t {}",err.error_type.as_string().unwrap()).as_str()));
+                error_message_dom.set_inner_html(err.message.as_str());
+                solution_dom.set_inner_html(err.solution.as_str());
+            },
+            "Failed to fetch data" => {
+                let err=ErrorBody{
+                    error_type:JsValue::from_str("Failed to fetch data"),
+                    message:"You are not connected to Anvel,please restart Anvel on your terminal or CMD by running <code class='text-[#C2C2C2] rounded-sm bg-[#252525] py-[2px] px-2'>anvel</code> .".to_string(),
+                    solution:"
+                    If the issue persists,
+                    <strong> please contact our support team at </strong>
+                    <a href='mailto:imranmat254@gmail.com' class='font-normal underline'>imranmat254@gmail.com</a>
+                    for further assistance, making sure to copy the error details below.
+                    ".to_string()
+                };
+                error_type_dom.set_text_content(Some(format!("TypeError: \t {}",err.error_type.as_string().unwrap()).as_str()));
+                error_message_dom.set_inner_html(err.message.as_str());
+                solution_dom.set_inner_html(err.solution.as_str());
+            },
+            _ => {
+                let err=ErrorBody{
+                    error_type:JsValue::from_str("Not found"),
+                    message:"This item might not be visible because you're not connected.".to_string(),
+                    solution:"
+                    If the issue persists,
+                    <strong> please contact our support team at </strong>
+                    <a href='mailto:imranmat254@gmail.com' class='font-normal underline'>imranmat254@gmail.com</a>
+                    for further assistance, making sure to copy the error details below.
+                    ".to_string()
+                };
+                error_type_dom.set_text_content(Some(format!("TypeError: \t {}",err.error_type.as_string().unwrap()).as_str()));
+                error_message_dom.set_inner_html(err.message.as_str());
+                solution_dom.set_inner_html(err.solution.as_str());
+            }
+        }
+    });
+    window.set_interval_with_callback_and_timeout_and_arguments_0(a.as_ref().unchecked_ref(), 500).unwrap();
+    a.forget();
 
     view! {
         <Title text="Something went wrong"/>
@@ -33,19 +89,15 @@ pub fn Error_page()->impl IntoView{
                 <div class="mb-[24px]">
                     <h1 class="font-semibold text-[32px]">Something went wrong</h1>
                 </div>
-                <p class="text-[13px] text-[#999999] mb-[24px]">
-                    "The sandbox or repository might not be visible because you're not signed in, you can sign in by clicking the 'Sign in' button."
+                <p id="error_message" class="text-[13px] text-[#999999] mb-[24px]">
+                    
                 </p>
-                <p class="text-[13px] text-[#999999] mb-[24px]">
-                    "If the issue persists,"
-                    <strong> please contact our support team at </strong>
-                    <a href="mailto:support@codesandbox.io" class="font-normal underline">support@codesandbox.io</a>
-                    " for further assistance, making sure to copy the error details below."
+                <p id="solution" class="text-[13px] text-[#999999] mb-[24px]">
                 </p>
                 <details>
                     <summary class="text-[#999999] cursor-pointer hover:text-white active:text-white focus:text-white text-[13px]">Problem details and configurations</summary>
                     <div class="text-[#999999] bg-[#151515] rounded-sm mt-[24px] p-[24px] text-[13px]">
-                        <p>"TypeError:  Failed to fetch"</p>
+                        <p id="error_type"></p>
                         <div class="mt-[16px] grid grid-rows-2 gap-3">
                             <code class="grid grid-cols-2 gap-6">
                                 <span>"Version"</span> 

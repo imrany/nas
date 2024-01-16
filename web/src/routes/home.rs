@@ -143,30 +143,43 @@ pub fn Home() -> impl IntoView {
                     });
 
                     let path_str_copy=path_str.clone();
-                    let open_file: Closure<dyn FnMut()> = Closure::new(move|| {
-                        web_sys::window().unwrap().location().set_href(path_str_copy.as_str()).unwrap();
-                    });
 
                     let image=web_sys::window().unwrap().document().unwrap().get_element_by_id(&format!("img_{}",name_str)).unwrap();
                     if is_file.clone().as_bool().unwrap() {
-                        image.set_attribute("src", "/assets/icons/file.png").unwrap();
+                        match file_extension.as_string().unwrap().as_str() {
+                            // "mp3" => image.set_attribute("src", "/assets/icons/mp3.png").unwrap(),
+                            // "mp4" => image.set_attribute("src", "/assets/icons/video.png").unwrap(),
+                            // "xlsx" => image.set_attribute("src", "/assets/icons/sheet.png").unwrap(),
+                            _ => image.set_attribute("src", "/assets/icons/file.png").unwrap()
+                        };
                         image.set_attribute("alt", "File").unwrap();
+                        let open_file: Closure<dyn FnMut()> = Closure::new(move|| {
+                            web_sys::window().unwrap().location().set_href(path_str_copy.as_str()).unwrap();
+                        });
+                        let btn=web_sys::window().unwrap().document().unwrap().get_element_by_id(&name_str.as_str()).unwrap();
+                        btn.add_event_listener_with_callback("dblclick", &open_file.as_ref().unchecked_ref()).unwrap();
+                        open_file.forget();
                     } else {
                         image.set_attribute("src", "/assets/icons/folder.png").unwrap();
                         image.set_attribute("alt", "Folder").unwrap();    
+                        let open_folder: Closure<dyn FnMut()> = Closure::new(move|| {
+                            web_sys::window().unwrap().location().set_href(format!("{path_str_copy}?error=not_supported").as_str()).unwrap();
+                        });
+                        let btn=web_sys::window().unwrap().document().unwrap().get_element_by_id(&name_str.as_str()).unwrap();
+                        btn.add_event_listener_with_callback("dblclick", &open_folder.as_ref().unchecked_ref()).unwrap();
+                        open_folder.forget();
                     }
                     
                     let btn=web_sys::window().unwrap().document().unwrap().get_element_by_id(&name_str.as_str()).unwrap();
-                    btn.add_event_listener_with_callback("dblclick", &open_file.as_ref().unchecked_ref()).unwrap();
                     btn.add_event_listener_with_callback("contextmenu", &show_context_menu.as_ref().unchecked_ref()).unwrap();
                     show_context_menu.forget();
-                    open_file.forget();
     
                     web_sys::window().unwrap().document().unwrap().get_element_by_id(&format!("context_share_{}",&name_str.as_str())).unwrap().add_event_listener_with_callback("click", &context_share.as_ref().unchecked_ref()).unwrap();
                     context_share.forget();
                 }
             }
             Err(e) => { 
+                web_sys::window().unwrap().location().set_href(format!("/error_page?error={}",e.as_string().unwrap()).as_str()).unwrap();
                 web_sys::console::error_1(&e.into());
             }
         }

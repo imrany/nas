@@ -4,9 +4,7 @@ use js_sys::{
     Array,
 };
 use web_sys::{
- window,
  Node,
- Event,
 };
 
 #[path="../lib/functions.rs"]
