@@ -27,6 +27,7 @@ mod functions;
 use functions::{
     open_dialog,
     fetch_data,
+    post_data,
 };
 
 // struct DirectoryObject {
@@ -43,6 +44,16 @@ use functions::{
 //     color: orange
 // "#;
 
+async fn handle_double_click(path:String){
+    match post_data(path.as_str()).await {
+        Ok(data) => {
+            web_sys::console::log_1(&data.into());
+        },
+        Err(e) => {
+            web_sys::console::log_1(&e.into());
+        }
+    }
+}
 
 #[component]
 pub fn Home() -> impl IntoView {
@@ -51,7 +62,7 @@ pub fn Home() -> impl IntoView {
     let navigator=window.navigator();
 
     let data=create_resource(|| (), |_| async move { 
-        match fetch_data("http://localhost:8000/api/directory_content").await {
+        match fetch_data("http://localhost:8000/api/directory_content/root").await {
             Ok(data) => {
                 // web_sys::console::log_1(&data.clone().into());
                 let dom_elem=web_sys::window().unwrap().document().unwrap().get_element_by_id("test").unwrap();
@@ -60,6 +71,8 @@ pub fn Home() -> impl IntoView {
 
                 let contents=Array::from(&object_content);
                 for content in contents {
+                    let root = js_sys::Reflect::get(&content, &JsValue::from_str("root"))
+                    .map_err(|_| JsValue::from_str("Failed to access root property")).unwrap(); 
                     let name = js_sys::Reflect::get(&content, &JsValue::from_str("name"))
                     .map_err(|_| JsValue::from_str("Failed to access name property")).unwrap();
                     let path = js_sys::Reflect::get(&content, &JsValue::from_str("path"))
@@ -73,6 +86,7 @@ pub fn Home() -> impl IntoView {
                     .map_err(|_| JsValue::from_str("Failed to access file_extension property")).unwrap();
     
                     // Convert the filename to a Rust String
+                    let root_str = root.as_string().unwrap_or_default();
                     let name_str = name.as_string().unwrap_or_default();
                     let path_str = path.as_string().unwrap_or_default();
             
@@ -89,7 +103,7 @@ pub fn Home() -> impl IntoView {
                                     <span class='material-symbols-outlined md-16 pr-[6px]'>open_in_new</span>
                                     <p>Open</p>
                                 </div>
-                                <div class='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
+                                <div class='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35 {name_str}_open_item_locally'>
                                     <span class='material-symbols-outlined md-16 pr-[6px]'>open_with</span>
                                     <p>Open with media player</p>
                                 </div>
@@ -142,7 +156,6 @@ pub fn Home() -> impl IntoView {
                     });
 
                     let path_str_copy=path_str.clone();
-
                     let image=web_sys::window().unwrap().document().unwrap().get_element_by_id(&format!("img_{}",name_str)).unwrap();
                     if is_file.clone().as_bool().unwrap() {
                         match file_extension.as_string().unwrap().as_str() {
@@ -151,9 +164,10 @@ pub fn Home() -> impl IntoView {
                             // "xlsx" => image.set_attribute("src", "/assets/icons/sheet.png").unwrap(),
                             _ => image.set_attribute("src", "/assets/icons/file.png").unwrap()
                         };
-                        image.set_attribute("alt", "File").unwrap();
+                        // image.set_attribute("alt", "File").unwrap();
+
                         let open_file: Closure<dyn FnMut()> = Closure::new(move|| {
-                            web_sys::window().unwrap().location().set_href(path_str_copy.as_str()).unwrap();
+                            wasm_bindgen_futures::spawn_local(handle_double_click(format!("http://localhost:8000/local{}",path_str_copy.as_str())));
                         });
                         let btn=web_sys::window().unwrap().document().unwrap().get_element_by_id(&name_str.as_str()).unwrap();
                         btn.add_event_listener_with_callback("dblclick", &open_file.as_ref().unchecked_ref()).unwrap();
@@ -175,6 +189,25 @@ pub fn Home() -> impl IntoView {
     
                     web_sys::window().unwrap().document().unwrap().get_element_by_id(&format!("context_share_{}",&name_str.as_str())).unwrap().add_event_listener_with_callback("click", &context_share.as_ref().unchecked_ref()).unwrap();
                     context_share.forget();
+
+                    let root_path_indicator=web_sys::window().unwrap().document().unwrap().get_elements_by_class_name("root_path_indicator");
+                    for i in 0..root_path_indicator.clone().length() {
+                        let indicator=root_path_indicator.get_with_index(i);
+                        let root=format!("{root_str}");
+                        indicator.unwrap().set_inner_html(root.as_str());
+                    }
+
+                    let path_str_ref=path_str.clone();
+                    let open_item_locally_closure: Closure<dyn FnMut()> = Closure::new(move|| {
+                        wasm_bindgen_futures::spawn_local(handle_double_click(format!("http://localhost:8000/local{}",path_str_ref.as_str())));
+                    });
+                    let open_item_locally=web_sys::window().unwrap().document().unwrap().get_elements_by_class_name(format!("{name_str}_open_item_locally").as_str());
+                    for i in 0..open_item_locally.clone().length() {
+                        let open_item_locally=open_item_locally.get_with_index(i);
+                        open_item_locally.unwrap().add_event_listener_with_callback("click", &open_item_locally_closure.as_ref().unchecked_ref()).unwrap();
+                    }
+                    open_item_locally_closure.forget();
+
                 }
             }
             Err(e) => { 
@@ -210,21 +243,21 @@ pub fn Home() -> impl IntoView {
                             <div class="flex w-full h-[35px] bg-[#151515]">
                                 <div class="bg-[#1d1d1d] hover:bg-[#3c3c3c]/55 cursor-pointer pl-[10px] pr-[3px] min-w-[106px] h-[35px] flex items-center">
                                     <span class="material-symbols-outlined md-16 w-[16px] mr-[5px]">folder_open</span>
-                                    <p class="text-[#E5E5E5] text-[13px]">Downloads</p>
+                                    <p class="text-[#E5E5E5] text-[13px] root_path_indicator"></p>
                                     <span class="material-symbols-outlined md-16 w-[22px] ml-[3px] p-[3px] hover:bg-gray-500 rounded-sm hover:text-white">close</span>
                                 </div>
 
-                                <div class="active:bg-[#1d1d1d] hover:bg-[#3c3c3c]/55 cursor-pointer pl-[10px] pr-[3px] min-w-[106px] h-[35px] flex items-center">
-                                    <span class="material-symbols-outlined md-16 w-[16px] mr-[5px]">folder</span>
-                                    <p class="text-[#E5E5E5] text-[13px]">telegram-desktop</p>
-                                    <span class="material-symbols-outlined md-16 w-[22px] p-[3px] ml-[3px] hover:bg-gray-500 rounded-sm hover:text-white">close</span>
-                                </div>
+                                // <div class="active:bg-[#1d1d1d] hover:bg-[#3c3c3c]/55 cursor-pointer pl-[10px] pr-[3px] min-w-[106px] h-[35px] flex items-center">
+                                //     <span class="material-symbols-outlined md-16 w-[16px] mr-[5px]">folder</span>
+                                //     <p class="text-[#E5E5E5] text-[13px]">telegram-desktop</p>
+                                //     <span class="material-symbols-outlined md-16 w-[22px] p-[3px] ml-[3px] hover:bg-gray-500 rounded-sm hover:text-white">close</span>
+                                // </div>
                             </div>
 
-                            <div class="w-full flex items-center h-[22px] text-[13px] text-[#999999] px-[16px]">
-                                <p>src</p>
-                                <span class="material-symbols-outlined md-16 w-[22px] p-[3px] hover:bg-gray-500 rounded-sm hover:text-white">chevron_right</span>
-                                <p>telegram-desktop</p>
+                            <div class="w-full flex items-center h-[22px] text-[13px] text-[#999999] px-[16px] root_path_indicator">
+                                // <p>src</p>
+                                // <span class="material-symbols-outlined md-16 w-[22px] p-[3px] hover:bg-gray-500 rounded-sm hover:text-white">chevron_right</span>
+                                // <p>telegram-desktop</p>
                             </div>
                         </div>
 

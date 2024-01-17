@@ -2,6 +2,7 @@ use actix_web::{
     HttpResponse,
     Responder,
     get,
+    post,
     web,
     Result
 };
@@ -83,7 +84,7 @@ pub async fn directory_content(state: web::Data<AppState>, path: web::Path<path:
                             // }
                         };
                         let directory_object=DirectoryObject {
-                            root:String::from(""),
+                            root:format!("{}",directory_path.to_str().unwrap()),
                             name:file_name.to_owned(),
                             path:directory_path.join(file_name.to_owned()),
                             metadata
@@ -108,14 +109,24 @@ pub async fn directory_content(state: web::Data<AppState>, path: web::Path<path:
 
 #[get("/{path}")]
 pub async fn open_file_by_name(path: web::Path<String>) -> Result<NamedFile> {
-    let file_path= path.into_inner();
+    #[cfg(not(target_os="windows"))]
+    let file_path= format!("/{}",path.into_inner());
+
+    #[cfg(target_os="windows")]
+    let file_path= format!("{}",path.into_inner());
+    
     // let path: path::PathBuf = req.match_info().query("filename").parse().unwrap();
     Ok(NamedFile::open(file_path)?)
 }
 
-#[get("/{path}")]
+#[post("/{path}")]
 pub async fn open_file_by_name_local(path: web::Path<String>) -> impl Responder {
+    #[cfg(not(target_os="windows"))]
     let file_path= format!("/{}",path.into_inner());
+
+    #[cfg(target_os="windows")]
+    let file_path= format!("{}",path.into_inner());
+
     // On Windows, use the "start" command to open the file with the default program
     #[cfg(target_os="windows")]
     {

@@ -96,8 +96,9 @@ pub fn Topnav()-> impl IntoView{
                         </div>
                     </div>
                 </div>
-                <div class="text-[#C2C2C2] flex min-w-[10%] justify-around">
-                    <p class="font-medium">Downloads/Telegram</p>
+                <div class="text-[#C2C2C2] flex font-medium min-w-[10%] items-center">
+                    <p class="rounded-md bg-[#252525] py-[2px] px-2 mr-2">Directory</p>
+                    <p class="root_path_indicator"></p>
                 </div>
                 <div class="text-[#C2C2C2] flex min-w-[10vw] justify-around">
                     <button 

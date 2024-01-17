@@ -19,7 +19,7 @@ pub fn Sidenav()->impl IntoView{
     let window=window().unwrap();
     let closure: Closure<dyn FnMut()> = Closure::new(move|| {
         create_resource(|| (), |_| async move { 
-            match fetch_data("http://localhost:8000/api/directory_content").await {
+            match fetch_data("http://localhost:8000/api/directory_content/root").await {
                 Ok(data) => {
                     // web_sys::console::log_1(&data.clone().into());
                     let dom_elem=web_sys::window().unwrap().document().unwrap().get_element_by_id("folders").unwrap();
