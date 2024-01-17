@@ -60,9 +60,13 @@ pub fn Home() -> impl IntoView {
     let window=window().expect("Failed to get Window");
     let _document=window.document().expect("Failed to get Document");
     let navigator=window.navigator();
+    let local_storage=window.local_storage().unwrap();
+    local_storage.as_ref().unwrap().set_item("path","root").unwrap();
 
-    let data=create_resource(|| (), |_| async move { 
-        match fetch_data("http://localhost:8000/api/directory_content/root").await {
+    let data=create_resource(|| (), |_| async move {  
+        let root=web_sys::window().unwrap().local_storage().unwrap().unwrap().get_item("path").unwrap();
+        web_sys::console::log_1(&root.clone().into());
+        match fetch_data(format!("http://localhost:8000/api/directory_content/{}",root.unwrap().as_str()).as_str()).await {
             Ok(data) => {
                 // web_sys::console::log_1(&data.clone().into());
                 let dom_elem=web_sys::window().unwrap().document().unwrap().get_element_by_id("test").unwrap();
@@ -99,10 +103,10 @@ pub fn Home() -> impl IntoView {
                         </button>
                         <div id='context_list_{name_str}' class='flex z-5 absolute flex-wrap dropdown-content none w-[200px] -ml-[5px] max-lg:-ml-[27px]'>
                             <div style='box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2);' class='font-normal mt-[40px]  py-[4px] absolute bg-[#252525] min-w-[180px] rounded-[4px] text-white text-[13px]'>
-                                <div class='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
+                                <a href='http://localhost:8000/api{path_str}' class='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
                                     <span class='material-symbols-outlined md-16 pr-[6px]'>open_in_new</span>
                                     <p>Open</p>
-                                </div>
+                                </a>
                                 <div class='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35 {name_str}_open_item_locally'>
                                     <span class='material-symbols-outlined md-16 pr-[6px]'>open_with</span>
                                     <p>Open with media player</p>
@@ -176,7 +180,8 @@ pub fn Home() -> impl IntoView {
                         image.set_attribute("src", "/assets/icons/folder.png").unwrap();
                         image.set_attribute("alt", "Folder").unwrap();    
                         let open_folder: Closure<dyn FnMut()> = Closure::new(move|| {
-                            web_sys::window().unwrap().location().set_href(format!("{path_str_copy}?error=not_supported").as_str()).unwrap();
+                            // web_sys::window().unwrap().location().set_href(format!("{path_str_copy}?error=not_supported").as_str()).unwrap();
+                            web_sys::window().unwrap().location().set_href(format!("http://localhost:8000/api/directory_content{path_str_copy}").as_str()).unwrap();
                         });
                         let btn=web_sys::window().unwrap().document().unwrap().get_element_by_id(&name_str.as_str()).unwrap();
                         btn.add_event_listener_with_callback("dblclick", &open_folder.as_ref().unchecked_ref()).unwrap();
