@@ -57,14 +57,29 @@ pub struct AppState {
 pub async fn directory_content(state: web::Data<AppState>, path: web::Path<path::PathBuf>)-> HttpResponse{
     let root =&state.root_dir;
     let path_dir=path.into_inner();
-    let directory_path = match path_dir.clone().to_str().unwrap() {
+
+    #[cfg(target_os="windows")]
+    let path_dir_win=format!("{}",path_dir.clone().to_str().unwrap());
+    #[cfg(target_os="windows")]
+    let dir_path_win=path::PathBuf::from(path_dir_win.as_str());
+    
+    #[cfg(not(target_os="windows"))]
+    let path_dir_unix=format!("/{}",path_dir.clone().to_str().unwrap());
+    #[cfg(not(target_os="windows"))]
+    let dir_path_unix=path::PathBuf::from(path_dir_unix.as_str());
+
+    let directory_path = match path_dir.to_str().unwrap() {
         "root" => {
             println!("{}", root.to_str().unwrap());
             root
         },
         _ => {
             println!("{}", path_dir.to_str().unwrap());
-            &path_dir
+            #[cfg(target_os="windows")]
+            return &dir_path_win;
+            
+            #[cfg(not(target_os="windows"))]
+            &dir_path_unix
         }
     };
     
