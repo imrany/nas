@@ -60,15 +60,17 @@ pub fn Home() -> impl IntoView {
     let window=window().expect("Failed to get Window");
     let _document=window.document().expect("Failed to get Document");
     let navigator=window.navigator();
-    let local_storage=window.local_storage().unwrap();
-    local_storage.as_ref().unwrap().set_item("path","root").unwrap();
-
+    // let local_storage=window.local_storage().unwrap();
+    // local_storage.as_ref().unwrap().set_item("path","root").unwrap();
     let data=create_resource(|| (), |_| async move {  
         let root=web_sys::window().unwrap().local_storage().unwrap().unwrap().get_item("path").unwrap();
-        web_sys::console::log_1(&root.clone().into());
-        match fetch_data(format!("http://localhost:8000/api/directory_content/{}",root.unwrap().as_str()).as_str()).await {
+        let path_dir=match root {
+            Some(path) => format!("http://localhost:8000/api/directory_content/{}",path.as_str()),
+            None => format!("http://localhost:8000/api/directory_content/root")
+        };
+        web_sys::console::log_1(&path_dir.clone().into());
+        match fetch_data(path_dir.as_str()).await {
             Ok(data) => {
-                // web_sys::console::log_1(&data.clone().into());
                 let dom_elem=web_sys::window().unwrap().document().unwrap().get_element_by_id("test").unwrap();
                 let object_content = js_sys::Reflect::get(&data, &JsValue::from_str("contents"))
                 .map_err(|_| JsValue::from_str("Failed to access contents property")).unwrap();
@@ -181,7 +183,9 @@ pub fn Home() -> impl IntoView {
                         image.set_attribute("alt", "Folder").unwrap();    
                         let open_folder: Closure<dyn FnMut()> = Closure::new(move|| {
                             // web_sys::window().unwrap().location().set_href(format!("{path_str_copy}?error=not_supported").as_str()).unwrap();
-                            web_sys::window().unwrap().location().set_href(format!("http://localhost:8000/api/directory_content{path_str_copy}").as_str()).unwrap();
+                            let path=path_str_copy.clone();
+                            web_sys::window().unwrap().local_storage().unwrap().unwrap().set_item("path",&path[1..]).unwrap();
+                            web_sys::window().unwrap().location().reload().unwrap();
                         });
                         let btn=web_sys::window().unwrap().document().unwrap().get_element_by_id(&name_str.as_str()).unwrap();
                         btn.add_event_listener_with_callback("dblclick", &open_folder.as_ref().unchecked_ref()).unwrap();
