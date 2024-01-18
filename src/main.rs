@@ -130,9 +130,6 @@ async fn serve_zippy(){
                     .service(directory_content)
                     .service(get_ip_address)
                     .service(open_file_by_name)
-            )
-            .service(
-                web::scope("/local")
                     .service(open_file_by_name_local)
             )
             .service(

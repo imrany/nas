@@ -62,16 +62,6 @@ pub async fn directory_content(state: web::Data<AppState>, path: web::Json<RootP
     let root =&state.root_dir;
     let path_dir=&path.root;
 
-    #[cfg(target_os="windows")]
-    let path_dir_win=format!("{}",path_dir.clone().to_str().unwrap());
-    #[cfg(target_os="windows")]
-    let dir_path_win=path::PathBuf::from(path_dir_win.as_str());
-    
-    #[cfg(not(target_os="windows"))]
-    let path_dir_unix=format!("/{}",path_dir.clone().to_str().unwrap());
-    #[cfg(not(target_os="windows"))]
-    let dir_path_unix=path::PathBuf::from(path_dir_unix.as_str());
-
     let directory_path = match path_dir.to_str().unwrap() {
         "root" => {
             println!("{}", root.to_str().unwrap());
@@ -79,11 +69,7 @@ pub async fn directory_content(state: web::Data<AppState>, path: web::Json<RootP
         },
         _ => {
             println!("{}", path_dir.to_str().unwrap());
-            #[cfg(target_os="windows")]
-            return &dir_path_win;
-            
-            #[cfg(not(target_os="windows"))]
-            &dir_path_unix
+            path_dir
         }
     };
     
@@ -126,31 +112,21 @@ pub async fn directory_content(state: web::Data<AppState>, path: web::Json<RootP
     HttpResponse::Ok().json(&directory_content)
 }
 
-#[get("/{path}")]
-pub async fn open_file_by_name(path: web::Path<String>) -> Result<NamedFile> {
-    #[cfg(not(target_os="windows"))]
-    let file_path= format!("/{}",path.into_inner());
-
-    #[cfg(target_os="windows")]
-    let file_path= format!("{}",path.into_inner());
-    
-    // let path: path::PathBuf = req.match_info().query("filename").parse().unwrap();
+#[get("/open_external")]
+pub async fn open_file_by_name(path: web::Path<RootPath>) -> Result<NamedFile> {
+    let file_path= &path.root;
     Ok(NamedFile::open(file_path)?)
 }
 
-#[post("/{path}")]
-pub async fn open_file_by_name_local(path: web::Path<String>) -> impl Responder {
-    #[cfg(not(target_os="windows"))]
-    let file_path= format!("/{}",path.into_inner());
-
-    #[cfg(target_os="windows")]
-    let file_path= format!("{}",path.into_inner());
+#[post("/open_local")]
+pub async fn open_file_by_name_local(path: web::Json<RootPath>) -> impl Responder {
+    let file_path= &path.root;
 
     // On Windows, use the "start" command to open the file with the default program
     #[cfg(target_os="windows")]
     {
         let open_cmd=Command::new("cmd")
-            .args(&["/C", "start", "", &file_path.as_str()])
+            .args(&["/C", "start", "", &file_path])
             .spawn();
 
         if let Ok(file) = open_cmd {
@@ -164,7 +140,7 @@ pub async fn open_file_by_name_local(path: web::Path<String>) -> impl Responder 
     #[cfg(not(target_os="windows"))]
     {
         let open_cmd=Command::new("xdg-open")
-            .arg(&file_path.as_str())
+            .arg(&file_path)
             .spawn();
             
         if let Ok(file) = open_cmd {

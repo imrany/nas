@@ -44,7 +44,7 @@ use functions::{
 //     color: orange
 // "#;
 
-async fn handle_double_click(url:String){
+async fn open_file_local(url:String){
     let root=web_sys::window().unwrap().local_storage().unwrap().unwrap().get_item("path").unwrap();
     let path_dir=match root {
         Some(path) => path,
@@ -60,13 +60,13 @@ async fn handle_double_click(url:String){
     }
 }
 
+
 #[component]
 pub fn Home() -> impl IntoView {
     let window=window().expect("Failed to get Window");
     let _document=window.document().expect("Failed to get Document");
     let navigator=window.navigator();
-    // let local_storage=window.local_storage().unwrap();
-    // local_storage.as_ref().unwrap().set_item("path","root").unwrap();
+
     let data=create_resource(|| (), |_| async move {  
         let root=web_sys::window().unwrap().local_storage().unwrap().unwrap().get_item("path").unwrap();
         let path_dir=match root {
@@ -178,23 +178,48 @@ pub fn Home() -> impl IntoView {
                         // image.set_attribute("alt", "File").unwrap();
 
                         let open_file: Closure<dyn FnMut()> = Closure::new(move|| {
-                            wasm_bindgen_futures::spawn_local(handle_double_click(format!("http://localhost:8000/local{}",path_str_copy.as_str())));
+                            let path=path_str_copy.clone();
+                            web_sys::window().unwrap().document().unwrap().location().unwrap().set_href(format!("http://localhost:8000/api/open_local/{}",&path[1..]).as_str()).unwrap();
                         });
                         let btn=web_sys::window().unwrap().document().unwrap().get_element_by_id(&name_str.as_str()).unwrap();
                         btn.add_event_listener_with_callback("dblclick", &open_file.as_ref().unchecked_ref()).unwrap();
                         open_file.forget();
+
+                        let path_str_ref=path_str.clone();
+                        let open_item_locally_closure: Closure<dyn FnMut()> = Closure::new(move|| {
+                            wasm_bindgen_futures::spawn_local(open_file_local(format!("http://localhost:8000/local{}",path_str_ref.as_str())));
+                        });
+                        let open_item_locally=web_sys::window().unwrap().document().unwrap().get_elements_by_class_name(format!("{name_str}_open_item_locally").as_str());
+                        for i in 0..open_item_locally.clone().length() {
+                            let open_item_locally=open_item_locally.get_with_index(i);
+                            open_item_locally.unwrap().add_event_listener_with_callback("click", &open_item_locally_closure.as_ref().unchecked_ref()).unwrap();
+                        }
+                        open_item_locally_closure.forget();
                     } else {
                         image.set_attribute("src", "/assets/icons/folder.png").unwrap();
                         image.set_attribute("alt", "Folder").unwrap();    
                         let open_folder: Closure<dyn FnMut()> = Closure::new(move|| {
                             // web_sys::window().unwrap().location().set_href(format!("{path_str_copy}?error=not_supported").as_str()).unwrap();
                             let path=path_str_copy.clone();
-                            web_sys::window().unwrap().local_storage().unwrap().unwrap().set_item("path",&path[1..]).unwrap();
+                            web_sys::window().unwrap().local_storage().unwrap().unwrap().set_item("path",&path).unwrap();
                             web_sys::window().unwrap().location().reload().unwrap();
                         });
                         let btn=web_sys::window().unwrap().document().unwrap().get_element_by_id(&name_str.as_str()).unwrap();
                         btn.add_event_listener_with_callback("dblclick", &open_folder.as_ref().unchecked_ref()).unwrap();
                         open_folder.forget();
+
+                        let path_str_copy=path_str.clone();
+                        let open_item_locally_closure: Closure<dyn FnMut()> = Closure::new(move|| {
+                            let path=path_str_copy.clone();
+                            web_sys::window().unwrap().local_storage().unwrap().unwrap().set_item("path",&path).unwrap();
+                            web_sys::window().unwrap().location().reload().unwrap();
+                        });
+                        let open_item_locally=web_sys::window().unwrap().document().unwrap().get_elements_by_class_name(format!("{name_str}_open_item_locally").as_str());
+                        for i in 0..open_item_locally.clone().length() {
+                            let open_item_locally=open_item_locally.get_with_index(i);
+                            open_item_locally.unwrap().add_event_listener_with_callback("click", &open_item_locally_closure.as_ref().unchecked_ref()).unwrap();
+                        }
+                        open_item_locally_closure.forget(); 
                     }
                     
                     let btn=web_sys::window().unwrap().document().unwrap().get_element_by_id(&name_str.as_str()).unwrap();
@@ -210,17 +235,6 @@ pub fn Home() -> impl IntoView {
                         let root=format!("{root_str}");
                         indicator.unwrap().set_inner_html(root.as_str());
                     }
-
-                    let path_str_ref=path_str.clone();
-                    let open_item_locally_closure: Closure<dyn FnMut()> = Closure::new(move|| {
-                        wasm_bindgen_futures::spawn_local(handle_double_click(format!("http://localhost:8000/local{}",path_str_ref.as_str())));
-                    });
-                    let open_item_locally=web_sys::window().unwrap().document().unwrap().get_elements_by_class_name(format!("{name_str}_open_item_locally").as_str());
-                    for i in 0..open_item_locally.clone().length() {
-                        let open_item_locally=open_item_locally.get_with_index(i);
-                        open_item_locally.unwrap().add_event_listener_with_callback("click", &open_item_locally_closure.as_ref().unchecked_ref()).unwrap();
-                    }
-                    open_item_locally_closure.forget();
 
                 }
             }

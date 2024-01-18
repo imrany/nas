@@ -63,7 +63,7 @@ pub fn Sidenav()->impl IntoView{
                         let path_str_copy=path_str.clone();
                         let open_file: Closure<dyn FnMut()> = Closure::new(move|| {
                             let path=path_str_copy.clone();
-                            web_sys::window().unwrap().local_storage().unwrap().unwrap().set_item("path",&path[1..]).unwrap();
+                            web_sys::window().unwrap().local_storage().unwrap().unwrap().set_item("path",&path).unwrap(); 
                             web_sys::window().unwrap().location().reload().unwrap();
                         });
     
