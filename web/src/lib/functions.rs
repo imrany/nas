@@ -40,11 +40,11 @@ pub async fn fetch_data(url:&str) ->Result<JsValue, JsValue> {
     }
 }
 
-pub async fn post_data(url:&str) ->Result<JsValue, JsValue> {
+pub async fn post_folders(url:&str, path:&str) ->Result<JsValue, JsValue> {
     let window=window().expect("Failed to get Window");
      // Create a simple JSON payload
      let payload = serde_json::json!({
-        "path": "/lib"
+        "root": path
     });
 
     // Convert the payload to a string

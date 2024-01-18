@@ -26,8 +26,8 @@ use bottom_nav::Bottomnav;
 mod functions;
 use functions::{
     open_dialog,
-    fetch_data,
-    post_data,
+    // fetch_data,
+    post_folders,
 };
 
 // struct DirectoryObject {
@@ -39,13 +39,18 @@ use functions::{
 //     is_file:bool,
 //     file_extension:Option<String>,
 // }
-
+ 
 // const ORANGE_ICON:&str =r#"
 //     color: orange
 // "#;
 
-async fn handle_double_click(path:String){
-    match post_data(path.as_str()).await {
+async fn handle_double_click(url:String){
+    let root=web_sys::window().unwrap().local_storage().unwrap().unwrap().get_item("path").unwrap();
+    let path_dir=match root {
+        Some(path) => path,
+        None => "root".to_string() 
+    };
+    match post_folders(&url.as_str(),path_dir.as_str()).await {
         Ok(data) => {
             web_sys::console::log_1(&data.into());
         },
@@ -65,11 +70,11 @@ pub fn Home() -> impl IntoView {
     let data=create_resource(|| (), |_| async move {  
         let root=web_sys::window().unwrap().local_storage().unwrap().unwrap().get_item("path").unwrap();
         let path_dir=match root {
-            Some(path) => format!("http://localhost:8000/api/directory_content/{}",path.as_str()),
-            None => format!("http://localhost:8000/api/directory_content/root")
+            Some(path) => path,
+            None => "root".to_string() 
         };
         web_sys::console::log_1(&path_dir.clone().into());
-        match fetch_data(path_dir.as_str()).await {
+        match post_folders("http://localhost:8000/api/directory_content",path_dir.as_str()).await {
             Ok(data) => {
                 let dom_elem=web_sys::window().unwrap().document().unwrap().get_element_by_id("test").unwrap();
                 let object_content = js_sys::Reflect::get(&data, &JsValue::from_str("contents"))

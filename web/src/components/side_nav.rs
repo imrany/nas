@@ -11,7 +11,8 @@ use web_sys::{
 #[path="../lib/functions.rs"]
 mod functions;
 use functions::{
-    fetch_data,
+    // fetch_data,
+    post_folders,
 };
 
 #[component]
@@ -21,10 +22,10 @@ pub fn Sidenav()->impl IntoView{
         create_resource(|| (), |_| async move { 
             let root=web_sys::window().unwrap().local_storage().unwrap().unwrap().get_item("path").unwrap();
             let path_dir=match root {
-                Some(path) => format!("http://localhost:8000/api/directory_content/{}",path.as_str()),
-                None => format!("http://localhost:8000/api/directory_content/root")
+                Some(path) => path,
+                None => "root".to_string() 
             };
-            match fetch_data(path_dir.as_str()).await {
+            match post_folders("http://localhost:8000/api/directory_content",path_dir.as_str()).await {
                 Ok(data) => {
                     // web_sys::console::log_1(&data.clone().into());
                     let dom_elem=web_sys::window().unwrap().document().unwrap().get_element_by_id("folders").unwrap();
@@ -50,10 +51,10 @@ pub fn Sidenav()->impl IntoView{
                         let path_str = path.as_string().unwrap_or_default();
                 
                         let item=format!("
-                            <a href='/' id='folders_{name_str}' class='flex items-center mx-[1px] px-3 py-1 cursor-pointer hover:text-white active:text-white focus:text-white focus:ring-1 focus:ring-violet-300'>
+                            <a href='#' id='folders_{name_str}' class='flex items-center mx-[1px] px-3 py-1 cursor-pointer hover:text-white active:text-white focus:text-white focus:ring-1 focus:ring-violet-300'>
                                 <span class='material-symbols-outlined md-16 pr-[3px]'>folder</span>
                                 <p class='text-[#e5e5e5 text-[11px] uppercase'>{name_str}</p>
-                            </a>
+                            </button>
                         "); 
                         // <img src='/assets/icons/folder.png' alt='folder' class='w-[23px] h-[22px] pr-[5px]'/> 
                      
@@ -61,7 +62,9 @@ pub fn Sidenav()->impl IntoView{
         
                         let path_str_copy=path_str.clone();
                         let open_file: Closure<dyn FnMut()> = Closure::new(move|| {
-                            web_sys::window().unwrap().location().set_href(path_str_copy.as_str()).unwrap();
+                            let path=path_str_copy.clone();
+                            web_sys::window().unwrap().local_storage().unwrap().unwrap().set_item("path",&path[1..]).unwrap();
+                            web_sys::window().unwrap().location().reload().unwrap();
                         });
     
                         if !is_file.clone().as_bool().unwrap() {

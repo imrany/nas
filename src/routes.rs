@@ -13,7 +13,7 @@ use std::{
 };
 use serde::{
     Serialize,
-    // Deserialize,
+    Deserialize,
 };
 use std::process::Command;
 use local_ip_address::local_ip;
@@ -48,15 +48,19 @@ struct Ip {
     external: String,
 }
 
+#[derive(Deserialize, Clone)]
+struct RootPath{
+    root: path::PathBuf,
+}
 
 pub struct AppState {
     pub root_dir: path::PathBuf,
 }
 
-#[get("/directory_content/{root}")]
-pub async fn directory_content(state: web::Data<AppState>, path: web::Path<path::PathBuf>)-> HttpResponse{
+#[post("/directory_content")]
+pub async fn directory_content(state: web::Data<AppState>, path: web::Json<RootPath>)-> HttpResponse{
     let root =&state.root_dir;
-    let path_dir=path.into_inner();
+    let path_dir=&path.root;
 
     #[cfg(target_os="windows")]
     let path_dir_win=format!("{}",path_dir.clone().to_str().unwrap());
