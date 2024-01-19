@@ -112,14 +112,14 @@ pub async fn directory_content(state: web::Data<AppState>, path: web::Json<RootP
     HttpResponse::Ok().json(&directory_content)
 }
 
-#[get("/open_external")]
-pub async fn open_file_by_name(path: web::Path<RootPath>) -> Result<NamedFile> {
-    let file_path= &path.root;
-    Ok(NamedFile::open(file_path)?)
-}
+// #[get("/open_external")]
+// pub async fn open_file_by_name(path: web::Path<RootPath>) -> Result<NamedFile> {
+//     let file_path= &path.root;
+//     Ok(NamedFile::open(file_path)?)
+// }
 
-#[post("/open_local")]
-pub async fn open_file_by_name_local(path: web::Json<RootPath>) -> impl Responder {
+#[post("/open")]
+pub async fn open_file(path: web::Json<RootPath>) -> impl Responder {
     let file_path= &path.root;
 
     // On Windows, use the "start" command to open the file with the default program

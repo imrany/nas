@@ -36,8 +36,7 @@ use routes::{
     AppState,
     directory_content,
     hello_world,
-    open_file_by_name,
-    open_file_by_name_local,
+    open_file,
     get_ip_address,
 };
 
@@ -129,8 +128,7 @@ async fn serve_zippy(){
                     .route("", web::get().to(hello_world))
                     .service(directory_content)
                     .service(get_ip_address)
-                    .service(open_file_by_name)
-                    .service(open_file_by_name_local)
+                    .service(open_file)
             )
             .service(
                 web::scope("/*")

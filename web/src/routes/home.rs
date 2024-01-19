@@ -110,13 +110,9 @@ pub fn Home() -> impl IntoView {
                         </button>
                         <div id='context_list_{name_str}' class='flex z-5 absolute flex-wrap dropdown-content none w-[200px] -ml-[5px] max-lg:-ml-[27px]'>
                             <div style='box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2);' class='font-normal mt-[40px]  py-[4px] absolute bg-[#252525] min-w-[180px] rounded-[4px] text-white text-[13px]'>
-                                <a href='http://localhost:8000/api{path_str}' class='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
+                                <div class='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35 {name_str}_open_item_locally'>
                                     <span class='material-symbols-outlined md-16 pr-[6px]'>open_in_new</span>
                                     <p>Open</p>
-                                </a>
-                                <div class='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35 {name_str}_open_item_locally'>
-                                    <span class='material-symbols-outlined md-16 pr-[6px]'>open_with</span>
-                                    <p>Open with media player</p>
                                 </div>
                                 <div>
                                     <button id='context_share_{name_str}' class='btn_more pl-[12px] pr-[5px] py-[8px] w-full flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
