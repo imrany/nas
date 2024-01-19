@@ -12,7 +12,7 @@ use web_sys::{
 mod functions;
 use functions::{
     // fetch_data,
-    post_folders,
+    open,
 };
 
 #[component]
@@ -25,7 +25,7 @@ pub fn Sidenav()->impl IntoView{
                 Some(path) => path,
                 None => "root".to_string() 
             };
-            match post_folders("http://localhost:8000/api/directory_content",path_dir.as_str()).await {
+            match open("http://localhost:8000/api/directory_content",path_dir.as_str()).await {
                 Ok(data) => {
                     // web_sys::console::log_1(&data.clone().into());
                     let dom_elem=web_sys::window().unwrap().document().unwrap().get_element_by_id("folders").unwrap();
@@ -43,18 +43,24 @@ pub fn Sidenav()->impl IntoView{
                         .map_err(|_| JsValue::from_str("Failed to access metadata property")).unwrap();
                         let is_file = js_sys::Reflect::get(&metadata, &JsValue::from_str("is_file"))
                         .map_err(|_| JsValue::from_str("Failed to access is_file property")).unwrap();
-                        let file_extension=js_sys::Reflect::get(&metadata, &JsValue::from_str("file_extension"))
+                        let _file_extension=js_sys::Reflect::get(&metadata, &JsValue::from_str("file_extension"))
                         .map_err(|_| JsValue::from_str("Failed to access file_extension property")).unwrap();
         
                         // Convert the filename to a Rust String
                         let name_str = name.as_string().unwrap_or_default();
                         let path_str = path.as_string().unwrap_or_default();
                 
-                        let item=format!("
+                        let folder=format!("
                             <a href='#' id='folders_{name_str}' class='flex items-center mx-[1px] px-3 py-1 cursor-pointer hover:text-white active:text-white focus:text-white focus:ring-1 focus:ring-violet-300'>
                                 <span class='material-symbols-outlined md-16 pr-[3px]'>folder</span>
                                 <p class='text-[#e5e5e5 text-[11px] uppercase'>{name_str}</p>
-                            </button>
+                            </a>
+                        "); 
+                        let _file=format!("
+                            <a href='#' id='folders_{name_str}' class='flex items-center mx-[1px] px-3 py-1 cursor-pointer hover:text-white active:text-white focus:text-white focus:ring-1 focus:ring-violet-300'>
+                                <span class='material-symbols-outlined md-16 pr-[3px]'>draft</span>
+                                <p class='text-[#e5e5e5 text-[11px] uppercase'>{name_str}</p>
+                            </a>
                         "); 
                         // <img src='/assets/icons/folder.png' alt='folder' class='w-[23px] h-[22px] pr-[5px]'/> 
                      
@@ -66,11 +72,15 @@ pub fn Sidenav()->impl IntoView{
                             web_sys::window().unwrap().local_storage().unwrap().unwrap().set_item("path",&path).unwrap(); 
                             web_sys::window().unwrap().location().reload().unwrap();
                         });
-    
-                        if !is_file.clone().as_bool().unwrap() {
-                            item_element.set_inner_html(&item);
+
+                        if !is_file.clone().as_bool().unwrap(){
+                            item_element.set_inner_html(&folder);
                             dom_elem.append_child(&Node::from(item_element)).unwrap();
                         }
+                        // else {
+                        //     item_element.set_inner_html(&file);
+                        //     dom_elem.append_child(&Node::from(item_element)).unwrap();
+                        // }
                         
                         let btn=web_sys::window().unwrap().document().unwrap().get_element_by_id(&format!("folders_{name_str}").as_str()).unwrap();
                         btn.add_event_listener_with_callback("dblclick", &open_file.as_ref().unchecked_ref()).unwrap();

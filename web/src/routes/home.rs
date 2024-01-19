@@ -27,7 +27,7 @@ mod functions;
 use functions::{
     open_dialog,
     // fetch_data,
-    post_folders,
+    open,
 };
 
 // struct DirectoryObject {
@@ -44,13 +44,8 @@ use functions::{
 //     color: orange
 // "#;
 
-async fn open_file_local(url:String){
-    let root=web_sys::window().unwrap().local_storage().unwrap().unwrap().get_item("path").unwrap();
-    let path_dir=match root {
-        Some(path) => path,
-        None => "root".to_string() 
-    };
-    match post_folders(&url.as_str(),path_dir.as_str()).await {
+async fn open_file(url:String, path:String){
+    match open(&url.as_str(),path.as_str()).await {
         Ok(data) => {
             web_sys::console::log_1(&data.into());
         },
@@ -74,7 +69,7 @@ pub fn Home() -> impl IntoView {
             None => "root".to_string() 
         };
         web_sys::console::log_1(&path_dir.clone().into());
-        match post_folders("http://localhost:8000/api/directory_content",path_dir.as_str()).await {
+        match open("http://localhost:8000/api/directory_content",path_dir.as_str()).await {
             Ok(data) => {
                 let dom_elem=web_sys::window().unwrap().document().unwrap().get_element_by_id("test").unwrap();
                 let object_content = js_sys::Reflect::get(&data, &JsValue::from_str("contents"))
@@ -110,27 +105,14 @@ pub fn Home() -> impl IntoView {
                         </button>
                         <div id='context_list_{name_str}' class='flex z-5 absolute flex-wrap dropdown-content none w-[200px] -ml-[5px] max-lg:-ml-[27px]'>
                             <div style='box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2);' class='font-normal mt-[40px]  py-[4px] absolute bg-[#252525] min-w-[180px] rounded-[4px] text-white text-[13px]'>
-                                <div class='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35 {name_str}_open_item_locally'>
+                                <div class='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35 {name_str}_open_item'>
                                     <span class='material-symbols-outlined md-16 pr-[6px]'>open_in_new</span>
                                     <p>Open</p>
                                 </div>
-                                <div>
-                                    <button id='context_share_{name_str}' class='btn_more pl-[12px] pr-[5px] py-[8px] w-full flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
-                                        <span class='material-symbols-outlined md-16 pr-[6px]'>share</span>
-                                        <p>Share</p>
-                                        <span class='material-symbols-outlined md-16 ml-auto'>chevron_right</span>
-                                    </button>
-                                    <div id='context_more_share_{name_str}' style='box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2);' class='font-normal ml-[191px] -mt-[10px] z-5 py-[4px] context-more-share absolute none bg-[#252525] min-w-[180px] rounded-[4px] text-white text-[13px]'>
-                                        <div class='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
-                                            <span class='material-symbols-outlined md-16 pr-[6px]'>bluetooth</span>
-                                            <p>Bluetooth</p>
-                                        </div>
-                                        <div class='px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
-                                            <span class='material-symbols-outlined md-16 pr-[6px]'>rss_feed</span>
-                                            <p>Send to</p>
-                                        </div>
-                                    </div>
-                                </div>
+                                <button id='share_with_bluetooth_{name_str}' class='btn_more pl-[12px] pr-[5px] py-[8px] w-full flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
+                                    <span class='material-symbols-outlined md-16 pr-[6px]'>bluetooth</span>
+                                    <p>Share with bluetooth</p>
+                                </button>
                                 <div class='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
                                     <span class='material-symbols-outlined md-16 pr-[6px]'>edit</span>
                                     <p>Rename</p>
@@ -155,13 +137,6 @@ pub fn Home() -> impl IntoView {
                         context_list.class_list().toggle("block").unwrap();
                     });
     
-                    let name_str_copy=name_str.clone();
-                    let context_share: Closure<dyn FnMut(_)> = Closure::new(move|e:Event| {
-                        e.prevent_default();
-                        let context_list=web_sys::window().unwrap().document().unwrap().get_element_by_id(format!("context_more_share_{}",&name_str_copy).as_str()).unwrap();
-                        context_list.class_list().toggle("block").unwrap();
-                    });
-
                     let path_str_copy=path_str.clone();
                     let image=web_sys::window().unwrap().document().unwrap().get_element_by_id(&format!("img_{}",name_str)).unwrap();
                     if is_file.clone().as_bool().unwrap() {
@@ -175,55 +150,40 @@ pub fn Home() -> impl IntoView {
 
                         let open_file: Closure<dyn FnMut()> = Closure::new(move|| {
                             let path=path_str_copy.clone();
-                            web_sys::window().unwrap().document().unwrap().location().unwrap().set_href(format!("http://localhost:8000/api/open_local/{}",&path[1..]).as_str()).unwrap();
+                            wasm_bindgen_futures::spawn_local(open_file("http://localhost:8000/api/open".to_string(),path))
                         });
+                        
+                        let open_item_locally=web_sys::window().unwrap().document().unwrap().get_elements_by_class_name(format!("{name_str}_open_item").as_str());
+                        for i in 0..open_item_locally.clone().length() {
+                            let open_item_locally=open_item_locally.get_with_index(i);
+                            open_item_locally.unwrap().add_event_listener_with_callback("click", &open_file.as_ref().unchecked_ref()).unwrap();
+                        }
                         let btn=web_sys::window().unwrap().document().unwrap().get_element_by_id(&name_str.as_str()).unwrap();
                         btn.add_event_listener_with_callback("dblclick", &open_file.as_ref().unchecked_ref()).unwrap();
                         open_file.forget();
-
-                        let path_str_ref=path_str.clone();
-                        let open_item_locally_closure: Closure<dyn FnMut()> = Closure::new(move|| {
-                            wasm_bindgen_futures::spawn_local(open_file_local(format!("http://localhost:8000/local{}",path_str_ref.as_str())));
-                        });
-                        let open_item_locally=web_sys::window().unwrap().document().unwrap().get_elements_by_class_name(format!("{name_str}_open_item_locally").as_str());
-                        for i in 0..open_item_locally.clone().length() {
-                            let open_item_locally=open_item_locally.get_with_index(i);
-                            open_item_locally.unwrap().add_event_listener_with_callback("click", &open_item_locally_closure.as_ref().unchecked_ref()).unwrap();
-                        }
-                        open_item_locally_closure.forget();
                     } else {
                         image.set_attribute("src", "/assets/icons/folder.png").unwrap();
-                        image.set_attribute("alt", "Folder").unwrap();    
+                        image.set_attribute("alt", "Folder").unwrap(); 
+
+                        let path_str_copy=path_str.clone();
                         let open_folder: Closure<dyn FnMut()> = Closure::new(move|| {
-                            // web_sys::window().unwrap().location().set_href(format!("{path_str_copy}?error=not_supported").as_str()).unwrap();
                             let path=path_str_copy.clone();
                             web_sys::window().unwrap().local_storage().unwrap().unwrap().set_item("path",&path).unwrap();
                             web_sys::window().unwrap().location().reload().unwrap();
                         });
+                        let open_item_locally=web_sys::window().unwrap().document().unwrap().get_elements_by_class_name(format!("{name_str}_open_item").as_str());
+                        for i in 0..open_item_locally.clone().length() {
+                            let open_item_locally=open_item_locally.get_with_index(i);
+                            open_item_locally.unwrap().add_event_listener_with_callback("click", &open_folder.as_ref().unchecked_ref()).unwrap();
+                        }
                         let btn=web_sys::window().unwrap().document().unwrap().get_element_by_id(&name_str.as_str()).unwrap();
                         btn.add_event_listener_with_callback("dblclick", &open_folder.as_ref().unchecked_ref()).unwrap();
                         open_folder.forget();
-
-                        let path_str_copy=path_str.clone();
-                        let open_item_locally_closure: Closure<dyn FnMut()> = Closure::new(move|| {
-                            let path=path_str_copy.clone();
-                            web_sys::window().unwrap().local_storage().unwrap().unwrap().set_item("path",&path).unwrap();
-                            web_sys::window().unwrap().location().reload().unwrap();
-                        });
-                        let open_item_locally=web_sys::window().unwrap().document().unwrap().get_elements_by_class_name(format!("{name_str}_open_item_locally").as_str());
-                        for i in 0..open_item_locally.clone().length() {
-                            let open_item_locally=open_item_locally.get_with_index(i);
-                            open_item_locally.unwrap().add_event_listener_with_callback("click", &open_item_locally_closure.as_ref().unchecked_ref()).unwrap();
-                        }
-                        open_item_locally_closure.forget(); 
                     }
                     
                     let btn=web_sys::window().unwrap().document().unwrap().get_element_by_id(&name_str.as_str()).unwrap();
                     btn.add_event_listener_with_callback("contextmenu", &show_context_menu.as_ref().unchecked_ref()).unwrap();
                     show_context_menu.forget();
-    
-                    web_sys::window().unwrap().document().unwrap().get_element_by_id(&format!("context_share_{}",&name_str.as_str())).unwrap().add_event_listener_with_callback("click", &context_share.as_ref().unchecked_ref()).unwrap();
-                    context_share.forget();
 
                     let root_path_indicator=web_sys::window().unwrap().document().unwrap().get_elements_by_class_name("root_path_indicator");
                     for i in 0..root_path_indicator.clone().length() {

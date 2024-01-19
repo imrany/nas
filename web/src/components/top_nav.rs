@@ -105,7 +105,7 @@ pub fn Topnav()-> impl IntoView{
                         on:click=open_share_dialog
                         class="hover:text-white active:text-white focus:text-white"
                     >
-                        Share
+                        Connnect
                     </button>
                     <a href="/" class="hover:text-white ml-[10px] active:text-white focus:text-white">Sign in</a>
                 </div>
