@@ -268,7 +268,10 @@ pub fn Home() -> impl IntoView {
                                 <div class="bg-[#1d1d1d] hover:bg-[#3c3c3c]/55 cursor-pointer pl-[10px] pr-[3px] min-w-[106px] h-[35px] flex items-center">
                                     <span class="material-symbols-outlined md-16 w-[16px] mr-[5px]">folder_open</span>
                                     <p class="text-[#E5E5E5] text-[13px] root_path_indicator"></p>
-                                    <span class="material-symbols-outlined md-16 w-[22px] ml-[3px] p-[3px] hover:bg-gray-500 rounded-sm hover:text-white">close</span>
+                                    <span class="material-symbols-outlined md-16 w-[22px] ml-[3px] p-[3px] hover:bg-gray-500 rounded-sm hover:text-white" on:click=move |_|{
+                                        web_sys::window().unwrap().local_storage().unwrap().unwrap().remove_item("path").unwrap(); 
+                                        web_sys::window().unwrap().location().reload().unwrap();
+                                    }>close</span>
                                 </div>
 
                                 // <div class="active:bg-[#1d1d1d] hover:bg-[#3c3c3c]/55 cursor-pointer pl-[10px] pr-[3px] min-w-[106px] h-[35px] flex items-center">
