@@ -17,6 +17,7 @@ use error_page::Error_page;
 #[path="./components/dialogs.rs"]
 mod dialogs;
 use dialogs::{
+    Offline_dialog,
     Connection_dialog,
 };
 
@@ -41,6 +42,7 @@ pub fn App() -> impl IntoView {
                     <Route path="/*any" view=|| view! { <Error_page/> }/>
                 </Routes>
             </Router>
+            <Offline_dialog/>
             <Connection_dialog/>
         </>
     }

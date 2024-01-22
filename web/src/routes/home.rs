@@ -203,7 +203,7 @@ pub fn Home() -> impl IntoView {
 
     if !navigator.on_line() {
         let closure: Closure<dyn FnMut()> = Closure::new(move|| {
-            open_dialog("connection_dialog");
+            open_dialog("offline_dialog");
         });
         
         window.set_timeout_with_callback_and_timeout_and_arguments_0(

@@ -5,6 +5,10 @@ use web_sys::{
 };
 use wasm_bindgen::prelude::*;
 
+#[path="../lib/functions.rs"]
+mod functions;
+use functions::open_dialog;
+
 #[component]
 pub fn Topnav()-> impl IntoView{
     let window=window().unwrap();
@@ -41,14 +45,8 @@ pub fn Topnav()-> impl IntoView{
     window.set_onclick(Some(click_handler.as_ref().unchecked_ref()));
     click_handler.forget();
     
-    let document_ref_0=document.clone();
-    let open_share_dialog=move|_|{
-        let dialog_bg=document_ref_0.get_element_by_id("dialog_bg").unwrap();
-        dialog_bg.class_list().add_1("ease-in-out").unwrap();
-        dialog_bg.class_list().add_1("block").unwrap();
-        // dialog_bg.style().set_property("display", "block").unwrap();
-        dialog_bg.class_list().add_1("duration-1000").unwrap();
-        dialog_bg.class_list().add_1("delay-2000").unwrap();
+    let open_offline_dialog=move|_|{
+        open_dialog("offline_dialog");
     };
 
     let document_ref_1=document.clone();
@@ -102,7 +100,7 @@ pub fn Topnav()-> impl IntoView{
                 </div>
                 <div class="text-[#C2C2C2] flex min-w-[10vw] justify-around">
                     <button 
-                        on:click=open_share_dialog
+                        on:click=open_offline_dialog
                         class="hover:text-white active:text-white focus:text-white"
                     >
                         Connnect

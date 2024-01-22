@@ -2,24 +2,21 @@ use leptos::*;
 use web_sys::{
     window,
 };
-// use js_sys::{
-//     Array
-// };
 
 #[component]
-pub fn Connection_dialog()->impl IntoView{
+pub fn Offline_dialog()->impl IntoView{
     let window=window().unwrap();
     let document=window.document().unwrap();
 
     let close_dialog=move|_|{
-        let dialog_bg=document.get_element_by_id("connection_dialog").unwrap();
+        let dialog_bg=document.get_element_by_id("offline_dialog").unwrap();
         dialog_bg.class_list().add_1("ease-in-out").unwrap();
         dialog_bg.class_list().remove_1("block").unwrap();
         dialog_bg.class_list().add_1("duration-1000").unwrap();
         dialog_bg.class_list().add_1("delay-2000").unwrap();
     };
     view!{
-        <div id="connection_dialog" 
+        <div id="offline_dialog" 
             class="fixed top-0 bottom-0 left-0 right-0 z-20 bg-[#151515]/70 none"
         >
             <div class="flex flex-col justify-center items-center h-[100vh]">
@@ -47,19 +44,19 @@ pub fn Connection_dialog()->impl IntoView{
 }
 
 #[component]
-pub fn op_dialog()->impl IntoView{
+pub fn Connection_dialog()->impl IntoView{
     let window=window().unwrap();
     let document=window.document().unwrap();
 
     let close_dialog=move|_|{
-        let dialog_bg=document.get_element_by_id("op_dialog").unwrap();
+        let dialog_bg=document.get_element_by_id("connection_dialog").unwrap();
         dialog_bg.class_list().add_1("ease-in-out").unwrap();
         dialog_bg.class_list().remove_1("block").unwrap();
         dialog_bg.class_list().add_1("duration-1000").unwrap();
         dialog_bg.class_list().add_1("delay-2000").unwrap();
     };
     view!{
-        <div id="op_dialog" 
+        <div id="connection_dialog" 
             on:dblclick=close_dialog.clone()
             class="fixed top-0 bottom-0 left-0 right-0 z-4 opacity-[0.9] bg-[#151515]/70 none"
         >
