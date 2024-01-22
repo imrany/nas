@@ -90,7 +90,7 @@ pub fn Topnav()-> impl IntoView{
                         </div>
                         <div class="px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
                             <span class="material-symbols-outlined md-16 pr-[6px]">login</span>
-                            <p>"Sign in"</p>
+                            <p>"Info"</p>
                         </div>
                     </div>
                 </div>
