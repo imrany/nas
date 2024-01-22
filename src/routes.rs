@@ -4,12 +4,19 @@ use actix_web::{
     get,
     post,
     web,
-    // Result
+    Result
 };
-// use actix_files::NamedFile;
+use actix_files::NamedFile;
+use actix_multipart::Multipart;
+use futures_util::stream::StreamExt;
+use tokio::{
+    io::AsyncWriteExt,
+    fs::File
+};
 use std::{
     fs,
-    path,
+    // fs::File,
+    path, 
 };
 use serde::{
     Serialize,
@@ -112,11 +119,34 @@ pub async fn directory_content(state: web::Data<AppState>, path: web::Json<RootP
     HttpResponse::Ok().json(&directory_content)
 }
 
-// #[get("/open_external")]
-// pub async fn open_file_by_name(path: web::Path<RootPath>) -> Result<NamedFile> {
-//     let file_path= &path.root;
-//     Ok(NamedFile::open(file_path)?)
-// }
+#[get("/download/{filename}")]
+pub async fn download(path: web::Path<RootPath>) -> Result<NamedFile> {
+    let file_path= format!("shared/{}",&path.root.to_str().unwrap());
+    Ok(NamedFile::open(file_path)?)
+}
+
+#[post("/share")]
+async fn share_file(mut payload: Multipart) -> Result<HttpResponse> {
+    while let Some(item) = payload.next().await {
+        let mut field = item?;
+        let content_disposition = field.content_disposition().clone();
+        let filename = content_disposition.get_filename().unwrap_or_default();
+
+        // Create a file with a unique name in the server's current directory
+        let filepath = format!("./shared/{}", filename);
+        let mut file = File::create(&filepath).await?;
+
+        // Write file content
+        while let Some(chunk) = field.next().await {
+            let data = chunk?;
+            file.write_all(&data).await?;
+        }
+
+        println!("File saved: {}", filename);
+    }
+
+    Ok(HttpResponse::Ok().body("File uploaded successfully"))
+}
 
 #[post("/open")]
 pub async fn open_file(path: web::Json<RootPath>) -> impl Responder {

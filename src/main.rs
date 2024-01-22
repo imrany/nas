@@ -105,6 +105,9 @@ async fn main(){
 }
 
 async fn serve_zippy(){
+    // Create the 'shared' directory if it doesn't exist
+    tokio::fs::create_dir_all("shared").await.unwrap();
+
     // let path: PathBuf = Path::new(PathBuf::from(current_exe().unwrap()).parent().unwrap()).join("static_files");
     let path =Path::new("./static_files");
     let app_state = web::Data::new(AppState {
