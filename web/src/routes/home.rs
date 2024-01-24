@@ -26,19 +26,10 @@ use bottom_nav::Bottomnav;
 mod functions;
 use functions::{
     open_dialog,
-    // fetch_data,
+    send,
     open,
+    SendFileInfo,
 };
-
-// struct DirectoryObject {
-//     name:String,
-//     path:std::path::PathBuf,
-//     metadata:FileMeta
-// }
-// struct FileMeta{
-//     is_file:bool,
-//     file_extension:Option<String>,
-// }
  
 // const ORANGE_ICON:&str =r#"
 //     color: orange
@@ -51,6 +42,47 @@ async fn open_file(url:String, path:String){
         },
         Err(e) => {
             web_sys::console::log_1(&e.into());
+        }
+    }
+}
+
+async fn send_file(url:&str, file_info:SendFileInfo){
+    match send(&url,&file_info).await {
+        Ok(data) => {
+            web_sys::console::log_1(&data.clone().into());
+            let feed=data.as_string().unwrap();
+            let context_list=web_sys::window().unwrap().document().unwrap().get_element_by_id(&format!("context_list_{}",file_info.file_name.as_str())).unwrap();
+            context_list.class_list().toggle("block").unwrap();
+            open_dialog("feedback_dialog");
+            let feedback_container=web_sys::window().unwrap().document().unwrap().get_element_by_id("feedback_container").unwrap();
+            let text=format!("
+            <h2 class='font-medium text-base text-white'>Success</h2>
+            <div class='text-[13px] mt-[4px] mb-[13px] pb-[24px] text-[#999999]'>
+                <p>
+                {feed}
+                </p>
+            </div>
+            ");
+
+            feedback_container.set_inner_html(&text);
+        },
+        Err(e) => {
+            web_sys::console::error_1(&e.clone().into());
+            let error=e.as_string().unwrap();
+            let context_list=web_sys::window().unwrap().document().unwrap().get_element_by_id(&format!("context_list_{}",file_info.file_name.as_str())).unwrap();
+            context_list.class_list().toggle("block").unwrap();
+            open_dialog("feedback_dialog");
+            let feedback_container=web_sys::window().unwrap().document().unwrap().get_element_by_id("feedback_container").unwrap();
+            let text=format!("
+            <h2 class='font-medium text-base text-white'>Error</h2>
+            <div class='text-[13px] mt-[4px] mb-[13px] pb-[24px] text-[#999999]'>
+                <p>
+                {error} 
+                </p>
+            </div>
+            ");
+
+            feedback_container.set_inner_html(&text);
         }
     }
 }
@@ -109,10 +141,16 @@ pub fn Home() -> impl IntoView {
                                     <span class='material-symbols-outlined md-16 pr-[6px]'>open_in_new</span>
                                     <p>Open</p>
                                 </div>
-                                <button id='share_with_bluetooth_{name_str}' class='btn_more pl-[12px] pr-[5px] py-[8px] w-full flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
-                                    <span class='material-symbols-outlined md-16 pr-[6px]'>bluetooth</span>
-                                    <p>Share with bluetooth</p>
-                                </button>
+                                <div class='share_{name_str}'>
+                                    <button class='share_with_network_{name_str} pl-[12px] pr-[5px] py-[8px] w-full flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
+                                        <span class='material-symbols-outlined md-16 pr-[6px]'>rss_feed</span>
+                                        <p>Send via network</p>
+                                    </button>
+                                    <button id='share_with_bluetooth_{name_str}' class='pl-[12px] pr-[5px] py-[8px] w-full flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
+                                        <span class='material-symbols-outlined md-16 pr-[6px]'>bluetooth</span>
+                                        <p>Share with bluetooth</p>
+                                    </button>
+                                </div>
                                 <div class='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
                                     <span class='material-symbols-outlined md-16 pr-[6px]'>edit</span>
                                     <p>Rename</p>
@@ -139,28 +177,54 @@ pub fn Home() -> impl IntoView {
     
                     let path_str_copy=path_str.clone();
                     let image=web_sys::window().unwrap().document().unwrap().get_element_by_id(&format!("img_{}",name_str)).unwrap();
+                    let share_section=web_sys::window().unwrap().document().unwrap().get_elements_by_class_name(format!("share_{name_str}").as_str());
+                    let share_with_network=web_sys::window().unwrap().document().unwrap().get_elements_by_class_name(format!("share_with_network_{name_str}").as_str());
                     if is_file.clone().as_bool().unwrap() {
+                        image.set_attribute("alt", "File").unwrap();
                         match file_extension.as_string().unwrap().as_str() {
                             // "mp3" => image.set_attribute("src", "/assets/icons/mp3.png").unwrap(),
                             // "mp4" => image.set_attribute("src", "/assets/icons/video.png").unwrap(),
                             // "xlsx" => image.set_attribute("src", "/assets/icons/sheet.png").unwrap(),
                             _ => image.set_attribute("src", "/assets/icons/file.png").unwrap()
                         };
-                        // image.set_attribute("alt", "File").unwrap();
 
+                        let path_ref=path_str_copy.clone();
                         let open_file: Closure<dyn FnMut()> = Closure::new(move|| {
-                            let path=path_str_copy.clone();
+                            let path=path_ref.clone();
                             wasm_bindgen_futures::spawn_local(open_file("http://localhost:8000/api/open".to_string(),path))
+                        });
+
+                        let path_ref=path_str_copy.clone();
+                        let name_str_ref=name_str.clone();
+                        let open_share_with_network: Closure<dyn FnMut()> = Closure::new(move|| {
+                            let file_path=path_ref.clone();
+                            let file_name=name_str_ref.clone();
+                            let recipient_ip=web_sys::window().unwrap().session_storage().unwrap().unwrap().get_item("recipient_ip").unwrap();
+                            match recipient_ip {
+                                Some(ip) => {
+                                    let recipient_server=format!("http://{ip}:8000/api/receive");
+                                    let Send_file_info=SendFileInfo{
+                                        file_name,
+                                        file_path,
+                                        recipient_server
+                                    };
+                                    wasm_bindgen_futures::spawn_local(send_file("http://localhost:8000/api/send",Send_file_info));
+                                },
+                                None => open_dialog("connection_dialog")
+                            }
                         });
                         
                         let open_item_locally=web_sys::window().unwrap().document().unwrap().get_elements_by_class_name(format!("{name_str}_open_item").as_str());
                         for i in 0..open_item_locally.clone().length() {
                             let open_item_locally=open_item_locally.get_with_index(i);
+                            let share_with_network=share_with_network.get_with_index(i);
                             open_item_locally.unwrap().add_event_listener_with_callback("click", &open_file.as_ref().unchecked_ref()).unwrap();
+                            share_with_network.unwrap().add_event_listener_with_callback("click", &open_share_with_network.as_ref().unchecked_ref()).unwrap();
                         }
                         let btn=web_sys::window().unwrap().document().unwrap().get_element_by_id(&name_str.as_str()).unwrap();
                         btn.add_event_listener_with_callback("dblclick", &open_file.as_ref().unchecked_ref()).unwrap();
                         open_file.forget();
+                        open_share_with_network.forget();
                     } else {
                         image.set_attribute("src", "/assets/icons/folder.png").unwrap();
                         image.set_attribute("alt", "Folder").unwrap(); 
@@ -171,10 +235,13 @@ pub fn Home() -> impl IntoView {
                             web_sys::window().unwrap().local_storage().unwrap().unwrap().set_item("path",&path).unwrap();
                             web_sys::window().unwrap().location().reload().unwrap();
                         });
+
                         let open_item_locally=web_sys::window().unwrap().document().unwrap().get_elements_by_class_name(format!("{name_str}_open_item").as_str());
                         for i in 0..open_item_locally.clone().length() {
                             let open_item_locally=open_item_locally.get_with_index(i);
+                            let share_section=share_section.get_with_index(i); 
                             open_item_locally.unwrap().add_event_listener_with_callback("click", &open_folder.as_ref().unchecked_ref()).unwrap();
+                            share_section.unwrap().class_list().add_1("none").unwrap();
                         }
                         let btn=web_sys::window().unwrap().document().unwrap().get_element_by_id(&name_str.as_str()).unwrap();
                         btn.add_event_listener_with_callback("dblclick", &open_folder.as_ref().unchecked_ref()).unwrap();

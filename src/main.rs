@@ -35,9 +35,12 @@ mod routes;
 use routes::{
     AppState,
     directory_content,
-    hello_world,
     open_file,
     get_ip_address,
+    send,
+    receive,
+    download,
+    get_shared_folder_contents,
 };
 
 #[derive(Parser)]
@@ -128,10 +131,13 @@ async fn serve_zippy(){
             .app_data(app_state.clone()) 
             .service(
                 web::scope("/api")
-                    .route("", web::get().to(hello_world))
                     .service(directory_content)
                     .service(get_ip_address)
                     .service(open_file)
+                    .service(send)
+                    .service(receive)
+                    .service(download)
+                    .service(get_shared_folder_contents)
             )
             .service(
                 web::scope("/*")

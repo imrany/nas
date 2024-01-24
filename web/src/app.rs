@@ -20,6 +20,7 @@ use dialogs::{
     Offline_dialog,
     Connection_dialog,
     Network_dialog,
+    Feedback_dialog,
 };
 
 #[component]
@@ -46,6 +47,7 @@ pub fn App() -> impl IntoView {
             <Offline_dialog/>
             <Connection_dialog/>
             <Network_dialog/>
+            <Feedback_dialog/>
         </>
     }
 }

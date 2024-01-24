@@ -679,6 +679,10 @@ video {
   margin-top: 24px;
 }
 
+.mt-\[37px\]{
+  margin-top: 37px;
+}
+
 .mt-\[40px\]{
   margin-top: 40px;
 }
@@ -773,10 +777,6 @@ video {
 
 .w-\[22px\]{
   width: 22px;
-}
-
-.w-\[23px\]{
-  width: 23px;
 }
 
 .w-\[30px\]{

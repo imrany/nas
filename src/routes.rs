@@ -32,23 +32,24 @@ use serde::{
     Serialize,
     Deserialize,
 };
+use serde_json::json;
 use std::process::Command;
 use local_ip_address::local_ip;
 
-#[derive(Serialize)]
+#[derive(Serialize,Deserialize, Debug)]
 struct DirectoryObject {
     root:String,
     name:String,
     path:path::PathBuf,
     metadata:FileMeta
 }
-#[derive(Serialize)]
+#[derive(Serialize,Deserialize, Debug)]
 struct FileMeta{
     is_file:bool,
     file_extension:Option<String>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize, Debug)]
 struct DirectoryContent {
     contents: Vec<DirectoryObject>,
 }
@@ -69,10 +70,11 @@ struct RootPath{
     root: path::PathBuf,
 }
 
-#[derive(Deserialize, Clone)]
+#[derive(Deserialize, Clone, Debug)]
 struct SendInfo{
     file_path: path::PathBuf,
-    receiving_server: String
+    file_name: String,
+    recipient_server: String
 }
 
 pub struct AppState {
@@ -140,6 +142,37 @@ pub async fn download(path: web::Path<RootPath>) -> Result<NamedFile> {
     Ok(NamedFile::open(file_path)?)
 }
 
+#[get("/shared_folder")]
+pub async fn get_shared_folder_contents()-> HttpResponse{
+    let shared_folder_path=path::PathBuf::from("./shared");
+    // This will POST a body of `{"root":"rust","body":"json"}`
+    let data = json!({
+        "root": &shared_folder_path
+    });
+
+    let resp=Client::new()
+    .post("http://localhost:8000/api/directory_content")
+    .json(&data)
+    .send()
+    .await;
+    match resp {
+        Ok(res) =>{
+            if res.status().is_success() {
+                let res_json:DirectoryContent=res.json().await.unwrap();
+                return HttpResponse::Ok().json(res_json);
+            } else {
+                let res_text=format!("Failed to get Shared Folder. Status code: {}",res.status());
+                println!("{res_text}");
+                return HttpResponse::InternalServerError().json(res_text);
+            }
+        }, 
+        Err(e) => {
+            let res_text=format!("{e}");
+            println!("{res_text}");
+            return HttpResponse::InternalServerError().json(res_text);
+        }
+    }
+}
 #[post("/receive")]
 pub async fn receive(mut payload: Multipart) -> Result<HttpResponse> {
     while let Some(item) = payload.next().await {
@@ -157,10 +190,10 @@ pub async fn receive(mut payload: Multipart) -> Result<HttpResponse> {
             file.write_all(&data).await?;
         }
 
-        println!("File saved: {}", filename);
+        println!("Sent file: {}", filename);
     }
 
-    Ok(HttpResponse::Ok().body("File uploaded successfully"))
+    Ok(HttpResponse::Ok().json("File was sent successfully"))
 }
 
 #[post("/send")]
@@ -168,39 +201,44 @@ pub async fn send(resource: web::Json<SendInfo>)-> HttpResponse{
     // Path to the media file you want to send
     // let file_path = "path/to/your/media/file.jpg";
     let file_path = &resource.file_path;
+    let file_name = resource.clone().file_name;
 
     // URL of the server that will receive the file
-    // let server_url = "https://example.com/upload";
-    let server_url = &resource.receiving_server;
+    // let server_url = "https://example.com/api/receive";
+    let server_url = &resource.recipient_server;
 
     // Read the file asynchronously
     let file_content = read(file_path).await.unwrap();
 
-
     // Create a multipart form with the file
     let form = Form::new()
-        .part("file", Part::bytes(file_content).file_name("file.jpg"));
-
-
+        .part("file", Part::bytes(file_content).file_name(file_name.clone()));
 
     // Send the multipart form to the server
     let response = Client::new()
         .post(server_url)
         .multipart(form)
         .send()
-        .await
-        .unwrap(); 
-
-    // Check the server's response
-    if response.status().is_success() {
-        println!("File uploaded successfully!");
-        return HttpResponse::Ok().json("File uploaded successfully!");
-    } else {
-        println!("Failed to upload file. Status code: {}", response.status());
-        let err_message=ErrorMessage{
-            message:format!("Failed to upload file. Status code: '{}'",response.status())
-        };
-        return HttpResponse::InternalServerError().json(err_message);
+        .await; 
+    match response {
+        Ok(res) => {
+            // Check the server's response
+            if res.status().is_success() {
+                let res_text=format!("'{file_name}' sent to '{server_url}'");
+                let res_json:String=res.json().await.unwrap();
+                println!("{res_text}, {res_json}");
+                return HttpResponse::Ok().json(res_text);
+            } else {
+                let res_text=format!("Failed to send '{file_name}' to '{server_url}'.  Status code: {}",res.status());
+                println!("{res_text}");
+                return HttpResponse::InternalServerError().json(res_text);
+            }
+        },
+        Err(e) => {
+            let res_text=format!("{e}");
+            println!("{res_text}");
+            return HttpResponse::InternalServerError().json(res_text);
+        }
     }
 }
 
@@ -264,8 +302,4 @@ pub async fn get_ip_address()-> impl Responder {
         };
         return HttpResponse::InternalServerError().json(err_message);
     }
-}
-
-pub async fn hello_world() -> impl Responder { 
-    HttpResponse::Ok().body("Hello world!")
 }

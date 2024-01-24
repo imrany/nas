@@ -102,7 +102,7 @@ pub fn Topnav()-> impl IntoView{
                         class="hover:text-white ml-[10px] active:text-white focus:text-white"
                         on:click=open_network_dialog
                     >
-                     LAN info
+                     Network info
                      </button>
                 </div>
             </div>
