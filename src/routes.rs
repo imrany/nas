@@ -6,12 +6,22 @@ use actix_web::{
     web,
     Result
 };
+use reqwest::{
+    Client,
+    multipart::{
+        Form, 
+        Part
+    }
+};
 use actix_files::NamedFile;
 use actix_multipart::Multipart;
 use futures_util::stream::StreamExt;
 use tokio::{
     io::AsyncWriteExt,
-    fs::File
+    fs::{
+        File,
+        read,
+    }
 };
 use std::{
     fs,
@@ -24,7 +34,6 @@ use serde::{
 };
 use std::process::Command;
 use local_ip_address::local_ip;
-use reqwest;
 
 #[derive(Serialize)]
 struct DirectoryObject {
@@ -58,6 +67,12 @@ struct Ip {
 #[derive(Deserialize, Clone)]
 struct RootPath{
     root: path::PathBuf,
+}
+
+#[derive(Deserialize, Clone)]
+struct SendInfo{
+    file_path: path::PathBuf,
+    receiving_server: String
 }
 
 pub struct AppState {
@@ -125,8 +140,8 @@ pub async fn download(path: web::Path<RootPath>) -> Result<NamedFile> {
     Ok(NamedFile::open(file_path)?)
 }
 
-#[post("/share")]
-async fn share_file(mut payload: Multipart) -> Result<HttpResponse> {
+#[post("/receive")]
+pub async fn receive(mut payload: Multipart) -> Result<HttpResponse> {
     while let Some(item) = payload.next().await {
         let mut field = item?;
         let content_disposition = field.content_disposition().clone();
@@ -146,6 +161,47 @@ async fn share_file(mut payload: Multipart) -> Result<HttpResponse> {
     }
 
     Ok(HttpResponse::Ok().body("File uploaded successfully"))
+}
+
+#[post("/send")]
+pub async fn send(resource: web::Json<SendInfo>)-> HttpResponse{
+    // Path to the media file you want to send
+    // let file_path = "path/to/your/media/file.jpg";
+    let file_path = &resource.file_path;
+
+    // URL of the server that will receive the file
+    // let server_url = "https://example.com/upload";
+    let server_url = &resource.receiving_server;
+
+    // Read the file asynchronously
+    let file_content = read(file_path).await.unwrap();
+
+
+    // Create a multipart form with the file
+    let form = Form::new()
+        .part("file", Part::bytes(file_content).file_name("file.jpg"));
+
+
+
+    // Send the multipart form to the server
+    let response = Client::new()
+        .post(server_url)
+        .multipart(form)
+        .send()
+        .await
+        .unwrap(); 
+
+    // Check the server's response
+    if response.status().is_success() {
+        println!("File uploaded successfully!");
+        return HttpResponse::Ok().json("File uploaded successfully!");
+    } else {
+        println!("Failed to upload file. Status code: {}", response.status());
+        let err_message=ErrorMessage{
+            message:format!("Failed to upload file. Status code: '{}'",response.status())
+        };
+        return HttpResponse::InternalServerError().json(err_message);
+    }
 }
 
 #[post("/open")]

@@ -19,6 +19,7 @@ mod dialogs;
 use dialogs::{
     Offline_dialog,
     Connection_dialog,
+    Network_dialog,
 };
 
 #[component]
@@ -44,6 +45,7 @@ pub fn App() -> impl IntoView {
             </Router>
             <Offline_dialog/>
             <Connection_dialog/>
+            <Network_dialog/>
         </>
     }
 }

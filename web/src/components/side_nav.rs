@@ -113,8 +113,15 @@ pub fn Sidenav()->impl IntoView{
                 </div>
                 //folders
                 <div id="folders" class="pb-[12px]">
-                    <div class="flex items-center text-[#e5e5e5] text-[11px] uppercase px-[8px] h-[35px]">
+                    <div class="flex items-center text-[#e5e5e5] text-[11px] uppercase px-[8px] h-[35px] hover:text-white text-[#e5e5e5]">
                         <p class="pl-[12px]">EXPLORER</p>
+                        <span class="material-symbols-outlined md-16 text-[#999999] w-[30px] ml-auto h-[25px] active:text-[#e5e5e5] cursor-pointer hover:text-[#e5e5e5] focus:text-[#e5e5e5]  p-[4px]">more_horiz</span>
+                    </div>
+                </div>
+                //shared folder
+                <div id="shared_folder" class="pb-[12px]">
+                    <div class="flex items-center cursor-pointer hover:text-white text-[#e5e5e5] text-[11px] uppercase px-[8px] h-[35px]">
+                        <p class="pl-[12px]">SHARED FOLDER</p>
                         <span class="material-symbols-outlined md-16 text-[#999999] w-[30px] ml-auto h-[25px] active:text-[#e5e5e5] cursor-pointer hover:text-[#e5e5e5] focus:text-[#e5e5e5]  p-[4px]">more_horiz</span>
                     </div>
                 </div>

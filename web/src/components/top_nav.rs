@@ -45,10 +45,9 @@ pub fn Topnav()-> impl IntoView{
     window.set_onclick(Some(click_handler.as_ref().unchecked_ref()));
     click_handler.forget();
     
-    let open_offline_dialog=move|_|{
-        open_dialog("offline_dialog");
+    let open_network_dialog=move|_|{
+        open_dialog("network_dialog");
     };
-
     let document_ref_1=document.clone();
     let show_dropdown_menu=move|_|{
         let dropdown_list=document_ref_1.get_element_by_id("dropdown_list").unwrap();
@@ -88,9 +87,9 @@ pub fn Topnav()-> impl IntoView{
                                 </div>
                             </div>
                         </div>
-                        <div class="px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
-                            <span class="material-symbols-outlined md-16 pr-[6px]">login</span>
-                            <p>"Info"</p>
+                        <div on:click=open_network_dialog class="px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
+                            <span class="material-symbols-outlined md-16 pr-[6px]">wifi</span>
+                            <p>"Network Info"</p>
                         </div>
                     </div>
                 </div>
@@ -99,13 +98,12 @@ pub fn Topnav()-> impl IntoView{
                     <p class="root_path_indicator"></p>
                 </div>
                 <div class="text-[#C2C2C2] flex min-w-[10vw] justify-around">
-                    <button 
-                        on:click=open_offline_dialog
-                        class="hover:text-white active:text-white focus:text-white"
+                    <button
+                        class="hover:text-white ml-[10px] active:text-white focus:text-white"
+                        on:click=open_network_dialog
                     >
-                        Connnect
-                    </button>
-                    <a href="/" class="hover:text-white ml-[10px] active:text-white focus:text-white">Sign in</a>
+                     LAN info
+                     </button>
                 </div>
             </div>
         </nav>

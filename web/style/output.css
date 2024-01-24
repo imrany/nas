@@ -606,6 +606,11 @@ video {
   margin-bottom: 0px;
 }
 
+.my-3{
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
 .-ml-\[5px\]{
   margin-left: -5px;
 }
@@ -945,6 +950,10 @@ video {
   background-color: rgb(237 255 165 / var(--tw-bg-opacity));
 }
 
+.bg-transparent{
+  background-color: transparent;
+}
+
 .p-6{
   padding: 1.5rem;
 }
@@ -993,6 +1002,11 @@ video {
 .px-\[5px\]{
   padding-left: 5px;
   padding-right: 5px;
+}
+
+.px-\[6px\]{
+  padding-left: 6px;
+  padding-right: 6px;
 }
 
 .px-\[7px\]{
@@ -1161,10 +1175,6 @@ video {
 
 .underline{
   text-decoration-line: underline;
-}
-
-.opacity-\[0\.9\]{
-  opacity: 0.9;
 }
 
 .duration-1000{
