@@ -74,7 +74,7 @@ pub fn Home() -> impl IntoView {
                 let dom_elem=web_sys::window().unwrap().document().unwrap().get_element_by_id("test").unwrap();
                 let object_content = js_sys::Reflect::get(&data, &JsValue::from_str("contents"))
                 .map_err(|_| JsValue::from_str("Failed to access contents property")).unwrap();
-
+                
                 let contents=Array::from(&object_content);
                 for content in contents {
                     let root = js_sys::Reflect::get(&content, &JsValue::from_str("root"))

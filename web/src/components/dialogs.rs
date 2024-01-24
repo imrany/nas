@@ -1,7 +1,16 @@
 use leptos::*;
 use web_sys::{
     window,
+    Node,
 };
+use wasm_bindgen::prelude::*;
+
+#[path="../lib/functions.rs"]
+mod functions;
+use functions::{
+    fetch_data,
+};
+
 
 #[component]
 pub fn Offline_dialog()->impl IntoView{
@@ -102,6 +111,68 @@ pub fn Network_dialog()->impl IntoView{
         dialog_bg.class_list().add_1("duration-1000").unwrap();
         dialog_bg.class_list().add_1("delay-2000").unwrap();
     };
+
+    let closure: Closure<dyn FnMut()> = Closure::new(move|| {
+        create_resource(|| (), |_| async move { 
+            match fetch_data("http://localhost:8000/api/get_ip_address").await {
+                Ok(data) => {
+                    let err_message = js_sys::Reflect::get(&data, &JsValue::from_str("message")).unwrap();
+                   
+                    match err_message.clone().is_string() {
+                        true => {
+                            let dom_elem=web_sys::window().unwrap().document().unwrap().get_element_by_id("network_info").unwrap();
+                            let message_str = err_message.as_string().unwrap_or_default();
+                            let item=format!("
+                                <p>
+                                    Error - {message_str}
+                                </p>
+                            "); 
+                            
+                            let item_element =web_sys::window().unwrap().document().unwrap().create_element("div").unwrap();
+        
+                            item_element.set_inner_html(&item);
+                            dom_elem.append_child(&Node::from(item_element)).unwrap();
+                        },
+                        false => {
+                            let dom_elem=web_sys::window().unwrap().document().unwrap().get_element_by_id("network_info").unwrap();
+                            let internal_ip = js_sys::Reflect::get(&data, &JsValue::from_str("internal"))
+                            .map_err(|_| JsValue::from_str("Failed to access internal property")).unwrap()
+                            .as_string().unwrap_or_default();
+                            let external_ip = js_sys::Reflect::get(&data, &JsValue::from_str("external"))
+                            .map_err(|_| JsValue::from_str("Failed to access external property")).unwrap()
+                            .as_string().unwrap_or_default();
+                            
+                            let item=format!("
+                                <p>
+                                    Your local Ip - {internal_ip}
+                                </p>
+                                <p>
+                                    Your external Ip - {external_ip}
+                                </p>
+                                <p>
+                                    Your anvel server url - <a href='http://{internal_ip}:8000'>http://{internal_ip}:8000</a>
+                                </p>
+                            "); 
+
+                            let item_element =web_sys::window().unwrap().document().unwrap().create_element("div").unwrap();
+        
+                            item_element.set_inner_html(&item);
+                            dom_elem.append_child(&Node::from(item_element)).unwrap();
+                        }
+                    };
+                }
+                Err(e) => { 
+                    web_sys::console::log_1(&e.into());
+                }
+            }
+        });
+    });
+    
+    window.set_timeout_with_callback_and_timeout_and_arguments_0(
+        closure.as_ref().unchecked_ref()
+    ,300).unwrap();
+    closure.forget();
+
     view!{
         <div id="network_dialog" 
             on:dblclick=close_dialog.clone()
@@ -114,16 +185,8 @@ pub fn Network_dialog()->impl IntoView{
                     </div>
                     <div class="w-[452px] h-[162px]"> 
                         <h2 class="text-white font-medium text-base">Network information</h2>
-                        <div class="text-[13px] mt-[4px] mb-[13px] pb-[24px] text-[#999999]">
-                            <p>
-                                "Your local Ip - 192.168.43.174"
-                            </p>
-                            <p>
-                                "Your external Ip - 192.168.43.174"
-                            </p>
-                            <p>
-                                "Your anvel server url - http://192.168.43.174:8080"
-                            </p>
+                        <div id="network_info" class="text-[13px] mt-[4px] mb-[13px] pb-[24px] text-[#999999]">
+                            
                         </div>
                         <div class="flex justify-end items-center">
                             <button on:click=move|_|web_sys::window().unwrap().location().reload().unwrap() class="mr-[12px] py-[4px] px-[16px] hover:bg-[#EDFFA1] border-none h-[28px] w-[100px] text-[13px] text-[#1D1D1D] rounded-sm bg-[#EDFFA5]">
