@@ -11,6 +11,14 @@
 .block{
     display:block;
 }
+.sidebar_folders::-webkit-scrollbar,
+.sidebar_shared_folder::-webkit-scrollbar {
+    display: none;
+}
+.sidebar_folders,
+.sidebar_shared_folder{
+    scrollbar-width: none;
+}
 .material-symbols-outlined.md-16 { font-size: 16px; }
 .material-symbols-outlined.md-17 { font-size: 17px; }
 .material-symbols-outlined.md-18 { font-size: 18px; }

@@ -194,7 +194,7 @@ pub fn Sidenav()->impl IntoView{
     
 
     view!{
-        <div class="min-h-[100vh] pt-[45px] pb-[12px] left-0 w-[200px] top-12 text-[13px] text-[#999999] bg-[#151515]">
+        <div id="sidebar" class="overflow-hidden h-[100vh] fixed pb-[12px] bottom-[18px] left-0 w-[200px] top-12 text-[13px] text-[#999999] bg-[#151515]">
             <div class="flex flex-col mb-3">
                 <div class="h-[33px] flex items-center text-[#999999] uppercase pl-[12px] pr-[8px]">
                     <button class="material-symbols-outlined md-18 focus:ring-1 focus:ring-violet-300 rounded-sm hover:bg-[#3c3c3c]/35 active:text-[#e5e5e5] cursor-pointer hover:text-[#e5e5e5] focus:text-[#e5e5e5]  p-[4px]">draft</button>
@@ -204,14 +204,14 @@ pub fn Sidenav()->impl IntoView{
                     } class="material-symbols-outlined md-18 focus:ring-1 focus:ring-violet-300 rounded-sm hover:bg-[#3c3c3c]/35 active:text-[#e5e5e5] cursor-pointer hover:text-[#e5e5e5] focus:text-[#e5e5e5]  p-[4px]">refresh</button>
                 </div>
                 //folders
-                <div id="folders" class="pb-[12px]">
+                <div id="folders" class="sidebar_folders pb-[12px] overflow-y-auto h-[45vh]">
                     <div class="flex items-center text-[#e5e5e5] text-[11px] uppercase px-[8px] h-[35px] hover:text-white text-[#e5e5e5]">
                         <p class="pl-[12px]">EXPLORER</p>
                         <span class="material-symbols-outlined md-16 text-[#999999] w-[30px] ml-auto h-[25px] active:text-[#e5e5e5] cursor-pointer hover:text-[#e5e5e5] focus:text-[#e5e5e5]  p-[4px]">more_horiz</span>
                     </div>
                 </div>
                 //shared folder
-                <div id="shared_folder" class="pb-[12px]">
+                <div id="shared_folder" class="sidebar_shared_folder pb-[12px] overflow-y-auto h-[45vh]">
                     <div class="flex items-center cursor-pointer hover:text-white text-[#e5e5e5] text-[11px] uppercase px-[8px] h-[35px]">
                         <p class="pl-[12px]">SHARED FOLDER</p>
                         <span class="material-symbols-outlined md-16 text-[#999999] w-[30px] ml-auto h-[25px] active:text-[#e5e5e5] cursor-pointer hover:text-[#e5e5e5] focus:text-[#e5e5e5]  p-[4px]">more_horiz</span>
