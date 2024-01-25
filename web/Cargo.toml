@@ -1,6 +1,6 @@
 [package]
 name = "anvel"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "Anvel is a productivity software that connects you to people in your network and enable file sharing and collaboration."
 license = "MIT"

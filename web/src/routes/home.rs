@@ -335,7 +335,7 @@ pub fn Home() -> impl IntoView {
                         
                         //folder view body 
                         <div class="w-full flex flex-wrap mt-[35px]" id="folder_view_body">
-                            <div id="test" class="flex grid max-sm:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 w-full gap-4 px-[25px] py-[13px]">
+                            <div id="test" class="flex ml-[200px] grid max-sm:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 w-full gap-4 px-[25px] py-[13px]">
                             </div>
                         </div>
                     </div>
