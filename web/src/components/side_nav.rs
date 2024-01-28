@@ -74,6 +74,7 @@ pub fn Sidenav()->impl IntoView{
                         "); 
                      
                         let item_element =web_sys::window().unwrap().document().unwrap().create_element("div").unwrap();
+                        // item_element.set_class_name("resize");
 
                         if !is_file.clone().as_bool().unwrap(){
                             item_element.set_inner_html(&folder);
@@ -204,19 +205,25 @@ pub fn Sidenav()->impl IntoView{
                     } class="material-symbols-outlined md-18 focus:ring-1 focus:ring-violet-300 rounded-sm hover:bg-[#3c3c3c]/35 active:text-[#e5e5e5] cursor-pointer hover:text-[#e5e5e5] focus:text-[#e5e5e5]  p-[4px]">refresh</button>
                 </div>
                 //folders
-                <div id="folders" class="sidebar_folders pb-[12px] overflow-y-auto h-[45vh]">
+                <div class="resize-y">
                     <div class="flex items-center text-[#e5e5e5] text-[11px] uppercase px-[8px] h-[35px] hover:text-white text-[#e5e5e5]">
                         <p class="pl-[12px]">EXPLORER</p>
                         <span class="material-symbols-outlined md-16 text-[#999999] w-[30px] ml-auto h-[25px] active:text-[#e5e5e5] cursor-pointer hover:text-[#e5e5e5] focus:text-[#e5e5e5]  p-[4px]">more_horiz</span>
                     </div>
+                    <div id="folders" class="sidebar_folders overflow-y-auto pb-[12px] h-[45vh]">
+                    </div>
                 </div>
+
                 //shared folder
-                <div id="shared_folder" class="sidebar_shared_folder pb-[12px] overflow-y-auto h-[45vh]">
+                <div class="resize-y">
                     <div class="flex items-center cursor-pointer hover:text-white text-[#e5e5e5] text-[11px] uppercase px-[8px] h-[35px]">
                         <p class="pl-[12px]">SHARED FOLDER</p>
                         <span class="material-symbols-outlined md-16 text-[#999999] w-[30px] ml-auto h-[25px] active:text-[#e5e5e5] cursor-pointer hover:text-[#e5e5e5] focus:text-[#e5e5e5]  p-[4px]">more_horiz</span>
                     </div>
+                    <div id="shared_folder" class="sidebar_shared_folder pb-[12px] overflow-y-auto h-[45vh]">
+                    </div>
                 </div>
+
                 //search
                 <div id="search"></div>
                 

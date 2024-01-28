@@ -250,7 +250,7 @@ pub async fn open_file(path: web::Json<RootPath>) -> impl Responder {
     #[cfg(target_os="windows")]
     {
         let open_cmd=Command::new("cmd")
-            .args(&["/C", "start", "", &file_path])
+            .args(&["/C", "start", "", &file_path.to_str().unwrap()])
             .spawn();
 
         if let Ok(file) = open_cmd {
