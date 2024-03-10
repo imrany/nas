@@ -4,9 +4,13 @@ import SideNav from "../components/SideNav";
 import TopNav from "../components/TopNav";
 import { useEffect, useState } from "react";
 import { ErrorBody, Folder } from "../types/definitions"
+import FileImage from "../assets/icons/file.png";
+import FolderImage from "../assets/icons/folder.png";
+import { openFile } from "../components/actions";
 
 export default function Home(){
     let [name,setName]=useState("")
+    let [isLoading,setIsLoading]=useState(true)
     let [folders,setFolders]=useState<Folder>({
         contents:[
             {
@@ -44,8 +48,10 @@ export default function Home(){
             }else{
                 setError(parseRes)
             }
+            setIsLoading(false)
         } catch (error:any) {
             console.error(error.message)
+            setIsLoading(false)
         }
     }
 
@@ -53,52 +59,103 @@ export default function Home(){
         open("http://localhost:8000/api/directory_content")
 	},[])
     return(
-        <div className="min-h-[100vh] bg-[#1d1d1d]">
-            <TopNav data={{name}}/>
-            <div className="flex">
-                <SideNav data={{folders,error,open}}/>
+        <>
+            {isLoading?(
+                <div className="bg-white text-[var(--theme-dark)] flex flex-col h-screen w-screen items-center justify-center">
+                    <p className="text-lg">Loading...</p>
+                </div>
+            ):(
+                <div className="min-h-[100vh] bg-[#1d1d1d]">
+                    <TopNav data={{name}}/>
+                    <div className="flex">
+                        <SideNav data={{folders,error,open}}/>
 
-                <div className="mt-[48px] flex-grow mb-[22px] text-[#999999]">
-                    {/*  folder view */}
-                    <div id="folder_view">
-                        {/* folder view nav */}
-                        <div id="folder_view_nav" className="fixed overflow-hidden left-[200px] right-0 top-[46px] h-[57px]">
-                            <div className="flex w-full bg-[#151515]">
-                                {localStorage.getItem("path")==="/"?"":(
-                                    <div onClick={()=>{
-                                        let path:any=localStorage.getItem("path")!==null?localStorage.getItem("path"):""
-                                        let newPath=path.slice(0,path?.lastIndexOf("/"))===""?path:path.slice(0,path?.lastIndexOf("/"))
-                                        localStorage.setItem("path",newPath)
-                                        open("http://localhost:8000/api/directory_content")
-                                    }} title="Previous" className="bg-[#151515] hover:bg-[#3c3c3c]/55 cursor-pointer pl-[10px] pr-[3px] w-[50px] h-[35px] flex items-center">
-                                        <MdArrowBack className="w-[18px] h-[18px] mr-[5px]"/>
+                        <div className="mt-[48px] flex-grow mb-[22px] text-[#999999]">
+                            {/*  folder view */}
+                            <div id="folder_view">
+                                {/* folder view nav */}
+                                <div id="folder_view_nav" className="fixed overflow-hidden left-[200px] right-0 top-[46px] h-[57px]">
+                                    <div className="flex w-full bg-[#151515]">
+                                        {localStorage.getItem("path")==="/"?"":(
+                                            <div onClick={()=>{
+                                                let path:any=localStorage.getItem("path")!==null?localStorage.getItem("path"):""
+                                                let newPath=path.slice(0,path?.lastIndexOf("/"))===""?path:path.slice(0,path?.lastIndexOf("/"))
+                                                localStorage.setItem("path",newPath)
+                                                open("http://localhost:8000/api/directory_content")
+                                            }} title="Previous" className="bg-[#151515] hover:bg-[#3c3c3c]/55 cursor-pointer pl-[10px] pr-[3px] w-[50px] h-[35px] flex items-center">
+                                                <MdArrowBack className="w-[18px] h-[18px] mr-[5px]"/>
+                                            </div>
+                                        )}
+                                        <div className="bg-[#1d1d1d] hover:bg-[#3c3c3c]/55 cursor-pointer pl-[10px] pr-[3px] min-w-[106px] h-[35px] flex items-center">
+                                            <MdFolder className="w-[18px] h-[18px] mr-[5px]"/>
+                                            <p className="text-[#E5E5E5] text-[13px] capitalize root_path_indicator">{name}</p>
+                                            <MdClose className="w-[22px] h-[22px] ml-[3px] p-[3px] hover:bg-gray-500 rounded-sm hover:text-white" onClick={()=>{
+                                                localStorage.removeItem("path");
+                                                window.location.reload();
+                                            }}/>
+                                        </div>
                                     </div>
-                                )}
-                                <div className="bg-[#1d1d1d] hover:bg-[#3c3c3c]/55 cursor-pointer pl-[10px] pr-[3px] min-w-[106px] h-[35px] flex items-center">
-                                    <MdFolder className="w-[18px] h-[18px] mr-[5px]"/>
-                                    <p className="text-[#E5E5E5] text-[13px] capitalize root_path_indicator">{name}</p>
-                                    <MdClose className="w-[22px] h-[22px] ml-[3px] p-[3px] hover:bg-gray-500 rounded-sm hover:text-white" onClick={()=>{
-                                        localStorage.removeItem("path");
-                                        window.location.reload();
-                                    }}/>
+                                </div>
+                                {/* folder view body  */}
+                                <div className="w-full flex flex-wrap mt-[35px]" id="folder_view_body">
+                                    <div id="test" className="ml-[200px] grid max-sm:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 w-full gap-4 px-[25px] py-[13px]">
+                                        { folders&&folders.contents.map((content)=>{
+                                            return(
+                                                <div key={content.name} className="flex flex-col items-center text-center">
+                                                    <button id={content.name} title={content.name}
+                                                        onDoubleClick={()=>{
+                                                            if(!content.metadata.is_file){
+                                                                localStorage.setItem("path",content.path)
+                                                                open("http://localhost:8000/api/directory_content")
+                                                            }else{
+                                                                openFile("http://localhost:8000/api/open",content.path)
+                                                            }
+                                                        }}  className='flex flex-col items-center justify-center text-[12px] max-w-[150px] hover:text-white active:text-white focus:text-white dropdown_btn'>
+                                                        {content.metadata.is_file?(<img src={FileImage} alt='file' className='w-[70px] h-[70px]'/>):(<img src={FolderImage} alt='folder' className='w-[70px] h-[70px]'/>)}
+                                                        <div>
+                                                            <p className='text-center'>{content.name.length<30?content.name:(<>{content.name.slice(0,38)}...</>)}</p>
+                                                        </div>
+                                                    </button>
+                                                    {/* <div id='context_list_{name_str}' className='flex z-5 absolute flex-wrap dropdown-content none w-[200px] -ml-[5px] max-lg:-ml-[27px]'>
+                                                        <div style='box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2);' className='font-normal mt-[40px]  py-[4px] absolute bg-[#252525] min-w-[180px] rounded-[4px] text-white text-[13px]'>
+                                                            <div className='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35 {name_str}_open_item'>
+                                                                <span className='material-symbols-outlined md-16 pr-[6px]'>open_in_new</span>
+                                                                <p>Open</p>
+                                                            </div>
+                                                            <div className='share_{name_str}'>
+                                                                <button className='share_with_network_{name_str} pl-[12px] pr-[5px] py-[8px] w-full flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
+                                                                    <span className='material-symbols-outlined md-16 pr-[6px]'>rss_feed</span>
+                                                                    <p>Send via network</p>
+                                                                </button>
+                                                                <button id='share_with_bluetooth_{name_str}' className='pl-[12px] pr-[5px] py-[8px] w-full flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
+                                                                    <span className='material-symbols-outlined md-16 pr-[6px]'>bluetooth</span>
+                                                                    <p>Share with bluetooth</p>
+                                                                </button>
+                                                            </div>
+                                                            <div className='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
+                                                                <span className='material-symbols-outlined md-16 pr-[6px]'>edit</span>
+                                                                <p>Rename</p>
+                                                            </div>
+                                                            <div className='px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
+                                                                <span className='material-symbols-outlined md-16 pr-[6px]'>delete</span>
+                                                                <p>Delete</p>
+                                                            </div>
+                                                        </div>
+                                                    </div> */}
+                                                </div>
+                                            )
+                                        })}
+                                    </div>
                                 </div>
                             </div>
 
-                            <div id="root_path_indicator_nav" className="w-full flex items-center h-[22px] text-[13px] bg-[#1d1d1d] text-[#999999] px-[16px] root_path_indicator">
-                            </div>
-                        </div>
-                        {/* folder view body  */}
-                        <div className="w-full flex flex-wrap mt-[35px]" id="folder_view_body">
-                            <div id="test" className="ml-[200px] grid max-sm:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 w-full gap-4 px-[25px] py-[13px]">
-                            </div>
+                            {/* share tab */}
+                            <div id="share_tab"></div>
                         </div>
                     </div>
-
-                    {/* share tab */}
-                    <div id="share_tab"></div>
+                    <Footer data={{folders}}/>
                 </div>
-            </div>
-            <Footer/>
-        </div>
+            )}
+        </>
     )
 }

@@ -1,7 +1,7 @@
 import { useEffect } from "react"
 import { FaGithub, FaTwitter, FaWhatsapp } from "react-icons/fa"
 import { MdArrowForward, MdFolder, MdMail, MdRefresh } from "react-icons/md"
-import { openDialog } from "../components/Feedback"
+import { openDialog } from "../components/actions"
 
 export default function LandingPage(){
     useEffect(()=>{
