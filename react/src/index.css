@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@font-face {
+  font-family: "Inter";
+  src: url(/Inter/Inter-VariableFont_slnt\,wght.ttf);
+}
+:root {
+  font-family: "Inter";
+  line-height: 1.5;
+  font-weight: 400;
+  scroll-behavior: smooth;
+
+  color: #ffff;
+  background: #252525;
+  font-size: 15px;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --theme-dark: #151515;
+  --hover-gray:#3c3c3c;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  font-weight: 500;
+  padding: 4px 0;
+  display: none;
+  position: absolute;
+  color: white;
+  font-size: 13px;
+  background: #252525;
+  border-radius: 4px;
+  min-width: 180px;
+  overflow: auto;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 10;
+}
+
+.block {display: block;}
+.none{display: none;}
+
+.sidebar_folders::-webkit-scrollbar,
+.sidebar_shared_folder::-webkit-scrollbar {
+  display: none;
+}
+.sidebar_folders,
+.sidebar_shared_folder{
+  scrollbar-width: none;
+}
