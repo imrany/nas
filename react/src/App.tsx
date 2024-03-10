@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import ErrorPage from './pages/ErrorPage';
 import Docs from './pages/Docs';
 import Home from "./pages/Home";
-import { OfflineDialog } from "./components/dialogs";
+import { OfflineDialog, OpenFolderDialog } from "./components/dialogs";
 import LandingPage from "./pages/LandingPage";
 import Layout from "./pages/Layout";
 
@@ -19,6 +19,7 @@ function App() {
         <Route path="*" element={<ErrorPage />} />
       </Routes>
       <OfflineDialog/>
+      <OpenFolderDialog/>
     </BrowserRouter>
   )
 }

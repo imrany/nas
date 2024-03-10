@@ -1,6 +1,7 @@
 import { useEffect } from "react"
 import { FaGithub, FaTwitter, FaWhatsapp } from "react-icons/fa"
-import { MdArrowForward, MdFileOpen, MdFolder, MdMail } from "react-icons/md"
+import { MdArrowForward, MdFolder, MdMail, MdRefresh } from "react-icons/md"
+import { openDialog } from "../components/Feedback"
 
 export default function LandingPage(){
     useEffect(()=>{
@@ -19,17 +20,16 @@ export default function LandingPage(){
                     <p>
                         Anvel is a networking program for file sharing. This program was developed by <a href="mailto:imranmat254@gmail.com" className="text-gray-400 underline" target="_blank" rel="noopener noreferrer" title="Contact imran">imrany</a>  to help in fast file sharing and expose users to computer networking.
                     </p>
-                    <div className="mt-4">
-                        <p className="mb-2 text-lg">Start</p>
-                        <div className="flex flex-col items-start justify-center gap-2">
-                            <a href="#" className="flex gap-2 items-center justify-center text-gray-400 hover:text-white underline">
-                                <MdFileOpen className="w-[20px] h-[20px]"/>
-                                <span>Open File</span>
-                            </a>
-                            <a href="#" className="flex gap-2 items-center justify-center text-gray-400 hover:text-white underline">
+                    <div className="mt-8 w-full">
+                        <div className="flex items-center justify-center gap-2">
+                            <button onClick={()=>openDialog("open_folder_dialog")} className="flex gap-2 text-[#252525] flex-grow items-center justify-center h-[30px] w-fit px-[20px] rounded-sm bg-white">
                                 <MdFolder className="w-[20px] h-[20px]"/>
                                 <span>Open Folder</span>
-                            </a>
+                            </button>
+                            <button onClick={()=>window.location.reload()} className="flex gap-2 text-[#252525] flex-grow items-center justify-center h-[30px] px-[20px] rounded-sm bg-white">
+                                <MdRefresh className="w-[20px] h-[20px]"/>
+                                <span>Refresh</span>
+                            </button>
                         </div>
                     </div>
                 </div>

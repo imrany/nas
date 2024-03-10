@@ -124,9 +124,10 @@ pub async fn directory_content(state: web::Data<AppState>, path: web::Json<RootP
             }
             contents
         }
-        Err(_) => {
+        Err(e) => {
+            println!("{e}");
             let err_message=ErrorMessage{
-                message:format!("Cannot find the folder named '{}'",directory_path.to_str().unwrap())
+                message:format!("No such folder name '{}'",directory_path.to_str().unwrap())
             };
             return HttpResponse::InternalServerError().json(err_message);
         }

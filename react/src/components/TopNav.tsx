@@ -1,9 +1,14 @@
+// @flow strict
 import { MdContentCopy, MdEdit, MdOutlineExpandMore, MdWifi } from "react-icons/md";
 import { openDialog } from "./Feedback";
 import { Link } from "react-router-dom";
 
-// @flow strict
-function TopNav() {
+type Props={
+    data:{
+        name:string
+    }
+}
+function TopNav(props:Props) {
     window.onclick = function(event:any) {
         if (!event.target.matches('.dropbtn')) {
             var dropdowns = document.getElementsByClassName("dropdown-content");
@@ -21,7 +26,7 @@ function TopNav() {
         let dropdown_list=document.getElementById("dropdown_list");
         dropdown_list?.classList.toggle("block");
     }
-
+    
     return (
         <nav className="fixed bg-[#151515] px-[12px] top-0 left-0 right-0 z-10">
             <div className="font-semibold text-[13px] flex justify-between min-h-[48px] items-center text-white">
@@ -48,7 +53,7 @@ function TopNav() {
                 </div>
                 <div className="text-[#C2C2C2] flex font-medium min-w-[10%] items-center">
                     <p className="rounded-md bg-[#252525] py-[2px] px-2 mr-2">Directory</p>
-                    <p className="root_path_indicator"></p>
+                    <p className="root_path_indicator capitalize">{props.data.name}</p>
                 </div>
                 <div className="text-[#C2C2C2] flex min-w-[10vw] justify-around">
                     <button

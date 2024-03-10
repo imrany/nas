@@ -1,43 +1,16 @@
 // @flow strict
-import { useEffect, useState } from "react"
-import { MdDrafts, MdFileOpen, MdFilePresent, MdFolder, MdMoreHoriz, MdRefresh, MdSearch } from "react-icons/md"
+import { MdEdit, MdFileOpen, MdFolder, MdMoreHoriz, MdRefresh, MdSearch } from "react-icons/md"
+import { openDialog } from "./Feedback"
+import { ErrorBody, Folder } from "../types/definitions"
 
-function SideNav() {
-    let [folders,setFolders]=useState([])
-    async function open(url:string,root:any){
-        try {
-            const response=await fetch(url,{
-                method:"POST",
-                headers:{
-                    "content-type":"application/json"
-                },
-                body:JSON.stringify({
-                    root
-                })
-            })
-            const parseRes=await response.json()
-            console.log(parseRes)
-            setFolders(parseRes.contents)
-        } catch (error:any) {
-            console.error(error.message)
-        }
+type Props = {
+    data:{
+        folders:Folder,
+        error:ErrorBody
+        open:any
     }
-
-    // async function handleFetchData(url:string){
-    //     try{
-    //         const response=await fetch(url,{
-    //             method:"GET"
-    //         })
-    //         const parseRes=await response.json()
-    //         console.log(parseRes)
-    //     }catch(error:any){
-    //         console.error(error.message)
-    //     }
-    // }
-
-    useEffect(()=>{
-        open("http://localhost:8000/api/directory_content",localStorage.getItem("path"))
-    },[])
+};
+function SideNav(props:Props) {
     return (
         <div id="sidebar" className="overflow-hidden h-[100vh] fixed pb-[12px] bottom-[18px] left-0 w-[200px] top-12 text-[13px] text-[#999999] bg-[#151515]">
             <div className="flex flex-col mb-3">
@@ -58,30 +31,40 @@ function SideNav() {
                         <p className="pl-[12px]">EXPLORER</p>
                         <MdMoreHoriz className="text-[#999999] w-[30px] ml-auto h-[25px] active:text-[#e5e5e5] cursor-pointer hover:text-[#e5e5e5] focus:text-[#e5e5e5]  p-[4px]"/>
                     </div>
-                    <div id="folders" className="sidebar_folders overflow-y-auto pb-[12px] pt-1 h-[45vh]">
-                        {folders?(
-                            <>
-                                <a href='#' id='folders_{name_str}' className='flex items-center mx-[1px] px-3 py-1 cursor-pointer hover:text-white active:text-white focus:text-white focus:ring-1 focus:ring-violet-300'>
-                                    <MdFolder className="w-[20px] h-[20px] pr-[3px]"/>
-                                    <p className='text-[#e5e5e5 text-[11px] uppercase'>Downloads</p>
-                                </a>
-
-                                <a href='#' id='folders_{name_str}' className='flex items-center mx-[1px] px-3 py-1 cursor-pointer hover:text-white active:text-white focus:text-white focus:ring-1 focus:ring-violet-300'>
-                                    <MdFileOpen className="w-[20px] h-[20px] pr-[3px]"/>
-                                    <p className='text-[#e5e5e5 text-[11px] uppercase'>music.mp3</p>
-                                </a>
-                            </>
-                        ):"No folder"}
-                    </div>
-                </div>
-
-                {/* shared folder */}
-                <div className="resize-y">
-                    <div className="flex items-center cursor-pointer hover:text-white text-[#e5e5e5] text-[11px] uppercase px-[8px] h-[35px]">
-                        <p className="pl-[12px]">SHARED FOLDER</p>
-                        <MdMoreHoriz className="text-[#999999] w-[30px] ml-auto h-[25px] active:text-[#e5e5e5] cursor-pointer hover:text-[#e5e5e5] focus:text-[#e5e5e5]  p-[4px]"/>
-                    </div>
-                    <div id="shared_folder" className="sidebar_shared_folder pb-[12px] overflow-y-auto h-[45vh]">
+                    <div id="folders" className="sidebar_folders overflow-y-auto pb-[30px] pt-1 h-screen">
+                        <div className="flex flex-col">
+                            {props.data.folders?props.data.folders.contents.map(content=>{
+                                return(
+                                    <>
+                                        {content.metadata.is_file?(
+                                            <button key={content.name} onClick={()=>{
+                                                localStorage.setItem("path",content.path)
+                                                props.data.open("http://localhost:8000/api/directory_content")
+                                            }} className='flex flex-grow items-center mx-[1px] px-3 py-1 cursor-pointer hover:text-white active:text-white focus:text-white focus:ring-1 focus:ring-violet-300'>
+                                                <MdFileOpen className="w-[20px] h-[20px] pr-[3px]"/>
+                                                <p className='text-[#e5e5e5 text-[11px] uppercase'>{content.name.length<20?content.name:(<>{content.name.slice(0,16)}...</>)}</p>
+                                            </button>
+                                        ):(
+                                            <button onClick={()=>{
+                                                localStorage.setItem("path",content.path)
+                                                props.data.open("http://localhost:8000/api/directory_content")
+                                            }} key={content.name} id='folders_{name_str}' className='flex flex-grow items-center mx-[1px] px-3 py-1 cursor-pointer hover:text-white active:text-white focus:text-white focus:ring-1 focus:ring-violet-300'>
+                                                <MdFolder className="w-[20px] h-[20px] pr-[3px]"/>
+                                                <p className='text-[#e5e5e5 text-[11px] uppercase'>{content.name.length<20?content.name:(<>{content.name.slice(0,16)}...</>)}</p>
+                                            </button>
+                                        )}
+                                    </>
+                                )
+                            }):(
+                                <div className="flex flex-col justify-start items-start py-2 px-3">
+                                    <p>{props.data.error.message}</p>
+                                    <button onClick={()=>openDialog("open_folder_dialog")} className="mt-2 underline flex gap-2 text-blue-500 items-center justify-center">
+                                        <MdEdit className="w-[16px] h-[16px]"/>
+                                        <span>Edit path</span>
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
 
