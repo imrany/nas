@@ -1,4 +1,4 @@
-import { MdArrowBack, MdClose, MdFolder } from "react-icons/md";
+import { MdArrowBack, MdClose, MdFolder, MdOpenInNew, MdShare } from "react-icons/md";
 import Footer from "../components/Footer";
 import SideNav from "../components/SideNav";
 import TopNav from "../components/TopNav";
@@ -11,6 +11,7 @@ import { openFile } from "../components/actions";
 export default function Home(){
     let [name,setName]=useState("")
     let [isLoading,setIsLoading]=useState(true)
+    let [showCloseBtn,setShowCloseBtn]=useState(false)
     let [folders,setFolders]=useState<Folder>({
         contents:[
             {
@@ -86,13 +87,15 @@ export default function Home(){
                                                 <MdArrowBack className="w-[18px] h-[18px] mr-[5px]"/>
                                             </div>
                                         )}
-                                        <div className="bg-[#1d1d1d] hover:bg-[#3c3c3c]/55 cursor-pointer pl-[10px] pr-[3px] min-w-[106px] h-[35px] flex items-center">
+                                        <div onMouseEnter={()=>setShowCloseBtn(true)} onMouseLeave={()=>setShowCloseBtn(false)} className="bg-[#1d1d1d] hover:bg-[#3c3c3c]/55 cursor-pointer pl-[10px] pr-[3px] min-w-[128px] h-[35px] flex items-center">
                                             <MdFolder className="w-[18px] h-[18px] mr-[5px]"/>
-                                            <p className="text-[#E5E5E5] text-[13px] capitalize root_path_indicator">{name}</p>
-                                            <MdClose className="w-[22px] h-[22px] ml-[3px] p-[3px] hover:bg-gray-500 rounded-sm hover:text-white" onClick={()=>{
-                                                localStorage.removeItem("path");
-                                                window.location.reload();
-                                            }}/>
+                                            <p className="text-[#E5E5E5] mr-[3px] text-[13px] capitalize root_path_indicator">{name}</p>
+                                            {showCloseBtn?(
+                                                <MdClose className="p-[3px] w-[22px] h-[22px] hover:bg-[#3c3c3c]/90 rounded-sm hover:text-white" onClick={()=>{
+                                                    localStorage.removeItem("path");
+                                                    window.location.reload();
+                                                }}/>
+                                            ):""}
                                         </div>
                                     </div>
                                 </div>
@@ -103,6 +106,12 @@ export default function Home(){
                                             return(
                                                 <div key={content.name} className="flex flex-col items-center text-center">
                                                     <button id={content.name} title={content.name}
+                                                        onContextMenu={()=>{
+                                                            if(content.metadata.is_file){
+                                                                let dropdown_list=document.getElementById(`context_list_${content.name}`);
+                                                                dropdown_list?.classList.toggle("block");
+                                                            }
+                                                        }}
                                                         onDoubleClick={()=>{
                                                             if(!content.metadata.is_file){
                                                                 localStorage.setItem("path",content.path)
@@ -113,35 +122,21 @@ export default function Home(){
                                                         }}  className='flex flex-col items-center justify-center text-[12px] max-w-[150px] hover:text-white active:text-white focus:text-white dropdown_btn'>
                                                         {content.metadata.is_file?(<img src={FileImage} alt='file' className='w-[70px] h-[70px]'/>):(<img src={FolderImage} alt='folder' className='w-[70px] h-[70px]'/>)}
                                                         <div>
-                                                            <p className='text-center'>{content.name.length<30?content.name:(<>{content.name.slice(0,38)}...</>)}</p>
+                                                            <p className='text-center'>{content.name.length<30?content.name:(<>{content.name.slice(0,30)}...</>)}</p>
                                                         </div>
                                                     </button>
-                                                    {/* <div id='context_list_{name_str}' className='flex z-5 absolute flex-wrap dropdown-content none w-[200px] -ml-[5px] max-lg:-ml-[27px]'>
-                                                        <div style='box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2);' className='font-normal mt-[40px]  py-[4px] absolute bg-[#252525] min-w-[180px] rounded-[4px] text-white text-[13px]'>
-                                                            <div className='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35 {name_str}_open_item'>
-                                                                <span className='material-symbols-outlined md-16 pr-[6px]'>open_in_new</span>
+                                                    <div id={`context_list_${content.name}`} className='dropdown-content  flex-wrap  w-[200px] mt-[50px] -ml-[5px] max-lg:-ml-[27px]'>
+                                                        <div>
+                                                            <div onClick={()=>openFile("http://localhost:8000/api/open",content.path)} className='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35 {name_str}_open_item'>
+                                                                <MdOpenInNew className="w-[25px] h-[25px] pr-[6px]"/>
                                                                 <p>Open</p>
                                                             </div>
-                                                            <div className='share_{name_str}'>
-                                                                <button className='share_with_network_{name_str} pl-[12px] pr-[5px] py-[8px] w-full flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
-                                                                    <span className='material-symbols-outlined md-16 pr-[6px]'>rss_feed</span>
-                                                                    <p>Send via network</p>
-                                                                </button>
-                                                                <button id='share_with_bluetooth_{name_str}' className='pl-[12px] pr-[5px] py-[8px] w-full flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
-                                                                    <span className='material-symbols-outlined md-16 pr-[6px]'>bluetooth</span>
-                                                                    <p>Share with bluetooth</p>
-                                                                </button>
-                                                            </div>
-                                                            <div className='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
-                                                                <span className='material-symbols-outlined md-16 pr-[6px]'>edit</span>
-                                                                <p>Rename</p>
-                                                            </div>
                                                             <div className='px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
-                                                                <span className='material-symbols-outlined md-16 pr-[6px]'>delete</span>
-                                                                <p>Delete</p>
+                                                                <MdShare className="w-[25px] h-[25px] pr-[6px]"/>
+                                                                <p>Share</p>
                                                             </div>
                                                         </div>
-                                                    </div> */}
+                                                    </div>
                                                 </div>
                                             )
                                         })}

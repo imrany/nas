@@ -8,6 +8,9 @@ import Layout from "./pages/Layout";
 
 function App() {
   let path=localStorage.getItem("path")
+  window.oncontextmenu=(e:any)=>{
+    e.preventDefault()
+  }
   return (
     <BrowserRouter>
       <Routes>
