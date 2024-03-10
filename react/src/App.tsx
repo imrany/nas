@@ -1,31 +1,21 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { ToastContainer } from 'react-toastify';
-import { Toaster } from "react-hot-toast";
 import ErrorPage from './pages/ErrorPage';
 import Docs from './pages/Docs';
 import Home from "./pages/Home";
 import { OfflineDialog } from "./components/dialogs";
 import LandingPage from "./pages/LandingPage";
+import Layout from "./pages/Layout";
 
 function App() {
+  let path=localStorage.getItem("path")
   return (
     <BrowserRouter>
-      <ToastContainer 
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
-      <Toaster/>
       <Routes>
-        <Route path="/" element={<LandingPage/>} />
-        <Route path="/home" element={<Home/>} />
-        <Route path="/docs" element={<Docs />} />
+        <Route path="/welcome" element={path===null?<LandingPage/>:<Navigate to="/"/>} />
+        <Route path="/" element={path!==null?<Layout/>:<Navigate to="/welcome"/>}>
+          <Route index element={<Home/>} />
+          <Route path="docs" element={<Docs />} />
+        </Route>
         <Route path="*" element={<ErrorPage />} />
       </Routes>
       <OfflineDialog/>
