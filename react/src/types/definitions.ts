@@ -4,14 +4,16 @@ export type ErrorBody={
     solution?:any
 }
 
+export interface Content{
+	root:string,
+	path:string,
+	name:string,
+	metadata:{
+		is_file:boolean,
+		file_extension:string,
+	}
+}
+
 export interface Folder{
-    contents:{
-        root:string,
-        path:string,
-        name:string,
-        metadata:{
-            is_file:boolean,
-            file_extension:string
-        }
-    }[]
+    contents:Content[]
 }
