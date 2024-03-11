@@ -12,7 +12,7 @@ function NotFound() {
     let errorQuery=search[0].get("error")
     useEffect(()=>{
         switch (errorQuery) {
-            case "not_supported":
+            case "Not supported":
                 setErrorBody({
                     error_type:"Not supported",
                     message:"This item or feature might not be supported on the current version, you can update to the lastest version.",
@@ -26,10 +26,10 @@ function NotFound() {
                 })
             break;
         
-            case "Failed to fetch data":
+            case "Failed to fetch":
                 setErrorBody({
-                    error_type:"Failed to fetch data",
-                    message:"This item or feature might not be supported on the current version, you can update to the lastest version.",
+                    error_type:"Failed to fetch",
+                    message:"Anvel is not running correctly, please cancel and run again.",
                     solution:(
                         <>
                             If the issue persists,
