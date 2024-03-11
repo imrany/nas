@@ -141,7 +141,7 @@ export default function Home(){
                                             <MdFolder className="w-[18px] h-[18px] mr-[5px]"/>
                                             <p className="text-[#E5E5E5] mr-[3px] text-[13px] capitalize root_path_indicator">{name}</p>
                                             {showCloseBtn?(
-                                                <MdClose className="p-[3px] w-[22px] h-[22px] hover:bg-[#3c3c3c]/90 ml-auto rounded-sm hover:text-white" onClick={()=>{
+                                                <MdClose className="p-[3px] w-[22px] h-[22px] bg-[#3c3c3c]/90 ml-auto rounded-sm text-white" onClick={()=>{
                                                     localStorage.removeItem("path");
                                                     window.location.reload();
                                                 }}/>

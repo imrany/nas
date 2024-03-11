@@ -22,11 +22,11 @@ export default function LandingPage(){
                     </p>
                     <div className="mt-8 w-full">
                         <div className="flex items-center justify-center gap-2">
-                            <button onClick={()=>openDialog("open_folder_dialog")} className="flex gap-2 text-[#252525] flex-grow items-center justify-center h-[30px] w-fit px-[20px] rounded-sm bg-white">
+                            <button onClick={()=>openDialog("open_folder_dialog")} className="flex gap-2 text-[#252525] flex-grow items-center justify-center h-[30px] w-fit px-[20px] rounded-sm bg-[#EDFFA5]">
                                 <MdFolder className="w-[20px] h-[20px]"/>
                                 <span>Open Folder</span>
                             </button>
-                            <button onClick={()=>window.location.reload()} className="flex gap-2 text-[#252525] flex-grow items-center justify-center h-[30px] px-[20px] rounded-sm bg-white">
+                            <button onClick={()=>window.location.reload()} className="flex gap-2 text-[#252525] flex-grow items-center justify-center h-[30px] px-[20px] rounded-sm bg-[#EDFFA5]">
                                 <MdRefresh className="w-[20px] h-[20px]"/>
                                 <span>Refresh</span>
                             </button>
