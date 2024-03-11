@@ -157,10 +157,8 @@ export default function Home(){
                                                 <div key={content.name} className="flex flex-col items-center text-center">
                                                     <button id={content.name} title={content.name}
                                                         onContextMenu={()=>{
-                                                            if(content.metadata.is_file){
-                                                                let dropdown_list=document.getElementById(`context_list_${content.name}`);
-                                                                dropdown_list?.classList.toggle("block");
-                                                            }
+                                                            let dropdown_list=document.getElementById(`context_list_${content.name}`);
+                                                            dropdown_list?.classList.toggle("block");
                                                         }}
                                                         onDoubleClick={()=>{
                                                             if(!content.metadata.is_file){
@@ -177,14 +175,21 @@ export default function Home(){
                                                     </button>
                                                     <div id={`context_list_${content.name}`} className='dropdown-content  flex-wrap  w-[200px] mt-[50px] -ml-[5px] max-lg:-ml-[27px]'>
                                                         <div>
-                                                            <div onClick={()=>openFile("http://localhost:8000/api/open",content.path)} className='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35 {name_str}_open_item'>
+                                                            <div onClick={()=>{
+                                                                if(content.metadata.is_file){
+                                                                    openFile("http://localhost:8000/api/open",content.path)
+                                                                }else{
+                                                                    localStorage.setItem("path",content.path)
+                                                                    open("http://localhost:8000/api/directory_content")
+                                                                }
+                                                            }} className='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35 {name_str}_open_item'>
                                                                 <MdOpenInNew className="w-[25px] h-[25px] pr-[6px]"/>
                                                                 <p>Open</p>
                                                             </div>
-                                                            <div className='px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
+                                                            {content.metadata.is_file?(<div className='px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
                                                                 <MdShare className="w-[25px] h-[25px] pr-[6px]"/>
                                                                 <p>Share</p>
-                                                            </div>
+                                                            </div>):""}
                                                         </div>
                                                     </div>
                                                 </div>

@@ -14,6 +14,11 @@ export interface Content{
 	}
 }
 
+export interface Notifications{
+	priority:string,
+	message:string
+}
+
 export interface Folder{
     contents:Content[]
 }
