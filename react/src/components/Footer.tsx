@@ -1,9 +1,12 @@
 import { Link } from "react-router-dom";
 import { Folder } from "../types/definitions";
+import { MdFileOpen, MdFolder, MdFolderShared } from "react-icons/md";
 
 type Props={
     data:{
-        folders:Folder
+        folders:Folder,
+        onlyFolders:any,
+        onlyFiles:any,
     }
 }
 export default function Footer(props:Props){
@@ -16,14 +19,48 @@ export default function Footer(props:Props){
             fileCount.push(item)
         }
     })
+    function showToast(id:string){
+        document.getElementById(id)?.classList.toggle("none")
+    }
     return(
         <footer className="fixed bottom-0 h-[25px] bg-blue-500 px-[7px] left-0 right-0">
             <div className="flex">
                 <p className="px-[5px] py-[2px] text-[13px]">anvel</p>
-                <div className="flex ml-auto text-[13px]">
-                    <Link to="/" className="mx-[3px] px-[5px] py-[2px] hover:bg-blue-400">Folder: {folderCount.length}</Link>
-                    <Link to="/" className="mx-[3px] px-[5px] py-[2px] hover:bg-blue-400">File: {fileCount.length}</Link>
-                    <Link to="/" className="mx-[3px] px-[5px] py-[2px] hover:bg-blue-400">Shared Folder: 8</Link>
+                <div className="flex ml-auto">
+                    <div className="flex items-center justify-center text-[13px] ">
+                        <Link to="/" onMouseEnter={()=>showToast("sign_up")} onMouseLeave={()=>showToast("sign_up")} className="relative inline-block px-[15px] py-[2px] hover:bg-blue-400">
+                            <span id="sign_up" className="absolute text-gray-300 none flex items-center justify-center bg-[#252525] z-10 -mt-8 border-[1px] border-[var(--theme-gray)] -ml-14 h-[25px] min-w-[150px]">Create an account</span>
+                            <span>Sign up</span>
+                        </Link>
+                        <Link to="/" onMouseEnter={()=>showToast("login")} onMouseLeave={()=>showToast("login")} className="relative inline-block px-[15px] py-[2px] hover:bg-blue-400">
+                            <span id="login" className="absolute text-gray-300 none flex items-center justify-center bg-[#252525] z-10 -mt-8 border-[1px] border-[var(--theme-gray)] -ml-14 h-[25px] min-w-[150px]">Login to your account</span>
+                            <span>Login</span>
+                        </Link>
+                    </div>
+                    <div className="flex items-center justify-center text-[13px] border-dotted border-l-[1px] border-gray-500">
+                        <button onClick={async ()=>{
+                            props.data.onlyFolders()
+                        }} onMouseOut={()=>showToast("folder_count")} onMouseLeave={()=>showToast("folder_count")} onMouseEnter={()=>showToast("folder_countr")} className="relative inline-block px-[10px] py-[2px] hover:bg-blue-400">
+                            <span id="folder_count" className="absolute none flex items-center justify-center text-gray-300 bg-[#252525] z-10 -mt-8 border-[1px] border-[var(--theme-gray)] -ml-6 h-[25px] min-w-[150px]">View folders : {folderCount.length}</span>
+                            <div className="flex gap-1 items-center ">
+                                <MdFolder/>
+                                <span>Folder: {folderCount.length}</span>
+                            </div>
+                        </button>
+                        <button onClick={async()=>{
+                            props.data.onlyFiles()
+                        }} className="px-[10px] flex gap-1 items-center py-[2px] hover:bg-blue-400">
+                            <MdFileOpen/>
+                            <span>File: {fileCount.length}</span>
+                        </button>
+                        <Link to="/" onMouseEnter={()=>showToast("shared_folder")} onMouseLeave={()=>showToast("shared_folder")} className="relative inline-block px-[10px] py-[2px] hover:bg-blue-400">
+                            <span id="shared_folder" className="absolute none flex items-center justify-center text-gray-300 bg-[#252525] z-10 -mt-8 border-[1px] border-[var(--theme-gray)] -ml-6 h-[25px] min-w-[150px]">View shared folders</span>
+                            <div className="flex gap-1 items-center ">
+                                <MdFolderShared/>
+                                <span>Shared Folder: 8</span>
+                            </div>
+                        </Link>
+                    </div>
                 </div>
             </div>
         </footer>

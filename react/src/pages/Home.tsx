@@ -3,12 +3,14 @@ import Footer from "../components/Footer";
 import SideNav from "../components/SideNav";
 import TopNav from "../components/TopNav";
 import { useEffect, useState } from "react";
-import { ErrorBody, Folder } from "../types/definitions"
+import { ErrorBody, Folder, Content } from "../types/definitions"
 import FileImage from "../assets/icons/file.png";
 import FolderImage from "../assets/icons/folder.png";
 import { openFile } from "../components/actions";
+import { useNavigate } from "react-router-dom";
 
 export default function Home(){
+    const navigate=useNavigate()
     let [name,setName]=useState("")
     let [isLoading,setIsLoading]=useState(true)
     let [showCloseBtn,setShowCloseBtn]=useState(false)
@@ -25,6 +27,18 @@ export default function Home(){
             }
         ]
     })
+   
+    let [contents,setContents]=useState<Content[]>([
+        {
+            name:"",
+            root:"",
+            path:"",
+            metadata:{
+                is_file:false,
+                file_extension:""
+            }
+        }
+    ])
     let [error,setError]=useState<ErrorBody>({
         message:""
     })
@@ -45,6 +59,7 @@ export default function Home(){
             setName(parts[parts.length - 1]);
             const parseRes:any=await response.json()
             if(response.ok){
+	    	    setContents(parseRes.contents)
                 setFolders(parseRes)
             }else{
                 setError(parseRes)
@@ -53,7 +68,32 @@ export default function Home(){
         } catch (error:any) {
             console.error(error.message)
             setIsLoading(false)
+            navigate(`/error?error=${error.message}`)
         }
+    }
+
+    function onlyFolders(){
+	    let arr:Folder={
+            contents:[]
+        }
+        contents.map((content)=>{
+            if(!content.metadata.is_file){
+                arr.contents.push(content)
+            }
+            setFolders(arr)
+        })
+    }
+
+    function onlyFiles(){
+        let arr:Folder={
+            contents:[]
+        }
+        contents.map((content)=>{
+            if(content.metadata.is_file){
+                arr.contents.push(content)
+            }
+            setFolders(arr)
+        })
     }
 
     useEffect(()=>{
@@ -148,7 +188,7 @@ export default function Home(){
                             <div id="share_tab"></div>
                         </div>
                     </div>
-                    <Footer data={{folders}}/>
+                    <Footer data={{folders, onlyFolders, onlyFiles}}/>
                 </div>
             )}
         </>
