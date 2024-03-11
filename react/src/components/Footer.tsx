@@ -142,7 +142,7 @@ export default function Footer(props:Props){
                             </div>
                             <button onClick={()=>{
                                 showToast("notification_dialog")
-                            }} onMouseEnter={()=>showToast("notification_toast")} onMouseLeave={()=>showToast("notification_toast")} className="relative inline-block px-[15px] h-full hover:bg-[#EDFFA5]">
+                            }} onMouseEnter={()=>showToast("notification_toast")} onMouseLeave={()=>showToast("notification_toast")} className="relative inline-block px-[15px] h-[25px] hover:bg-[#EDFFA5]">
                                 <span id="notification_toast" className="absolute text-gray-300 none flex items-center justify-center bg-[#252525] z-10 -mt-8 border-[1px] border-[var(--theme-gray)] -ml-[115px] h-[25px] min-w-[150px]">No New Notifications</span>
                                 <div className="flex gap-1 items-center">
                                     <MdNotifications className="w-[17px] h-[17px]"/>
