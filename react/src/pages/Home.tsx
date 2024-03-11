@@ -91,7 +91,7 @@ export default function Home(){
                                             <MdFolder className="w-[18px] h-[18px] mr-[5px]"/>
                                             <p className="text-[#E5E5E5] mr-[3px] text-[13px] capitalize root_path_indicator">{name}</p>
                                             {showCloseBtn?(
-                                                <MdClose className="p-[3px] w-[22px] h-[22px] hover:bg-[#3c3c3c]/90 rounded-sm hover:text-white" onClick={()=>{
+                                                <MdClose className="p-[3px] w-[22px] h-[22px] hover:bg-[#3c3c3c]/90 ml-auto rounded-sm hover:text-white" onClick={()=>{
                                                     localStorage.removeItem("path");
                                                     window.location.reload();
                                                 }}/>
@@ -119,7 +119,7 @@ export default function Home(){
                                                             }else{
                                                                 openFile("http://localhost:8000/api/open",content.path)
                                                             }
-                                                        }}  className='flex flex-col items-center justify-center text-[12px] max-w-[150px] hover:text-white active:text-white focus:text-white dropdown_btn'>
+                                                        }}  className='flex flex-col items-center justify-center text-[12px] max-w-[150px] hover:text-white active:text-white focus:bg-[#3c3c3c]/90 focus:text-white dropdown_btn'>
                                                         {content.metadata.is_file?(<img src={FileImage} alt='file' className='w-[70px] h-[70px]'/>):(<img src={FolderImage} alt='folder' className='w-[70px] h-[70px]'/>)}
                                                         <div>
                                                             <p className='text-center'>{content.name.length<30?content.name:(<>{content.name.slice(0,30)}...</>)}</p>
