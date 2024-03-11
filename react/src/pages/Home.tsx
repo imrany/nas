@@ -59,8 +59,18 @@ export default function Home(){
             setName(parts[parts.length - 1]);
             const parseRes:any=await response.json()
             if(response.ok){
-	    	    setContents(parseRes.contents)
-                setFolders(parseRes)
+	    	    // setContents(parseRes.contents)
+                // setFolders(parseRes)
+                let withOutDotConfig:Folder={
+                    contents:[]
+                }
+                parseRes.contents.forEach((content:Content) => {
+                   if(content.name.slice(0,1)!=="."){
+                    withOutDotConfig.contents.push(content)
+                   }
+                });
+                setFolders(withOutDotConfig)
+	    	    setContents(withOutDotConfig.contents)
             }else{
                 setError(parseRes)
             }
