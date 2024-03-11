@@ -9,7 +9,7 @@ function NotFound() {
         solution:(<></>)
     });
     let search:any=useSearchParams()
-    let errorQuery=search.get("error")
+    let errorQuery=search[0].get("error")
     useEffect(()=>{
         switch (errorQuery) {
             case "not_supported":
@@ -20,8 +20,7 @@ function NotFound() {
                         <>
                             If the issue persists,
                             <strong> please contact our support team at </strong>
-                            <a href='mailto:imranmat254@gmail.com' className='font-normal underline'>imranmat254@gmail.com</a>
-                            for further assistance, making sure to copy the error details below.
+                            <a href='mailto:imranmat254@gmail.com' className='font-normal underline'>imranmat254@gmail.com</a> for further assistance, making sure to copy the error details below.
                         </>
                     )
                 })
@@ -35,8 +34,7 @@ function NotFound() {
                         <>
                             If the issue persists,
                             <strong> please contact our support team at </strong>
-                            <a href='mailto:imranmat254@gmail.com' className='font-normal underline'>imranmat254@gmail.com</a>
-                            for further assistance, making sure to copy the error details below.
+                            <a href='mailto:imranmat254@gmail.com' className='font-normal underline'>imranmat254@gmail.com</a> for further assistance, making sure to copy the error details below.
                         </>
                     )
                 })
@@ -50,8 +48,7 @@ function NotFound() {
                         <>
                             If the issue persists,
                             <strong> please contact our support team at </strong>
-                            <a href='mailto:imranmat254@gmail.com' className='font-normal underline'>imranmat254@gmail.com</a>
-                            for further assistance, making sure to copy the error details below.
+                            <a href='mailto:imranmat254@gmail.com' className='font-normal underline'>imranmat254@gmail.com</a> for further assistance, making sure to copy the error details below.
                         </>
                     )
                 })
@@ -81,7 +78,10 @@ function NotFound() {
                 <details>
                     <summary className="text-[#999999] cursor-pointer hover:text-white active:text-white focus:text-white text-[13px]">Problem details and configurations</summary>
                     <div className="text-[#999999] bg-[#151515] rounded-sm mt-[24px] p-[24px] text-[13px]">
-                        <p>TypeError: {errorBody.error_type}</p>
+                        <div className="grid grid-cols-2 gap-6">
+                            <p>TypeError: </p>
+                            <p>{errorBody.error_type}</p>
+                        </div>
                         <div className="mt-[16px] grid grid-rows-2 gap-3">
                             <code className="grid grid-cols-2 gap-6">
                                 <span>Version</span> 
