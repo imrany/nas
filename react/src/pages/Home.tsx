@@ -1,4 +1,4 @@
-import { MdArrowBack, MdClose, MdFolder, MdOpenInNew, MdShare } from "react-icons/md";
+import { MdArrowBack, MdClose, MdContentCopy, MdFolder, MdOpenInNew, MdShare } from "react-icons/md";
 import Footer from "../components/Footer";
 import SideNav from "../components/SideNav";
 import TopNav from "../components/TopNav";
@@ -186,6 +186,12 @@ export default function Home(){
                                                                 <MdOpenInNew className="w-[25px] h-[25px] pr-[6px]"/>
                                                                 <p>Open</p>
                                                             </div>
+                                                            <button onClick={()=>{
+                                                                navigator.clipboard.writeText(content.path)
+                                                            }} className='px-[12px] w-full py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35 {name_str}_open_item'>
+                                                                <MdContentCopy className="w-[25px] h-[25px] pr-[6px]"/>
+                                                                <p>Copy Path</p>
+                                                            </button>
                                                             {content.metadata.is_file?(<div className='px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
                                                                 <MdShare className="w-[25px] h-[25px] pr-[6px]"/>
                                                                 <p>Share</p>
