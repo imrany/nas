@@ -1,5 +1,5 @@
 // @flow strict
-import { MdContentCopy, MdEdit, MdOutlineExpandMore, MdWifi } from "react-icons/md";
+import { MdContentCopy, MdEdit, MdOutlineExpandMore, MdSettings,  } from "react-icons/md";
 import { openDialog } from "./actions";
 import { Link } from "react-router-dom";
 
@@ -46,8 +46,8 @@ function TopNav(props:Props) {
                         </div>
                         
                         <div onClick={()=>openDialog("network_dialog")} className="px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
-                            <MdWifi className="w-[25px] h-[25px] pr-[6px]"/>
-                            <p>Network Info</p>
+                            <MdSettings className="w-[25px] h-[25px] pr-[6px]"/>
+                            <p>Settings</p>
                         </div>
                     </div>
                 </div>
@@ -55,13 +55,8 @@ function TopNav(props:Props) {
                     <p className="rounded-md bg-[#252525] py-[2px] px-2 mr-2">Directory</p>
                     <p className="root_path_indicator capitalize">{props.data.name}</p>
                 </div>
-                <div className="text-[#C2C2C2] flex min-w-[10vw] justify-around">
-                    <button
-                        className="hover:text-white ml-[10px] active:text-white focus:text-white"
-                        onClick={()=>openDialog("network_dialog")}
-                    >
-                     Network info
-                     </button>
+                <div className="text-[#C2C2C2] flex gap-2 min-w-[10vw] justify-around">
+                    {/* more nav link or btn */}
                 </div>
             </div>
         </nav>

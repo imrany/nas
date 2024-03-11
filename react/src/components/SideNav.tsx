@@ -35,7 +35,7 @@ function SideNav(props:Props) {
                         <div className="flex flex-col">
                             {props.data.folders?props.data.folders.contents.map(content=>{
                                 return(
-                                    <>
+                                    <div key={content.name}>
                                         {content.metadata.is_file?(
                                             <button key={content.name} onClick={()=>{
                                                 if(!content.metadata.is_file){
@@ -57,7 +57,7 @@ function SideNav(props:Props) {
                                                 <p className='text-[#e5e5e5 text-[11px] uppercase'>{content.name.length<20?content.name:(<>{content.name.slice(0,16)}...</>)}</p>
                                             </button>
                                         )}
-                                    </>
+                                    </div>
                                 )
                             }):(
                                 <div className="flex flex-col justify-start items-start py-2 px-3">
