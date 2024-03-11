@@ -21,7 +21,7 @@ function SideNav(props:Props) {
                     <button className="focus:ring-1 focus:ring-violet-300 rounded-sm hover:bg-[#3c3c3c]/35 active:text-[#e5e5e5] cursor-pointer hover:text-[#e5e5e5] focus:text-[#e5e5e5]  p-[4px]">
                         <MdSearch className="w-[18px] h-[18px]"/>
                     </button>
-                    <button onClick={()=>window.location.reload()} className="focus:ring-1 focus:ring-violet-300 rounded-sm hover:bg-[#3c3c3c]/35 active:text-[#e5e5e5] cursor-pointer hover:text-[#e5e5e5] focus:text-[#e5e5e5]  p-[4px]">
+                    <button onClick={()=>props.data.open("http://localhost:8000/api/directory_content")} className="focus:ring-1 focus:ring-violet-300 rounded-sm hover:bg-[#3c3c3c]/35 active:text-[#e5e5e5] cursor-pointer hover:text-[#e5e5e5] focus:text-[#e5e5e5]  p-[4px]">
                         <MdRefresh className="w-[18px] h-[18px]"/>
                     </button>
                 </div>
