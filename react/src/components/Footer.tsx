@@ -14,6 +14,7 @@ type Props={
         open:any,
         handleShowSettings:any,
         showToast:any,
+        handleCloseSettings:any,
         notifications:Notifications[]
     }
 }
@@ -88,6 +89,7 @@ export default function Footer(props:Props){
                     <div className="flex items-center justify-center border-dotted border-l-[1px] border-gray-500">
                         <button onClick={()=>{
                            props.data.onlyFolders()
+                           props.data.handleCloseSettings()
                         }} onMouseEnter={()=>props.data.showToast("folder_count")} onMouseLeave={()=>props.data.showToast("folder_count")} className="relative inline-block px-[15px] py-[2px] hover:bg-[#EDFFA5]">
                             <span id="folder_count" className="absolute text-[13px] none flex items-center justify-center text-gray-300 bg-[#252525] z-10 -mt-8 border-[1px] border-[var(--theme-gray)] -ml-10 h-[25px] min-w-[150px]">{folderCount.length!==0?(<p>View folders : {folderCount.length}</p>):(<p>No folder</p>)}</span>
                             <div className="flex gap-1 items-center">
@@ -97,6 +99,7 @@ export default function Footer(props:Props){
                         </button>
                         <button onClick={()=>{
                             props.data.onlyFiles()
+                            props.data.handleCloseSettings()
                         }} onMouseEnter={()=>props.data.showToast("file_count")} onMouseLeave={()=>props.data.showToast("file_count")} className="relative inline-block px-[15px] py-[2px] hover:bg-[#EDFFA5]">
                             <span id="file_count" className="absolute text-[13px] text-gray-300 none flex items-center justify-center bg-[#252525] z-10 -mt-8 border-[1px] border-[var(--theme-gray)] -ml-10 h-[25px] min-w-[150px]">{fileCount.length!==0?(<p>View files : {fileCount.length}</p>):(<p>No file</p>)}</span>
                             <div className="flex gap-1 items-center ">
@@ -106,9 +109,10 @@ export default function Footer(props:Props){
                         </button>
                         <button onClick={()=>{
                             let path:any=localStorage.getItem("path")
-                            localStorage.setItem("previous",path)
+                            path!=="shared"?localStorage.setItem("previous",path):""
                             localStorage.setItem("path","shared")
                             props.data.open("http://localhost:8000/api/directory_content")
+                            props.data.handleCloseSettings()
                         }} onMouseEnter={()=>props.data.showToast("shared_resources")} onMouseLeave={()=>props.data.showToast("shared_resources")} className="relative inline-block px-[10px] py-[2px] hover:bg-[#EDFFA5]">
                             <span id="shared_resources" className="text-[13px] absolute text-gray-300 none flex items-center justify-center bg-[#252525] z-10 -mt-8 border-[1px] border-[var(--theme-gray)] -ml-3 h-[25px] min-w-[150px]">View shared resources</span>
                             <div className="flex gap-1 items-center ">
