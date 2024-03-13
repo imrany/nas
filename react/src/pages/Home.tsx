@@ -300,7 +300,7 @@ export default function Home(props:Props){
                                     <div className="w-full flex flex-wrap mt-[35px]" id="settings_view">
                                         <div className="ml-[200px] flex flex-col w-full gap-4 px-[25px] py-[13px]">
                                             <div>
-                                                <p className="text-white text-lg mb-1">User Preference</p>
+                                                <p className="text-white text-lg mb-2">User Preference</p>
                                                 <div className="flex flex-col">
                                                     <p>Choose Background image</p>
                                                     <div className="flex max-sm:flex-col gap-2 my-2">
