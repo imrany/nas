@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
 import { Folder, Notifications } from "../types/definitions";
-import { MdClose, MdFileOpen, MdFolder, MdFolderShared, MdNotifications, MdOutlineNotificationsActive, MdRadar,  } from "react-icons/md";
+import { MdClose, MdFileOpen, MdFolder, MdFolderShared, MdNotifications, MdOutlineNotifications, MdOutlineNotificationsActive, MdOutlineNotificationsOff, MdRadar  } from "react-icons/md";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TbCircleX } from "react-icons/tb";
 import {motion, AnimatePresence} from "framer-motion";
 
@@ -17,18 +17,10 @@ type Props={
 export default function Footer(props:Props){
     let folderCount=[]
     let fileCount=[]
-    props.data.folders.contents.forEach((item)=>{
-        if(!item.metadata.is_file){
-            folderCount.push(item)
-        }else{
-            fileCount.push(item)
-        }
-    })
-    function showToast(id:string){
-        let toast=document.getElementById(id)
-        toast?.classList.contains("none")?toast?.classList.remove("none"):toast?.classList.add("none")
-    }
-    let notifications:Notifications[]=[
+    let notification_off:any=localStorage.getItem("notification_off")
+    let notificationOff:boolean=JSON.parse(notification_off)
+    let [showNotificationAlertBtn,setShowNotificationAlertBtn]=useState(false)
+    let [notifications,setNotifications]=useState<Notifications[]>([
         {
             priority:"not important",
             message:"Hello welcome to anvel, contact our support via imranmat254@gmail.com for help."
@@ -41,7 +33,35 @@ export default function Footer(props:Props){
             priority:"important",
             message:"Zero connections"
         },
-    ]
+    ])
+
+    props.data.folders.contents.forEach((item)=>{
+        if(!item.metadata.is_file){
+            folderCount.push(item)
+        }else{
+            fileCount.push(item)
+        }
+    })
+    function showToast(id:string){
+        let toast=document.getElementById(id)
+        toast?.classList.contains("none")?toast?.classList.remove("none"):toast?.classList.add("none")
+    }
+
+    function hideSingleNotifications(){
+        if(notificationOff===true){
+            setShowNotificationAlertBtn(true)
+            let single_notifications:any=document.getElementById("single_notifications")
+            if(single_notifications.classList.contains("none")===false){
+                single_notifications.classList.add("none")
+            }
+        }else{
+            setShowNotificationAlertBtn(false)
+        }
+    }
+
+    useEffect(()=>{
+        hideSingleNotifications()
+    },[showNotificationAlertBtn])
     return(
         <footer className="fixed bottom-0 h-[25px] bg-[#e0ff72] text-[#252525] px-[7px] left-0 right-0">
             <div className="flex">
@@ -89,6 +109,8 @@ export default function Footer(props:Props){
                             </div>
                         </button>
                         <button onClick={()=>{
+                            let path:any=localStorage.getItem("path")
+                            localStorage.setItem("previous",path)
                             localStorage.setItem("path","shared")
                             props.data.open("http://localhost:8000/api/directory_content")
                         }} onMouseEnter={()=>showToast("shared_folder")} onMouseLeave={()=>showToast("shared_folder")} className="relative inline-block px-[10px] py-[2px] hover:bg-[#EDFFA5]">
@@ -210,6 +232,25 @@ export default function Footer(props:Props){
                                         <div className="px-[12px] border-b-[1px] border-[#9999991A] py-[8px] rounded-t-md flex items-center bg-[#3c3c3c]/70">
                                             <p className="uppercase text-[11px]">Notifications</p>
                                             <div className="ml-auto flex gap-2 items-center">
+                                                {showNotificationAlertBtn===true?(
+                                                    <button title="Turn on notification alerts" onClick={()=>{
+                                                        setShowNotificationAlertBtn(false)
+                                                        showToast("notification_dialog")
+                                                        localStorage.setItem("notification_off",JSON.stringify(false))
+                                                    }} className="p-[5px] hover:bg-[#3c3c3c]/90 flex items-center justify-center rounded-md">
+                                                        <MdOutlineNotifications className="text-gray-400 w-[15px] h-[15px]"/>
+                                                    </button>
+                                                ):(
+                                                    <button  title="Turn off notification alerts" onClick={()=>{
+                                                        setShowNotificationAlertBtn(true)
+                                                        showToast("notification_dialog")
+                                                        localStorage.setItem("notification_off",JSON.stringify(true))
+                                                    }} className="p-[5px] hover:bg-[#3c3c3c]/90 flex items-center justify-center rounded-md">
+                                                        <MdOutlineNotificationsOff className="text-gray-400 w-[15px] h-[15px]"/>
+                                                    </button>
+                                                )}
+
+
                                                 <button onClick={()=>showToast("notification_dialog")} className="p-[5px] hover:bg-[#3c3c3c]/90 flex items-center justify-center rounded-md">
                                                     <FaChevronDown className="text-gray-400 w-[13px] h-[12px]"/>
                                                 </button>
@@ -296,13 +337,16 @@ export default function Footer(props:Props){
                                         </div>
                                     </div>
                                 }
-                                
                             </div>
                             <button onClick={()=>{
                                 document.getElementById("single_notifications")?.classList.add("none")
                                 showToast("notification_dialog")
                             }} onMouseEnter={()=>showToast("notification_toast")} onMouseLeave={()=>showToast("notification_toast")} className="relative inline-block px-[15px] h-[25px] hover:bg-[#EDFFA5]">
-                                <span id="notification_toast" className="absolute text-gray-300 none flex items-center justify-center bg-[#252525] z-10 -mt-8 border-[1px] border-[var(--theme-gray)] -ml-[115px] h-[25px] min-w-[150px]">No New Notifications</span>
+                                {notifications.length===0?(
+                                    <span id="notification_toast" className="absolute text-gray-300 none flex items-center justify-center bg-[#252525] z-10 -mt-8 border-[1px] border-[var(--theme-gray)] -ml-[115px] h-[25px] min-w-[150px]">No New Notifications</span>
+                                ):(
+                                    <span id="notification_toast" className="absolute text-gray-300 none flex items-center justify-center bg-[#252525] z-10 -mt-8 border-[1px] border-[var(--theme-gray)] -ml-[115px] h-[25px] min-w-[150px]">{notifications.length} notifications</span>
+                                )}
                                 <div className="flex gap-1 items-center">
                                     <MdNotifications className="w-[17px] h-[17px]"/>
                                 </div>
