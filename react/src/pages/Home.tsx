@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 export default function Home(){
     const navigate=useNavigate()
     let [name,setName]=useState("")
+    let [counter,setCounter]=useState(0)
     let [isLoading,setIsLoading]=useState(true)
     let [showSettings,setShowSettings]=useState(false)
     let [showSettingsTab,setShowSettingsTab]=useState(false)
@@ -124,10 +125,22 @@ export default function Home(){
         setShowSettingsTab(true)
         setSettingsHeader("Settings - Anvel")
     }
+
+    function handleCloseSettings(){
+        setSettingsHeader("")
+        setShowSettings(false)
+    }
     
     function toggleShowCloseBtn(id:string){
         let closeBtn=document.getElementById(id)
         closeBtn?.classList.contains("none")?closeBtn?.classList.remove("none"):closeBtn?.classList.add("none")
+    }
+
+    let maxRequest=1
+    for (let i = 0; i < maxRequest; i++) {
+        setTimeout(() => {
+            setCounter(i)
+        }, 500);
     }
 
     useEffect(()=>{
@@ -146,7 +159,8 @@ export default function Home(){
                 message:"Zero connections"
             },
         ])
-	},[])
+        // console.log("hey")
+	},[counter])
     return(
         <>
             {isLoading?(
@@ -182,10 +196,7 @@ export default function Home(){
                                             </div>
                                         )}
 
-                                        <div onClick={()=>{
-                                            setSettingsHeader("")
-                                            setShowSettings(false)
-                                        }} onMouseEnter={()=>toggleShowCloseBtn(`folder_close_btn`)} onMouseLeave={()=>toggleShowCloseBtn(`folder_close_btn`)} className={showSettings===true?"bg-[#151515] border-dotted border-l-[1px] border-[#3c3c3c]/50 hover:bg-[#3c3c3c]/55 cursor-pointer pl-[10px] pr-[3px] min-w-[128px] h-[35px] flex items-center":"bg-[#1d1d1d] hover:bg-[#3c3c3c]/55 cursor-pointer pl-[10px] pr-[3px] min-w-[128px] h-[35px] flex items-center"}>
+                                        <div onClick={()=>handleCloseSettings()} onMouseEnter={()=>toggleShowCloseBtn(`folder_close_btn`)} onMouseLeave={()=>toggleShowCloseBtn(`folder_close_btn`)} className={showSettings===true?"bg-[#151515] border-dotted border-l-[1px] border-[#3c3c3c]/50 hover:bg-[#3c3c3c]/55 cursor-pointer pl-[10px] pr-[3px] min-w-[128px] h-[35px] flex items-center":"bg-[#1d1d1d] hover:bg-[#3c3c3c]/55 cursor-pointer pl-[10px] pr-[3px] min-w-[128px] h-[35px] flex items-center"}>
                                             <MdFolder className="w-[18px] h-[18px] mr-[5px]"/>
                                             <p className="text-[#E5E5E5] mr-[3px] text-[13px] capitalize root_path_indicator">{name}</p>
                                             <MdClose id="folder_close_btn" className="p-[3px] none w-[22px] h-[22px] bg-[#3c3c3c]/90 ml-auto rounded-sm text-white" onClick={()=>{
@@ -276,7 +287,7 @@ export default function Home(){
                             </div>
                         </div>
                     </div>
-                    <Footer data={{folders, onlyFolders, onlyFiles, open, handleShowSettings, notifications, showToast}}/>
+                    <Footer data={{folders, onlyFolders, onlyFiles, open, handleShowSettings, notifications, showToast, handleCloseSettings}}/>
                 </div>
             )}
         </>
