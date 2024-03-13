@@ -114,6 +114,11 @@ export default function Home(){
         })
     }
 
+    function showToast(id:string){
+        let toast=document.getElementById(id)
+        toast?.classList.contains("none")?toast?.classList.remove("none"):toast?.classList.add("none")
+    }
+
     function handleShowSettings(){
         setShowSettings(true)
         setShowSettingsTab(true)
@@ -150,7 +155,7 @@ export default function Home(){
                 </div>
             ):(
                 <div className="min-h-[100vh] bg-[#1d1d1d]">
-                    <TopNav data={{name, handleShowSettings, settingsHeader}}/>
+                    <TopNav data={{name, handleShowSettings, settingsHeader, showToast}}/>
                     <div className="flex">
                         <SideNav data={{folders,error,open}}/>
                         <div className="mt-[48px] flex-grow mb-[22px] text-[#999999]">
@@ -271,7 +276,7 @@ export default function Home(){
                             </div>
                         </div>
                     </div>
-                    <Footer data={{folders, onlyFolders, onlyFiles, open, handleShowSettings, notifications}}/>
+                    <Footer data={{folders, onlyFolders, onlyFiles, open, handleShowSettings, notifications, showToast}}/>
                 </div>
             )}
         </>

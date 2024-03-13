@@ -1,12 +1,14 @@
 // @flow strict
-import { MdContentCopy, MdEdit, MdOutlineExpandMore, MdSettings,  } from "react-icons/md";
+import { MdContentCopy, MdEdit, MdNotifications, MdOutlineExpandMore, MdSettings,  } from "react-icons/md";
 import { Link } from "react-router-dom";
+import { openDialog } from "./actions";
 
 type Props={
     data:{
         name:string,
         handleShowSettings:any,
         settingsHeader:string,
+        showToast:any
     }
 }
 function TopNav(props:Props) {
@@ -37,13 +39,14 @@ function TopNav(props:Props) {
                         <MdOutlineExpandMore className="w-[25px] h-[25px] dropbtn p-[3px]"/>
                     </button>
                     <div id="dropdown_list"  className="dropdown-content  ml-[12px]">
-                        <Link to="/docs" className="px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
-                            <MdContentCopy className="w-[25px] h-[25px] pr-[6px]"/>
-                            <p>Documentation</p>
-                        </Link>
-                        <div className="px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
+                        <div onClick={()=>openDialog("open_folder_dialog")} className="px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
                             <MdEdit className="w-[25px] h-[25px] pr-[6px]"/>
-                            <p>Customize</p>
+                            <p>Open Folder</p>
+                        </div>
+
+                        <div onClick={()=>props.data.showToast("notification_dialog")} className="px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
+                            <MdNotifications className="w-[25px] h-[25px] pr-[6px]"/>
+                            <p>Notifications</p>
                         </div>
                         
                         <div onClick={()=>props.data.handleShowSettings()} className="px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">

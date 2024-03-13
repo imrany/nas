@@ -13,6 +13,7 @@ type Props={
         onlyFiles:any,
         open:any,
         handleShowSettings:any,
+        showToast:any,
         notifications:Notifications[]
     }
 }
@@ -30,10 +31,6 @@ export default function Footer(props:Props){
             fileCount.push(item)
         }
     })
-    function showToast(id:string){
-        let toast=document.getElementById(id)
-        toast?.classList.contains("none")?toast?.classList.remove("none"):toast?.classList.add("none")
-    }
 
     function hideSingleNotifications(){
         if(notificationOff===true){
@@ -57,7 +54,7 @@ export default function Footer(props:Props){
                
                 <button onClick={()=>{
                     props.data.handleShowSettings()
-                }} onMouseEnter={()=>showToast("connection_count")} onMouseLeave={()=>showToast("connection_count")} className="relative inline-block px-[15px] py-[2px] hover:bg-[#EDFFA5]">
+                }} onMouseEnter={()=>props.data.showToast("connection_count")} onMouseLeave={()=>props.data.showToast("connection_count")} className="relative inline-block px-[15px] py-[2px] hover:bg-[#EDFFA5]">
                     <span id="connection_count" className="absolute none text-[13px] flex items-center justify-center text-gray-300 bg-[#252525] z-10 -mt-8 border-[1px] border-[var(--theme-gray)] -ml-3 h-[25px] min-w-[150px]">My configurations</span>
                     <div className="flex gap-1 items-center ">
                         <MdSettings className="w-[15px] h-[15px]"/>
@@ -67,11 +64,11 @@ export default function Footer(props:Props){
 
                 <div className="flex ml-auto">
                     <div className="flex items-center justify-center">
-                        <Link to="/" onMouseEnter={()=>showToast("sign_up")} onMouseLeave={()=>showToast("sign_up")} className="relative inline-block px-[15px] py-[2px] hover:bg-[#EDFFA5]">
+                        <Link to="/" onMouseEnter={()=>props.data.showToast("sign_up")} onMouseLeave={()=>props.data.showToast("sign_up")} className="relative inline-block px-[15px] py-[2px] hover:bg-[#EDFFA5]">
                             <span id="sign_up" className="text-[13px] absolute none text-gray-300 flex items-center justify-center bg-[#252525] z-10 -mt-8 border-[1px] border-[var(--theme-gray)] -ml-14 h-[25px] min-w-[150px]">Create an account</span>
                             <span className="text-[13px]">Sign up</span>
                         </Link>
-                        <Link to="/" onMouseEnter={()=>showToast("login")} onMouseLeave={()=>showToast("login")} className="relative inline-block px-[15px] py-[2px] hover:bg-[#EDFFA5]">
+                        <Link to="/" onMouseEnter={()=>props.data.showToast("login")} onMouseLeave={()=>props.data.showToast("login")} className="relative inline-block px-[15px] py-[2px] hover:bg-[#EDFFA5]">
                             <span id="login" className="absolute text-[13px] none text-gray-300 flex items-center justify-center bg-[#252525] z-10 -mt-8 border-[1px] border-[var(--theme-gray)] -ml-14 h-[25px] min-w-[150px]">Login to your account</span>
                             <span className="text-[13px]">Login</span>
                         </Link>
@@ -79,7 +76,7 @@ export default function Footer(props:Props){
 
                     {/* <div className="flex items-center justify-center text-[13px] border-dotted border-l-[1px] border-gray-500">
                         <button onClick={()=>{
-                        }} onMouseEnter={()=>showToast("connection_count")} onMouseLeave={()=>showToast("connection_count")} className="relative inline-block px-[15px] py-[2px] hover:bg-[#EDFFA5]">
+                        }} onMouseEnter={()=>props.data.showToast("connection_count")} onMouseLeave={()=>props.data.showToast("connection_count")} className="relative inline-block px-[15px] py-[2px] hover:bg-[#EDFFA5]">
                             <span id="connection_count" className="absolute none flex items-center justify-center text-gray-300 bg-[#252525] z-10 -mt-8 border-[1px] border-[var(--theme-gray)] -ml-8 h-[25px] min-w-[150px]">My configurations</span>
                             <div className="flex gap-1 items-center ">
                                 <MdSettings className="w-[15px] h-[15px]"/>
@@ -91,7 +88,7 @@ export default function Footer(props:Props){
                     <div className="flex items-center justify-center border-dotted border-l-[1px] border-gray-500">
                         <button onClick={()=>{
                            props.data.onlyFolders()
-                        }} onMouseEnter={()=>showToast("folder_count")} onMouseLeave={()=>showToast("folder_count")} className="relative inline-block px-[15px] py-[2px] hover:bg-[#EDFFA5]">
+                        }} onMouseEnter={()=>props.data.showToast("folder_count")} onMouseLeave={()=>props.data.showToast("folder_count")} className="relative inline-block px-[15px] py-[2px] hover:bg-[#EDFFA5]">
                             <span id="folder_count" className="absolute text-[13px] none flex items-center justify-center text-gray-300 bg-[#252525] z-10 -mt-8 border-[1px] border-[var(--theme-gray)] -ml-10 h-[25px] min-w-[150px]">{folderCount.length!==0?(<p>View folders : {folderCount.length}</p>):(<p>No folder</p>)}</span>
                             <div className="flex gap-1 items-center">
                                 <MdFolder/>
@@ -100,7 +97,7 @@ export default function Footer(props:Props){
                         </button>
                         <button onClick={()=>{
                             props.data.onlyFiles()
-                        }} onMouseEnter={()=>showToast("file_count")} onMouseLeave={()=>showToast("file_count")} className="relative inline-block px-[15px] py-[2px] hover:bg-[#EDFFA5]">
+                        }} onMouseEnter={()=>props.data.showToast("file_count")} onMouseLeave={()=>props.data.showToast("file_count")} className="relative inline-block px-[15px] py-[2px] hover:bg-[#EDFFA5]">
                             <span id="file_count" className="absolute text-[13px] text-gray-300 none flex items-center justify-center bg-[#252525] z-10 -mt-8 border-[1px] border-[var(--theme-gray)] -ml-10 h-[25px] min-w-[150px]">{fileCount.length!==0?(<p>View files : {fileCount.length}</p>):(<p>No file</p>)}</span>
                             <div className="flex gap-1 items-center ">
                                 <MdFileOpen/>
@@ -112,7 +109,7 @@ export default function Footer(props:Props){
                             localStorage.setItem("previous",path)
                             localStorage.setItem("path","shared")
                             props.data.open("http://localhost:8000/api/directory_content")
-                        }} onMouseEnter={()=>showToast("shared_resources")} onMouseLeave={()=>showToast("shared_resources")} className="relative inline-block px-[10px] py-[2px] hover:bg-[#EDFFA5]">
+                        }} onMouseEnter={()=>props.data.showToast("shared_resources")} onMouseLeave={()=>props.data.showToast("shared_resources")} className="relative inline-block px-[10px] py-[2px] hover:bg-[#EDFFA5]">
                             <span id="shared_resources" className="text-[13px] absolute text-gray-300 none flex items-center justify-center bg-[#252525] z-10 -mt-8 border-[1px] border-[var(--theme-gray)] -ml-3 h-[25px] min-w-[150px]">View shared resources</span>
                             <div className="flex gap-1 items-center ">
                                 <MdFolderShared/>
@@ -192,7 +189,7 @@ export default function Footer(props:Props){
                                                             }
                                                             <button 
                                                                 onClick={()=>{
-                                                                    showToast(`single_${notification.message}`)
+                                                                    props.data.showToast(`single_${notification.message}`)
                                                                 }} 
                                                                 className="p-[5px] hover:bg-[#265f5f3d] flex items-center justify-center rounded-md"
                                                             >
@@ -208,7 +205,7 @@ export default function Footer(props:Props){
                                     <div id="single_no_new_notifications" className="px-[12px] py-[8px] rounded-md flex items-center bg-[#3c3c3c]/70">
                                         <p className="uppercase text-[11px]">No New Notifications</p>
                                         <div className="ml-auto flex gap-2 items-center">
-                                            <button onClick={()=>showToast("single_no_new_notifications")} className="p-[5px] hover:bg-[#3c3c3c]/90 flex items-center justify-center rounded-md">
+                                            <button onClick={()=>props.data.showToast("single_no_new_notifications")} className="p-[5px] hover:bg-[#3c3c3c]/90 flex items-center justify-center rounded-md">
                                                 <MdClose className="text-gray-400 w-[13px] h-[12px]"/>
                                             </button>
                                         </div>
@@ -234,7 +231,7 @@ export default function Footer(props:Props){
                                                 {showNotificationAlertBtn===true?(
                                                     <button title="Turn on notification alerts" onClick={()=>{
                                                         setShowNotificationAlertBtn(false)
-                                                        showToast("notification_dialog")
+                                                        props.data.showToast("notification_dialog")
                                                         localStorage.setItem("notification_off",JSON.stringify(false))
                                                     }} className="p-[5px] hover:bg-[#3c3c3c]/90 flex items-center justify-center rounded-md">
                                                         <MdOutlineNotifications className="text-gray-400 w-[15px] h-[15px]"/>
@@ -242,7 +239,7 @@ export default function Footer(props:Props){
                                                 ):(
                                                     <button  title="Turn off notification alerts" onClick={()=>{
                                                         setShowNotificationAlertBtn(true)
-                                                        showToast("notification_dialog")
+                                                        props.data.showToast("notification_dialog")
                                                         localStorage.setItem("notification_off",JSON.stringify(true))
                                                     }} className="p-[5px] hover:bg-[#3c3c3c]/90 flex items-center justify-center rounded-md">
                                                         <MdOutlineNotificationsOff className="text-gray-400 w-[15px] h-[15px]"/>
@@ -250,7 +247,7 @@ export default function Footer(props:Props){
                                                 )}
 
 
-                                                <button onClick={()=>showToast("notification_dialog")} className="p-[5px] hover:bg-[#3c3c3c]/90 flex items-center justify-center rounded-md">
+                                                <button onClick={()=>props.data.showToast("notification_dialog")} className="p-[5px] hover:bg-[#3c3c3c]/90 flex items-center justify-center rounded-md">
                                                     <FaChevronDown className="text-gray-400 w-[13px] h-[12px]"/>
                                                 </button>
                                             </div>
@@ -293,9 +290,9 @@ export default function Footer(props:Props){
                                                     exit={{ x: "12rem", opacity: 0 }}
                                                     transition={{ duration: 0.2 }}
                                                     layout onMouseEnter={()=>{
-                                                    // showToast(`btn_${notification.message}`)
+                                                    // props.data.showToast(`btn_${notification.message}`)
                                                 }} onMouseLeave={()=>{
-                                                    // showToast(`btn_${notification.message}`)
+                                                    // props.data.showToast(`btn_${notification.message}`)
                                                 }} key={notification.message} id={`bar_${notification.message}`} className="px-[12px] py-2 flex gap-2 items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/20 active:bg-[#3c3c3c]/20">
                                                     {icon}
                                                     <p className="w-[250px]">{message}</p>
@@ -317,7 +314,7 @@ export default function Footer(props:Props){
                                                                 <FaChevronDown className="text-gray-400 w-[13px] h-[12px]"/>
                                                             </button>
                                                         }
-                                                        <button onClick={()=>showToast(`bar_${notification.message}`)} className="p-[5px] hover:bg-[#3c3c3c]/90 flex items-center justify-center rounded-md">
+                                                        <button onClick={()=>props.data.showToast(`bar_${notification.message}`)} className="p-[5px] hover:bg-[#3c3c3c]/90 flex items-center justify-center rounded-md">
                                                             <MdClose className="w-[13px] h-[12px]"/>
                                                         </button>
                                                     </div>
@@ -330,7 +327,7 @@ export default function Footer(props:Props){
                                     <div id="bar_no_new_notifications" className="px-[12px] py-[8px] rounded-md flex items-center bg-[#3c3c3c]/70">
                                         <p className="uppercase text-[11px]">No New Notifications</p>
                                         <div className="ml-auto flex gap-2 items-center">
-                                            <button onClick={()=>showToast("bar_no_new_notifications")} className="p-[5px] hover:bg-[#3c3c3c]/90 flex items-center justify-center rounded-md">
+                                            <button onClick={()=>props.data.showToast("bar_no_new_notifications")} className="p-[5px] hover:bg-[#3c3c3c]/90 flex items-center justify-center rounded-md">
                                                 <MdClose className="text-gray-400 w-[13px] h-[12px]"/>
                                             </button>
                                         </div>
@@ -339,8 +336,8 @@ export default function Footer(props:Props){
                             </div>
                             <button onClick={()=>{
                                 document.getElementById("single_notifications")?.classList.add("none")
-                                showToast("notification_dialog")
-                            }} onMouseEnter={()=>showToast("notification_toast")} onMouseLeave={()=>showToast("notification_toast")} className="relative inline-block px-[15px] h-[25px] hover:bg-[#EDFFA5]">
+                                props.data.showToast("notification_dialog")
+                            }} onMouseEnter={()=>props.data.showToast("notification_toast")} onMouseLeave={()=>props.data.showToast("notification_toast")} className="relative inline-block px-[15px] h-[25px] hover:bg-[#EDFFA5]">
                                 {props.data.notifications.length===0?(
                                     <span id="notification_toast" className="absolute text-[13px] text-gray-300 none flex items-center justify-center bg-[#252525] z-10 -mt-8 border-[1px] border-[var(--theme-gray)] -ml-[120px] h-[25px] min-w-[150px]">No New Notifications</span>
                                 ):(
