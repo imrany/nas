@@ -85,12 +85,17 @@ pub struct AppState {
 pub async fn directory_content(state: web::Data<AppState>, path: web::Json<RootPath>)-> HttpResponse{
     let root =&state.root_dir;
     let path_dir=&path.root;
+    let shared_dir=&path::PathBuf::from("./shared");
 
     let directory_path = match path_dir.to_str().unwrap() {
         "root" => {
             println!("{}", root.to_str().unwrap());
             root
         },
+        "shared"=>{
+            println!("{}",path_dir.to_str().unwrap());
+            shared_dir
+        }
         _ => {
             println!("{}", path_dir.to_str().unwrap());
             path_dir
@@ -127,7 +132,7 @@ pub async fn directory_content(state: web::Data<AppState>, path: web::Json<RootP
         Err(e) => {
             println!("{e}");
             let err_message=ErrorMessage{
-                message:format!("No such folder name '{}'",directory_path.to_str().unwrap())
+                message:format!("{e} name '{}'",directory_path.to_str().unwrap())
             };
             return HttpResponse::InternalServerError().json(err_message);
         }
