@@ -1,5 +1,5 @@
 // @flow strict
-import { MdEdit, MdNotifications, MdOutlineExpandMore, MdSettings,  } from "react-icons/md";
+import { MdEdit, MdExitToApp, MdNotifications, MdOutlineExpandMore, MdSettings,  } from "react-icons/md";
 import { openDialog } from "./actions";
 
 type Props={
@@ -48,9 +48,17 @@ function TopNav(props:Props) {
                             <p>Notifications</p>
                         </div>
                         
-                        <div onClick={()=>props.data.handleShowSettings()} className="px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
+                        <div onClick={()=>props.data.handleShowSettings()} className="px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
                             <MdSettings className="w-[25px] h-[25px] pr-[6px]"/>
                             <p>Settings</p>
+                        </div>
+
+                        <div onClick={()=>{
+                            localStorage.removeItem("path")
+                            window.location.href="/welcome"
+                        }} className="px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
+                            <MdExitToApp className="w-[25px] h-[25px] pr-[6px]"/>
+                            <p>Exit</p>
                         </div>
                     </div>
                 </div>
