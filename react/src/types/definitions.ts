@@ -5,6 +5,10 @@ export type ErrorBody={
     solution?:any
 }
 
+export type UserPreference={
+	backgroundImage:string,
+}
+
 export interface Content{
 	root:string,
 	path:string,

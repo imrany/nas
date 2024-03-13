@@ -23,15 +23,7 @@
   --theme-dark: #151515;
   --hover-gray:#3c3c3c;
 }
-.get_started_background{
-  background: linear-gradient(0deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),url('./assets/background/anime.png') no-repeat top;
-  background-size: cover;
-  position:fixed;
-  bottom: 0;
-  top: 0;
-  left: 0;
-  right: 0;
-}
+
 .dropdown {
   position: relative;
   display: inline-block;

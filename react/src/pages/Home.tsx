@@ -9,7 +9,12 @@ import FolderImage from "../assets/icons/folder.png";
 import { openFile } from "../components/actions";
 import { useNavigate } from "react-router-dom";
 
-export default function Home(){
+type Props={
+    data:{
+        backgroundImage:string,
+    }
+}
+export default function Home(props:Props){
     const navigate=useNavigate()
     let [name,setName]=useState("")
     let [counter,setCounter]=useState(0)
@@ -168,7 +173,7 @@ export default function Home(){
                     <p className="text-lg">Loading...</p>
                 </div>
             ):(
-                <div className="min-h-[100vh] bg-[#1d1d1d]">
+                <div style={{background: `linear-gradient(0deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),url('${props.data.backgroundImage}') top no-repeat`, backgroundSize:"cover", backgroundAttachment:"fixed"}} className="min-h-[100vh]">
                     <TopNav data={{name, handleShowSettings, settingsHeader, showToast}}/>
                     <div className="flex">
                         <SideNav data={{folders,error,open}}/>
@@ -280,7 +285,17 @@ export default function Home(){
                                 ):(
                                     <div className="w-full flex flex-wrap mt-[35px]" id="settings_view">
                                         <div className="ml-[200px] flex flex-col w-full gap-4 px-[25px] py-[13px]">
-                                            Setting Tab
+                                            <div>
+                                                <p className="text-white text-lg mb-1">User Preference</p>
+                                                <div className="flex flex-col">
+                                                    <p>Choose Background image</p>
+                                                    <div className="flex gap-2">
+                                                        <div className="bg-[#252525]">
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 )}
