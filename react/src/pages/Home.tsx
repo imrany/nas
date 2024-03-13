@@ -24,6 +24,7 @@ export default function Home(props:Props){
     let [isLoading,setIsLoading]=useState(true)
     let [showSettings,setShowSettings]=useState(false)
     let [showSettingsTab,setShowSettingsTab]=useState(false)
+    let [startRequestLoop,setStartRequestLoop]=useState(false)
     let [settingsHeader,setSettingsHeader]=useState("")
     let [folders,setFolders]=useState<Folder>({
         contents:[
@@ -156,11 +157,21 @@ export default function Home(props:Props){
         closeBtn?.classList.contains("none")?closeBtn?.classList.remove("none"):closeBtn?.classList.add("none")
     }
 
-    let maxRequest=2
-    for (let i = 0; i < maxRequest; i++) {
-        setTimeout(() => {
-            setCounter(i)
-        }, 500);
+    function kickOffStartRequestLoop(){
+        setStartRequestLoop(true)
+    }
+
+    function endStartRequestLoop(){
+        setStartRequestLoop(false)
+    }
+
+    if(startRequestLoop===true){
+        let maxRequest=2
+        for (let i = 0; i < maxRequest; i++) {
+            setTimeout(() => {
+                setCounter(i)
+            }, 500);
+        }
     }
 
     useEffect(()=>{
@@ -179,6 +190,7 @@ export default function Home(props:Props){
                 message:"Zero connections"
             },
         ])
+        console.log("looping request")
 	},[counter])
     return(
         <>
@@ -325,7 +337,7 @@ export default function Home(props:Props){
                             </div>
                         </div>
                     </div>
-                    <Footer data={{folders, onlyFolders, onlyFiles, open, handleShowSettings, notifications, showToast, handleCloseSettings}}/>
+                    <Footer data={{folders, onlyFolders, onlyFiles, open, handleShowSettings, notifications, showToast, handleCloseSettings, kickOffStartRequestLoop, endStartRequestLoop}}/>
                 </div>
             )}
         </>
