@@ -130,8 +130,15 @@ export default function Home(){
                                     <div className="flex w-full bg-[#151515]">
                                         {localStorage.getItem("path")==="/"?"":(
                                             <div onClick={()=>{
-                                                let path:any=localStorage.getItem("path")!=="shared"?localStorage.getItem("path"):"root"
-                                                let newPath=path.slice(0,path?.lastIndexOf("/"))===""?path:path.slice(0,path?.lastIndexOf("/"))
+                                                let path:any=localStorage.getItem("path")!==null?localStorage.getItem("path"):""
+                                                let newPath:any;
+                                                if(path.slice(0,path?.lastIndexOf("/"))===""||path.slice(0,path?.lastIndexOf("/"))===":"){
+                                                    newPath="root"
+                                                }else if(path==="shared"){
+                                                    newPath=localStorage.getItem("previous")
+                                                }else{
+                                                    newPath=path.slice(0,path?.lastIndexOf("/"))
+                                                }
                                                 localStorage.setItem("path",newPath)
                                                 open("http://localhost:8000/api/directory_content")
                                             }} title="Previous" className="bg-[#151515] hover:bg-[#3c3c3c]/55 cursor-pointer pl-[10px] pr-[3px] w-[50px] h-[35px] flex items-center">
