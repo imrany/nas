@@ -12,7 +12,8 @@ type Props={
         onlyFolders:any,
         onlyFiles:any,
         open:any,
-        handleShowSettings:any
+        handleShowSettings:any,
+        notifications:Notifications[]
     }
 }
 export default function Footer(props:Props){
@@ -21,20 +22,6 @@ export default function Footer(props:Props){
     let notification_off:any=localStorage.getItem("notification_off")
     let notificationOff:boolean=JSON.parse(notification_off)
     let [showNotificationAlertBtn,setShowNotificationAlertBtn]=useState(false)
-    let [notifications,setNotifications]=useState<Notifications[]>([
-        {
-            priority:"not important",
-            message:"Hello welcome to anvel, contact our support via imranmat254@gmail.com for help."
-        },
-        {
-            priority:"not important",
-            message:"Turn on Hotspot or WIFI and connect with other person using anvel."
-        },
-        {
-            priority:"important",
-            message:"Zero connections"
-        },
-    ])
 
     props.data.folders.contents.forEach((item)=>{
         if(!item.metadata.is_file){
@@ -137,14 +124,14 @@ export default function Footer(props:Props){
                             <div id="single_notifications"
                             className="text-gray-300 flex flex-col justify-center z-20 fixed right-2 bottom-8  w-[380px]"
                             >
-                                {notifications.length!==0?(
+                                {props.data.notifications.length!==0?(
                                     <motion.div
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
                                         className="flex flex-col gap-2"
                                     >
                                         <AnimatePresence>
-                                            {notifications.map((notification)=>{
+                                            {props.data.notifications.map((notification)=>{
                                                 let [message,setMessage]=useState(<>{notification.message.slice(0,30)}...</>)
                                                 let [showChevronDown,setShowChevronDown]=useState(false)
                                                 let icon
@@ -235,7 +222,7 @@ export default function Footer(props:Props){
                             style={{boxShadow:"0px 8px 16px 0px rgba(0,0,0,0.7)"}} 
                             className="none text-gray-300 flex flex-col rounded-md justify-center bg-[#252525] z-20 fixed right-2 bottom-8  w-[380px]"
                             >
-                                {notifications.length!==0?
+                                {props.data.notifications.length!==0?
                                 <AnimatePresence>
                                     <motion.div
                                         initial={{ opacity: 0 }}
@@ -268,7 +255,7 @@ export default function Footer(props:Props){
                                                 </button>
                                             </div>
                                         </div>
-                                        {notifications.map((notification)=>{
+                                        {props.data.notifications.map((notification)=>{
                                             let [showChevronDown,setShowChevronDown]=useState(false)
                                             let [message,setMessage]=useState(<>{notification.message.slice(0,30)}...</>)
                                             let icon
@@ -354,10 +341,10 @@ export default function Footer(props:Props){
                                 document.getElementById("single_notifications")?.classList.add("none")
                                 showToast("notification_dialog")
                             }} onMouseEnter={()=>showToast("notification_toast")} onMouseLeave={()=>showToast("notification_toast")} className="relative inline-block px-[15px] h-[25px] hover:bg-[#EDFFA5]">
-                                {notifications.length===0?(
+                                {props.data.notifications.length===0?(
                                     <span id="notification_toast" className="absolute text-[13px] text-gray-300 none flex items-center justify-center bg-[#252525] z-10 -mt-8 border-[1px] border-[var(--theme-gray)] -ml-[120px] h-[25px] min-w-[150px]">No New Notifications</span>
                                 ):(
-                                    <span id="notification_toast" className="absolute text-[13px] text-gray-300 none flex items-center justify-center bg-[#252525] z-10 -mt-8 border-[1px] border-[var(--theme-gray)] -ml-[120px] h-[25px] min-w-[150px]">{notifications.length} notifications</span>
+                                    <span id="notification_toast" className="absolute text-[13px] text-gray-300 none flex items-center justify-center bg-[#252525] z-10 -mt-8 border-[1px] border-[var(--theme-gray)] -ml-[120px] h-[25px] min-w-[150px]">{props.data.notifications.length} notifications</span>
                                 )}
                                 <div className="flex gap-1 items-center">
                                     <MdNotifications className="w-[17px] h-[17px]"/>

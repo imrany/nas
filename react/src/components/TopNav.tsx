@@ -5,7 +5,8 @@ import { Link } from "react-router-dom";
 type Props={
     data:{
         name:string,
-        handleShowSettings:any
+        handleShowSettings:any,
+        settingsHeader:string,
     }
 }
 function TopNav(props:Props) {
@@ -52,8 +53,14 @@ function TopNav(props:Props) {
                     </div>
                 </div>
                 <div className="text-[#C2C2C2] h-[35px] justify-center border-[#3c3c3c]/50 border-b-[1px] gap-x-2 py-1 flex-grow flex font-medium items-center">
-                    <p className="rounded-md bg-[#252525] py-[2px] px-2">Directory</p>
-                    <p className="capitalize">{props.data.name}</p>
+                    {props.data.settingsHeader.length!==0?(
+                        <p className="capitalize">{props.data.settingsHeader}</p>
+                    ):(
+                        <>
+                            <p className="rounded-md bg-[#252525] py-[2px] px-2">Directory</p>
+                            <p className="capitalize">{props.data.name}</p>
+                        </>
+                    )}
                 </div>
                 {/* <div className="text-[#C2C2C2] flex gap-2 min-w-[10vw] justify-around">
                     more nav link or btn

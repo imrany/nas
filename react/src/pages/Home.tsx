@@ -3,7 +3,7 @@ import Footer from "../components/Footer";
 import SideNav from "../components/SideNav";
 import TopNav from "../components/TopNav";
 import { useEffect, useState } from "react";
-import { ErrorBody, Folder, Content } from "../types/definitions"
+import { ErrorBody, Folder, Content, Notifications } from "../types/definitions"
 import FileImage from "../assets/icons/file.png";
 import FolderImage from "../assets/icons/folder.png";
 import { openFile } from "../components/actions";
@@ -15,6 +15,7 @@ export default function Home(){
     let [isLoading,setIsLoading]=useState(true)
     let [showSettings,setShowSettings]=useState(false)
     let [showSettingsTab,setShowSettingsTab]=useState(false)
+    let [settingsHeader,setSettingsHeader]=useState("")
     let [folders,setFolders]=useState<Folder>({
         contents:[
             {
@@ -28,7 +29,12 @@ export default function Home(){
             }
         ]
     })
-   
+    let [notifications,setNotifications]=useState<Notifications[]>([
+        {
+            priority:"",
+            message:""
+        }
+    ])
     let [contents,setContents]=useState<Content[]>([
         {
             name:"",
@@ -111,6 +117,7 @@ export default function Home(){
     function handleShowSettings(){
         setShowSettings(true)
         setShowSettingsTab(true)
+        setSettingsHeader("Settings - Anvel")
     }
     
     function toggleShowCloseBtn(id:string){
@@ -120,6 +127,20 @@ export default function Home(){
 
     useEffect(()=>{
         open("http://localhost:8000/api/directory_content")
+        setNotifications([
+            {
+                priority:"not important",
+                message:"Hello welcome to anvel, contact our support via imranmat254@gmail.com for help."
+            },
+            {
+                priority:"not important",
+                message:"Turn on Hotspot or WIFI and connect with other person using anvel."
+            },
+            {
+                priority:"important",
+                message:"Zero connections"
+            },
+        ])
 	},[])
     return(
         <>
@@ -129,7 +150,7 @@ export default function Home(){
                 </div>
             ):(
                 <div className="min-h-[100vh] bg-[#1d1d1d]">
-                    <TopNav data={{name, handleShowSettings}}/>
+                    <TopNav data={{name, handleShowSettings, settingsHeader}}/>
                     <div className="flex">
                         <SideNav data={{folders,error,open}}/>
                         <div className="mt-[48px] flex-grow mb-[22px] text-[#999999]">
@@ -156,24 +177,31 @@ export default function Home(){
                                             </div>
                                         )}
 
-                                        <div onClick={()=>setShowSettings(false)} onMouseEnter={()=>toggleShowCloseBtn(`folder_close_btn`)} onMouseLeave={()=>toggleShowCloseBtn(`folder_close_btn`)} className={showSettings===true?"bg-[#151515] border-dotted border-l-[1px] border-[#3c3c3c]/50 hover:bg-[#3c3c3c]/55 cursor-pointer pl-[10px] pr-[3px] min-w-[128px] h-[35px] flex items-center":"bg-[#1d1d1d] hover:bg-[#3c3c3c]/55 cursor-pointer pl-[10px] pr-[3px] min-w-[128px] h-[35px] flex items-center"}>
+                                        <div onClick={()=>{
+                                            setSettingsHeader("")
+                                            setShowSettings(false)
+                                        }} onMouseEnter={()=>toggleShowCloseBtn(`folder_close_btn`)} onMouseLeave={()=>toggleShowCloseBtn(`folder_close_btn`)} className={showSettings===true?"bg-[#151515] border-dotted border-l-[1px] border-[#3c3c3c]/50 hover:bg-[#3c3c3c]/55 cursor-pointer pl-[10px] pr-[3px] min-w-[128px] h-[35px] flex items-center":"bg-[#1d1d1d] hover:bg-[#3c3c3c]/55 cursor-pointer pl-[10px] pr-[3px] min-w-[128px] h-[35px] flex items-center"}>
                                             <MdFolder className="w-[18px] h-[18px] mr-[5px]"/>
                                             <p className="text-[#E5E5E5] mr-[3px] text-[13px] capitalize root_path_indicator">{name}</p>
                                             <MdClose id="folder_close_btn" className="p-[3px] none w-[22px] h-[22px] bg-[#3c3c3c]/90 ml-auto rounded-sm text-white" onClick={()=>{
-                                                localStorage.removeItem("path");
-                                                window.location.reload();
+                                                localStorage.setItem("path","root");
+                                                open("http://localhost:8000/api/directory_content")
                                             }}/>
                                         </div>
 
                                         {showSettingsTab?(
                                             <div onMouseEnter={()=>toggleShowCloseBtn(`settings_close_btn`)} onMouseLeave={()=>toggleShowCloseBtn(`settings_close_btn`)} className={showSettings!==true?"bg-[#151515] border-dotted border-r-[1px] border-[#3c3c3c]/50 hover:bg-[#3c3c3c]/55 cursor-pointer pr-[3px] min-w-[128px] h-[35px] flex items-center":"bg-[#1d1d1d] hover:bg-[#3c3c3c]/55 cursor-pointer pr-[3px] min-w-[128px] h-[35px] flex items-center"}>
-                                                <div className="flex pl-[10px]" onClick={()=>setShowSettings(true)}>
+                                                <div className="flex pl-[10px]" onClick={()=>{
+                                                    setSettingsHeader("Settings - Anvel")
+                                                    setShowSettings(true)
+                                                }}>
                                                     <MdSettings className="w-[18px] h-[18px] mr-[5px]"/>
                                                     <p className="text-[#E5E5E5] mr-[3px] text-[13px] capitalize">Settings</p>
                                                 </div>
                                                 <MdClose id="settings_close_btn" className="p-[3px] none w-[22px] h-[22px] bg-[#3c3c3c]/90 ml-auto rounded-sm text-white" onClick={()=>{
                                                     setShowSettings(false)
                                                     setShowSettingsTab(false)
+                                                    setSettingsHeader("")
                                                 }}/>
                                             </div>
                                         ):""}
@@ -243,7 +271,7 @@ export default function Home(){
                             </div>
                         </div>
                     </div>
-                    <Footer data={{folders, onlyFolders, onlyFiles, open, handleShowSettings}}/>
+                    <Footer data={{folders, onlyFolders, onlyFiles, open, handleShowSettings, notifications}}/>
                 </div>
             )}
         </>
