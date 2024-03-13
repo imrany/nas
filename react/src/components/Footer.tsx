@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Folder, Notifications } from "../types/definitions";
-import { MdClose, MdFileOpen, MdFolder, MdFolderShared, MdNotifications, MdOutlineNotifications, MdOutlineNotificationsActive, MdOutlineNotificationsOff, MdRadar  } from "react-icons/md";
+import { MdClose, MdFileOpen, MdFolder, MdFolderShared, MdNotifications, MdOutlineNotifications, MdOutlineNotificationsActive, MdOutlineNotificationsOff, MdSettings } from "react-icons/md";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { TbCircleX } from "react-icons/tb";
@@ -11,7 +11,8 @@ type Props={
         folders:Folder,
         onlyFolders:any,
         onlyFiles:any,
-        open:any
+        open:any,
+        handleShowSettings:any
     }
 }
 export default function Footer(props:Props){
@@ -63,49 +64,60 @@ export default function Footer(props:Props){
         hideSingleNotifications()
     },[showNotificationAlertBtn])
     return(
-        <footer className="fixed bottom-0 h-[25px] bg-[#e0ff72] text-[#252525] px-[7px] left-0 right-0">
+        <footer className="fixed bottom-0 h-[26px] bg-[#e0ff72] text-[#252525]  left-0 right-0">
             <div className="flex">
-                <p className="px-[5px] py-[2px] text-[13px]">anvel</p>
+                {/* <p className="px-[5px] py-[2px] text-[13px]">anvel</p> */}
+               
+                <button onClick={()=>{
+                    props.data.handleShowSettings()
+                }} onMouseEnter={()=>showToast("connection_count")} onMouseLeave={()=>showToast("connection_count")} className="relative inline-block px-[15px] py-[2px] hover:bg-[#EDFFA5]">
+                    <span id="connection_count" className="absolute none text-[13px] flex items-center justify-center text-gray-300 bg-[#252525] z-10 -mt-8 border-[1px] border-[var(--theme-gray)] -ml-3 h-[25px] min-w-[150px]">My configurations</span>
+                    <div className="flex gap-1 items-center ">
+                        <MdSettings className="w-[15px] h-[15px]"/>
+                        <span className="text-[13px]">Settings</span>
+                    </div>
+                </button>
+
                 <div className="flex ml-auto">
-                    <div className="flex items-center justify-center text-[13px] ">
+                    <div className="flex items-center justify-center">
                         <Link to="/" onMouseEnter={()=>showToast("sign_up")} onMouseLeave={()=>showToast("sign_up")} className="relative inline-block px-[15px] py-[2px] hover:bg-[#EDFFA5]">
-                            <span id="sign_up" className="absolute none text-gray-300 flex items-center justify-center bg-[#252525] z-10 -mt-8 border-[1px] border-[var(--theme-gray)] -ml-14 h-[25px] min-w-[150px]">Create an account</span>
-                            <span>Sign up</span>
+                            <span id="sign_up" className="text-[13px] absolute none text-gray-300 flex items-center justify-center bg-[#252525] z-10 -mt-8 border-[1px] border-[var(--theme-gray)] -ml-14 h-[25px] min-w-[150px]">Create an account</span>
+                            <span className="text-[13px]">Sign up</span>
                         </Link>
                         <Link to="/" onMouseEnter={()=>showToast("login")} onMouseLeave={()=>showToast("login")} className="relative inline-block px-[15px] py-[2px] hover:bg-[#EDFFA5]">
-                            <span id="login" className="absolute none text-gray-300 flex items-center justify-center bg-[#252525] z-10 -mt-8 border-[1px] border-[var(--theme-gray)] -ml-14 h-[25px] min-w-[150px]">Login to your account</span>
-                            <span>Login</span>
+                            <span id="login" className="absolute text-[13px] none text-gray-300 flex items-center justify-center bg-[#252525] z-10 -mt-8 border-[1px] border-[var(--theme-gray)] -ml-14 h-[25px] min-w-[150px]">Login to your account</span>
+                            <span className="text-[13px]">Login</span>
                         </Link>
                     </div>
 
-                    <div className="flex items-center justify-center text-[13px] border-dotted border-l-[1px] border-gray-500">
+                    {/* <div className="flex items-center justify-center text-[13px] border-dotted border-l-[1px] border-gray-500">
                         <button onClick={()=>{
                         }} onMouseEnter={()=>showToast("connection_count")} onMouseLeave={()=>showToast("connection_count")} className="relative inline-block px-[15px] py-[2px] hover:bg-[#EDFFA5]">
-                            <span id="connection_count" className="absolute none flex items-center justify-center text-gray-300 bg-[#252525] z-10 -mt-8 border-[1px] border-[var(--theme-gray)] -ml-8 h-[25px] min-w-[150px]">Get Connected</span>
+                            <span id="connection_count" className="absolute none flex items-center justify-center text-gray-300 bg-[#252525] z-10 -mt-8 border-[1px] border-[var(--theme-gray)] -ml-8 h-[25px] min-w-[150px]">My configurations</span>
                             <div className="flex gap-1 items-center ">
-                                <MdRadar className="w-[15px] h-[15px]"/>
-                                <span>Connections</span>
+                                <MdSettings className="w-[15px] h-[15px]"/>
+                                <span>Settings</span>
                             </div>
                         </button>
-                    </div>
+                    </div> */}
 
-                    <div className="flex items-center justify-center text-[13px] border-dotted border-l-[1px] border-gray-500">
+                    <div className="flex items-center justify-center border-dotted border-l-[1px] border-gray-500">
                         <button onClick={()=>{
                            props.data.onlyFolders()
                         }} onMouseEnter={()=>showToast("folder_count")} onMouseLeave={()=>showToast("folder_count")} className="relative inline-block px-[15px] py-[2px] hover:bg-[#EDFFA5]">
-                            <span id="folder_count" className="absolute none flex items-center justify-center text-gray-300 bg-[#252525] z-10 -mt-8 border-[1px] border-[var(--theme-gray)] -ml-10 h-[25px] min-w-[150px]">{folderCount.length!==0?(<p>View folders : {folderCount.length}</p>):(<p>No folder</p>)}</span>
-                            <div className="flex gap-1 items-center ">
+                            <span id="folder_count" className="absolute text-[13px] none flex items-center justify-center text-gray-300 bg-[#252525] z-10 -mt-8 border-[1px] border-[var(--theme-gray)] -ml-10 h-[25px] min-w-[150px]">{folderCount.length!==0?(<p>View folders : {folderCount.length}</p>):(<p>No folder</p>)}</span>
+                            <div className="flex gap-1 items-center">
                                 <MdFolder/>
-                                <span>Folder: {folderCount.length}</span>
+                                <span className="text-[13px]">Folder: {folderCount.length}</span>
                             </div>
                         </button>
                         <button onClick={()=>{
                             props.data.onlyFiles()
                         }} onMouseEnter={()=>showToast("file_count")} onMouseLeave={()=>showToast("file_count")} className="relative inline-block px-[15px] py-[2px] hover:bg-[#EDFFA5]">
-                            <span id="file_count" className="absolute text-gray-300 none flex items-center justify-center bg-[#252525] z-10 -mt-8 border-[1px] border-[var(--theme-gray)] -ml-10 h-[25px] min-w-[150px]">{fileCount.length!==0?(<p>View files : {fileCount.length}</p>):(<p>No file</p>)}</span>
+                            <span id="file_count" className="absolute text-[13px] text-gray-300 none flex items-center justify-center bg-[#252525] z-10 -mt-8 border-[1px] border-[var(--theme-gray)] -ml-10 h-[25px] min-w-[150px]">{fileCount.length!==0?(<p>View files : {fileCount.length}</p>):(<p>No file</p>)}</span>
                             <div className="flex gap-1 items-center ">
                                 <MdFileOpen/>
-                                <span>File: {fileCount.length}</span>
+                                <span className="text-[13px]">File: {fileCount.length}</span>
                             </div>
                         </button>
                         <button onClick={()=>{
@@ -113,11 +125,11 @@ export default function Footer(props:Props){
                             localStorage.setItem("previous",path)
                             localStorage.setItem("path","shared")
                             props.data.open("http://localhost:8000/api/directory_content")
-                        }} onMouseEnter={()=>showToast("shared_folder")} onMouseLeave={()=>showToast("shared_folder")} className="relative inline-block px-[10px] py-[2px] hover:bg-[#EDFFA5]">
-                            <span id="shared_folder" className="absolute text-gray-300 none flex items-center justify-center bg-[#252525] z-10 -mt-8 border-[1px] border-[var(--theme-gray)] -ml-6 h-[25px] min-w-[150px]">View shared folders</span>
+                        }} onMouseEnter={()=>showToast("shared_resources")} onMouseLeave={()=>showToast("shared_resources")} className="relative inline-block px-[10px] py-[2px] hover:bg-[#EDFFA5]">
+                            <span id="shared_resources" className="text-[13px] absolute text-gray-300 none flex items-center justify-center bg-[#252525] z-10 -mt-8 border-[1px] border-[var(--theme-gray)] -ml-3 h-[25px] min-w-[150px]">View shared resources</span>
                             <div className="flex gap-1 items-center ">
                                 <MdFolderShared/>
-                                <span>Shared Folder: 8</span>
+                                <span className="text-[13px]">Shared Resources</span>
                             </div>
                         </button>
 
@@ -343,9 +355,9 @@ export default function Footer(props:Props){
                                 showToast("notification_dialog")
                             }} onMouseEnter={()=>showToast("notification_toast")} onMouseLeave={()=>showToast("notification_toast")} className="relative inline-block px-[15px] h-[25px] hover:bg-[#EDFFA5]">
                                 {notifications.length===0?(
-                                    <span id="notification_toast" className="absolute text-gray-300 none flex items-center justify-center bg-[#252525] z-10 -mt-8 border-[1px] border-[var(--theme-gray)] -ml-[115px] h-[25px] min-w-[150px]">No New Notifications</span>
+                                    <span id="notification_toast" className="absolute text-[13px] text-gray-300 none flex items-center justify-center bg-[#252525] z-10 -mt-8 border-[1px] border-[var(--theme-gray)] -ml-[120px] h-[25px] min-w-[150px]">No New Notifications</span>
                                 ):(
-                                    <span id="notification_toast" className="absolute text-gray-300 none flex items-center justify-center bg-[#252525] z-10 -mt-8 border-[1px] border-[var(--theme-gray)] -ml-[115px] h-[25px] min-w-[150px]">{notifications.length} notifications</span>
+                                    <span id="notification_toast" className="absolute text-[13px] text-gray-300 none flex items-center justify-center bg-[#252525] z-10 -mt-8 border-[1px] border-[var(--theme-gray)] -ml-[120px] h-[25px] min-w-[150px]">{notifications.length} notifications</span>
                                 )}
                                 <div className="flex gap-1 items-center">
                                     <MdNotifications className="w-[17px] h-[17px]"/>

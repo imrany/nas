@@ -1,4 +1,4 @@
-import { MdArrowBack, MdClose, MdContentCopy, MdFolder, MdOpenInNew, MdShare } from "react-icons/md";
+import { MdArrowBack, MdClose, MdContentCopy, MdFolder, MdOpenInNew, MdSend, MdSettings } from "react-icons/md";
 import Footer from "../components/Footer";
 import SideNav from "../components/SideNav";
 import TopNav from "../components/TopNav";
@@ -13,7 +13,7 @@ export default function Home(){
     const navigate=useNavigate()
     let [name,setName]=useState("")
     let [isLoading,setIsLoading]=useState(true)
-    let [showCloseBtn,setShowCloseBtn]=useState(false)
+    let [showSettings,setShowSettings]=useState(false)
     let [folders,setFolders]=useState<Folder>({
         contents:[
             {
@@ -107,6 +107,15 @@ export default function Home(){
         })
     }
 
+    function handleShowSettings(){
+        setShowSettings(true)
+    }
+
+    function toggleShowCloseBtn(id:string){
+        let closeBtn=document.getElementById(id)
+        closeBtn?.classList.contains("none")?closeBtn?.classList.remove("none"):closeBtn?.classList.add("none")
+    }
+
     useEffect(()=>{
         open("http://localhost:8000/api/directory_content")
 	},[])
@@ -118,15 +127,14 @@ export default function Home(){
                 </div>
             ):(
                 <div className="min-h-[100vh] bg-[#1d1d1d]">
-                    <TopNav data={{name}}/>
+                    <TopNav data={{name, handleShowSettings}}/>
                     <div className="flex">
                         <SideNav data={{folders,error,open}}/>
-
                         <div className="mt-[48px] flex-grow mb-[22px] text-[#999999]">
                             {/*  folder view */}
                             <div id="folder_view">
                                 {/* folder view nav */}
-                                <div id="folder_view_nav" className="fixed overflow-hidden left-[200px] right-0 top-[46px] h-[57px]">
+                                <div id="folder_view_nav" className="fixed overflow-hidden border-[#3c3c3c]/50 border-l-[1px] left-[199px] right-0 top-[35px]">
                                     <div className="flex w-full bg-[#151515]">
                                         {localStorage.getItem("path")==="/"?"":(
                                             <div onClick={()=>{
@@ -145,79 +153,92 @@ export default function Home(){
                                                 <MdArrowBack className="w-[18px] h-[18px] mr-[5px]"/>
                                             </div>
                                         )}
-                                        <div onMouseEnter={()=>setShowCloseBtn(true)} onMouseLeave={()=>setShowCloseBtn(false)} className="bg-[#1d1d1d] hover:bg-[#3c3c3c]/55 cursor-pointer pl-[10px] pr-[3px] min-w-[128px] h-[35px] flex items-center">
+
+                                        <div onClick={()=>setShowSettings(false)} onMouseEnter={()=>toggleShowCloseBtn(`folder_close_btn`)} onMouseLeave={()=>toggleShowCloseBtn(`folder_close_btn`)} className={showSettings===true?"bg-[#151515] border-dotted border-l-[1px] border-[#3c3c3c]/50 hover:bg-[#3c3c3c]/55 cursor-pointer pl-[10px] pr-[3px] min-w-[128px] h-[35px] flex items-center":"bg-[#1d1d1d] hover:bg-[#3c3c3c]/55 cursor-pointer pl-[10px] pr-[3px] min-w-[128px] h-[35px] flex items-center"}>
                                             <MdFolder className="w-[18px] h-[18px] mr-[5px]"/>
                                             <p className="text-[#E5E5E5] mr-[3px] text-[13px] capitalize root_path_indicator">{name}</p>
-                                            {showCloseBtn?(
-                                                <MdClose className="p-[3px] w-[22px] h-[22px] bg-[#3c3c3c]/90 ml-auto rounded-sm text-white" onClick={()=>{
-                                                    localStorage.removeItem("path");
-                                                    window.location.reload();
-                                                }}/>
-                                            ):""}
+                                            <MdClose id="folder_close_btn" className="p-[3px] none w-[22px] h-[22px] bg-[#3c3c3c]/90 ml-auto rounded-sm text-white" onClick={()=>{
+                                                localStorage.removeItem("path");
+                                                window.location.reload();
+                                            }}/>
+                                        </div>
+
+                                        <div onMouseEnter={()=>toggleShowCloseBtn(`settings_close_btn`)} onMouseLeave={()=>toggleShowCloseBtn(`settings_close_btn`)} className={showSettings!==true?"bg-[#151515] border-dotted border-r-[1px] border-[#3c3c3c]/50 hover:bg-[#3c3c3c]/55 cursor-pointer pr-[3px] min-w-[128px] h-[35px] flex items-center":"bg-[#1d1d1d] hover:bg-[#3c3c3c]/55 cursor-pointer pr-[3px] min-w-[128px] h-[35px] flex items-center"}>
+                                            <div className="flex pl-[10px]" onClick={()=>setShowSettings(true)}>
+                                                <MdSettings className="w-[18px] h-[18px] mr-[5px]"/>
+                                                <p className="text-[#E5E5E5] mr-[3px] text-[13px] capitalize">Settings</p>
+                                            </div>
+                                            <MdClose id="settings_close_btn" className="p-[3px] none w-[22px] h-[22px] bg-[#3c3c3c]/90 ml-auto rounded-sm text-white" onClick={()=>{
+                                                setShowSettings(false)
+                                            }}/>
                                         </div>
                                     </div>
                                 </div>
-                                {/* folder view body  */}
-                                <div className="w-full flex flex-wrap mt-[35px]" id="folder_view_body">
-                                    <div id="test" className="ml-[200px] grid max-sm:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 w-full gap-4 px-[25px] py-[13px]">
-                                        { folders&&folders.contents.map((content)=>{
-                                            return(
-                                                <div key={content.name} className="flex flex-col items-center text-center">
-                                                    <button id={content.name} title={content.name}
-                                                        onContextMenu={()=>{
-                                                            let dropdown_list=document.getElementById(`context_list_${content.name}`);
-                                                            dropdown_list?.classList.toggle("block");
-                                                        }}
-                                                        onDoubleClick={()=>{
-                                                            if(!content.metadata.is_file){
-                                                                localStorage.setItem("path",content.path)
-                                                                open("http://localhost:8000/api/directory_content")
-                                                            }else{
-                                                                openFile("http://localhost:8000/api/open",content.path)
-                                                            }
-                                                        }}  className='flex flex-col items-center justify-center text-[12px] max-w-[150px] hover:text-white active:text-white focus:bg-[#3c3c3c]/90 focus:text-white dropdown_btn'>
-                                                        {content.metadata.is_file?(<img src={FileImage} alt='file' className='w-[70px] h-[70px]'/>):(<img src={FolderImage} alt='folder' className='w-[70px] h-[70px]'/>)}
-                                                        <div>
-                                                            <p className='text-center'>{content.name.length<30?content.name:(<>{content.name.slice(0,30)}...</>)}</p>
-                                                        </div>
-                                                    </button>
-                                                    <div id={`context_list_${content.name}`} className='dropdown-content  flex-wrap  w-[200px] mt-[50px] -ml-[5px] max-lg:-ml-[27px]'>
-                                                        <div>
-                                                            <div onClick={()=>{
-                                                                if(content.metadata.is_file){
-                                                                    openFile("http://localhost:8000/api/open",content.path)
-                                                                }else{
+                                {!showSettings?(
+                                    <div className="w-full flex flex-wrap mt-[35px]" id="folder_view_body">
+                                        <div id="test" className="ml-[200px] grid max-sm:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 w-full gap-4 px-[25px] py-[13px]">
+                                            { folders&&folders.contents.map((content)=>{
+                                                return(
+                                                    <div key={content.name} className="flex flex-col items-center text-center">
+                                                        <button id={content.name} title={content.name}
+                                                            onContextMenu={()=>{
+                                                                let dropdown_list=document.getElementById(`context_list_${content.name}`);
+                                                                dropdown_list?.classList.toggle("block");
+                                                            }}
+                                                            onDoubleClick={()=>{
+                                                                if(!content.metadata.is_file){
                                                                     localStorage.setItem("path",content.path)
                                                                     open("http://localhost:8000/api/directory_content")
+                                                                }else{
+                                                                    openFile("http://localhost:8000/api/open",content.path)
                                                                 }
-                                                            }} className='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35 {name_str}_open_item'>
-                                                                <MdOpenInNew className="w-[25px] h-[25px] pr-[6px]"/>
-                                                                <p>Open</p>
+                                                            }}  className='flex flex-col items-center justify-center text-[12px] max-w-[150px] hover:text-white active:text-white focus:bg-[#3c3c3c]/90 focus:text-white dropdown_btn'>
+                                                            {content.metadata.is_file?(<img src={FileImage} alt='file' className='w-[70px] h-[70px]'/>):(<img src={FolderImage} alt='folder' className='w-[70px] h-[70px]'/>)}
+                                                            <div>
+                                                                <p className='text-center'>{content.name.length<30?content.name:(<>{content.name.slice(0,30)}...</>)}</p>
                                                             </div>
-                                                            <button onClick={()=>{
-                                                                navigator.clipboard.writeText(content.path)
-                                                            }} className='px-[12px] w-full py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35 {name_str}_open_item'>
-                                                                <MdContentCopy className="w-[25px] h-[25px] pr-[6px]"/>
-                                                                <p>Copy Path</p>
-                                                            </button>
-                                                            {content.metadata.is_file?(<div className='px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
-                                                                <MdShare className="w-[25px] h-[25px] pr-[6px]"/>
-                                                                <p>Share</p>
-                                                            </div>):""}
+                                                        </button>
+                                                        <div id={`context_list_${content.name}`} className='dropdown-content  flex-wrap  w-[200px] mt-[50px] -ml-[5px] max-lg:-ml-[27px]'>
+                                                            <div>
+                                                                <div onClick={()=>{
+                                                                    if(content.metadata.is_file){
+                                                                        openFile("http://localhost:8000/api/open",content.path)
+                                                                    }else{
+                                                                        localStorage.setItem("path",content.path)
+                                                                        open("http://localhost:8000/api/directory_content")
+                                                                    }
+                                                                }} className='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35 {name_str}_open_item'>
+                                                                    <MdOpenInNew className="w-[25px] h-[25px] pr-[6px]"/>
+                                                                    <p>Open</p>
+                                                                </div>
+                                                                <button onClick={()=>{
+                                                                    navigator.clipboard.writeText(content.path)
+                                                                }} className='px-[12px] w-full py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35 {name_str}_open_item'>
+                                                                    <MdContentCopy className="w-[25px] h-[25px] pr-[6px]"/>
+                                                                    <p>Copy Path</p>
+                                                                </button>
+                                                                {content.metadata.is_file?(<div className='px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
+                                                                    <MdSend className="w-[25px] h-[25px] pr-[6px]"/>
+                                                                    <p>Send to ...</p>
+                                                                </div>):""}
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            )
-                                        })}
+                                                )
+                                            })}
+                                        </div>
                                     </div>
-                                </div>
+                                ):(
+                                    <div className="w-full flex flex-wrap mt-[35px]" id="settings_view">
+                                        <div className="ml-[200px] flex flex-col w-full gap-4 px-[25px] py-[13px]">
+                                            Setting Tab
+                                        </div>
+                                    </div>
+                                )}
                             </div>
-
-                            {/* share tab */}
-                            <div id="share_tab"></div>
                         </div>
                     </div>
-                    <Footer data={{folders, onlyFolders, onlyFiles, open}}/>
+                    <Footer data={{folders, onlyFolders, onlyFiles, open, handleShowSettings}}/>
                 </div>
             )}
         </>

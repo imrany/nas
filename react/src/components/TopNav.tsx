@@ -1,11 +1,11 @@
 // @flow strict
 import { MdContentCopy, MdEdit, MdOutlineExpandMore, MdSettings,  } from "react-icons/md";
-import { openDialog } from "./actions";
 import { Link } from "react-router-dom";
 
 type Props={
     data:{
-        name:string
+        name:string,
+        handleShowSettings:any
     }
 }
 function TopNav(props:Props) {
@@ -28,14 +28,14 @@ function TopNav(props:Props) {
     }
     
     return (
-        <nav className="fixed bg-[#151515] px-[12px] top-0 left-0 right-0 z-10">
-            <div className="font-semibold text-[13px] flex justify-between min-h-[48px] items-center text-white">
+        <nav className="fixed bg-[var(--theme-dark)] top-0 left-0 right-0 z-10">
+            <div className="font-semibold text-[13px] flex justify-between h-[35px] items-center">
                 <div className="dropdown">
-                    <button onClick={showDropdownMenu} className="flex dropbtn justify-center items-center py-[4px] px-[12px] cursor-pointer h-[24px]">
+                    <button onClick={showDropdownMenu} className="pl-[12px] justify-start w-[200px] h-[35px] border-[#3c3c3c]/50 border-r-[1px] flex dropbtn items-center py-[4px] px-[12px] cursor-pointer">
                         <p className="dropbtn">Anvel</p>
                         <MdOutlineExpandMore className="w-[25px] h-[25px] dropbtn p-[3px]"/>
                     </button>
-                    <div id="dropdown_list"  className="dropdown-content">
+                    <div id="dropdown_list"  className="dropdown-content  ml-[12px]">
                         <Link to="/docs" className="px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
                             <MdContentCopy className="w-[25px] h-[25px] pr-[6px]"/>
                             <p>Documentation</p>
@@ -45,19 +45,19 @@ function TopNav(props:Props) {
                             <p>Customize</p>
                         </div>
                         
-                        <div onClick={()=>openDialog("network_dialog")} className="px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
+                        <div onClick={()=>props.data.handleShowSettings()} className="px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
                             <MdSettings className="w-[25px] h-[25px] pr-[6px]"/>
                             <p>Settings</p>
                         </div>
                     </div>
                 </div>
-                <div className="text-[#C2C2C2] flex font-medium min-w-[10%] items-center">
-                    <p className="rounded-md bg-[#252525] py-[2px] px-2 mr-2">Directory</p>
-                    <p className="root_path_indicator capitalize">{props.data.name}</p>
+                <div className="text-[#C2C2C2] h-[35px] justify-center border-[#3c3c3c]/50 border-b-[1px] gap-x-2 py-1 flex-grow flex font-medium items-center">
+                    <p className="rounded-md bg-[#252525] py-[2px] px-2">Directory</p>
+                    <p className="capitalize">{props.data.name}</p>
                 </div>
-                <div className="text-[#C2C2C2] flex gap-2 min-w-[10vw] justify-around">
-                    {/* more nav link or btn */}
-                </div>
+                {/* <div className="text-[#C2C2C2] flex gap-2 min-w-[10vw] justify-around">
+                    more nav link or btn
+                </div> */}
             </div>
         </nav>
     );

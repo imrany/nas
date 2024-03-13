@@ -40,9 +40,9 @@ function SideNav(props:Props) {
         setSearchResults(results)
     }
     return (
-        <div id="sidebar" className="overflow-hidden h-[100vh] fixed pb-[12px] bottom-[18px] left-0 w-[200px] top-12 text-[13px] text-[#999999] bg-[#151515]">
+        <div id="sidebar" className="overflow-hidden border-[#3c3c3c]/50 border-r-[1px] h-[100vh] fixed pb-[12px] bottom-[18px] left-0 w-[200px] top-[35px] text-[13px] text-[#999999] bg-[#151515]">
             <div className="flex flex-col mb-3">
-                <div className="h-[33px] flex items-center text-[#999999] uppercase pl-[12px] pr-[8px]">
+                <div className="h-[46px] flex items-center text-[#999999] uppercase pl-[12px] pr-[8px]">
                     <button  onClick={()=>{
                         setSearchResults({
                             contents:[]
