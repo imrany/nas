@@ -5,29 +5,33 @@ import Home from "./pages/Home";
 import { OpenFolderDialog } from "./components/dialogs";
 import LandingPage from "./pages/LandingPage";
 import Layout from "./pages/Layout";
-import bg1 from "./assets/background/bg_1.png";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { UserPreference } from "./types/definitions";
 
 function App() {
   let userPreference:UserPreference={
-    backgroundImage:""
+    backgroundImage:"default"
   }
-  let [backgroundImage,setBackgroundImage]=useState("")
+  let user_preference:any=localStorage.getItem("user_preference")!==null?localStorage.getItem("user_preference"):""
+  let userPreferenceParsed:UserPreference=user_preference.length!==0?JSON.parse(user_preference):userPreference;
+  let [backgroundImage,setBackgroundImage]=useState(userPreferenceParsed.backgroundImage)
   let path=localStorage.getItem("path")
+
+  function changeBackground(background:string){
+    userPreference["backgroundImage"]=background
+    localStorage.setItem("user_preference",JSON.stringify(userPreference))
+    setBackgroundImage(background)
+  }
+
   window.oncontextmenu=(e:any)=>{
     e.preventDefault()
   }
-
-  useEffect(()=>{
-    setBackgroundImage(bg1)
-  },[backgroundImage])
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/welcome" element={path===null?<LandingPage data={{backgroundImage}}/>:<Navigate to="/"/>} />
         <Route path="/" element={path!==null?<Layout/>:<Navigate to="/welcome"/>}>
-          <Route index element={<Home data={{backgroundImage}}/>} />
+          <Route index element={<Home data={{backgroundImage, changeBackground}}/>} />
           <Route path="docs" element={<Docs />} />
         </Route>
         <Route path="*" element={<ErrorPage />} />

@@ -8,10 +8,13 @@ import FileImage from "../assets/icons/file.png";
 import FolderImage from "../assets/icons/folder.png";
 import { openFile } from "../components/actions";
 import { useNavigate } from "react-router-dom";
+import bg1 from "../assets/background/bg_1.png";
+// import bg2 from "../assets/background/bg_2.png";
 
 type Props={
     data:{
         backgroundImage:string,
+        changeBackground:any
     }
 }
 export default function Home(props:Props){
@@ -173,7 +176,7 @@ export default function Home(props:Props){
                     <p className="text-lg">Loading...</p>
                 </div>
             ):(
-                <div style={{background: `linear-gradient(0deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),url('${props.data.backgroundImage}') top no-repeat`, backgroundSize:"cover", backgroundAttachment:"fixed"}} className="min-h-[100vh]">
+                <div style={props.data.backgroundImage!=="default"?{background: `linear-gradient(0deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),url('${props.data.backgroundImage}') top no-repeat`, backgroundSize:"cover", backgroundAttachment:"fixed"}:{background: "var(--theme-gray)"}} className="min-h-[100vh]">
                     <TopNav data={{name, handleShowSettings, settingsHeader, showToast}}/>
                     <div className="flex">
                         <SideNav data={{folders,error,open}}/>
@@ -289,10 +292,16 @@ export default function Home(props:Props){
                                                 <p className="text-white text-lg mb-1">User Preference</p>
                                                 <div className="flex flex-col">
                                                     <p>Choose Background image</p>
-                                                    <div className="flex gap-2">
-                                                        <div className="bg-[#252525]">
-
-                                                        </div>
+                                                    <div className="flex max-sm:flex-col gap-2 my-2">
+                                                        <button onClick={()=>props.data.changeBackground("default")} style={{boxShadow: "0px 8px 16px 0px rgba(0,0,0,0.2)"}} className="bg-[#252525] flex justify-center items-center rounded-md h-[200px] hover:text-white w-[240px]">
+                                                            <p className="text-base text-gray-100">Default</p>
+                                                        </button>
+                                                        <button onClick={()=>props.data.changeBackground(bg1)} style={{boxShadow: "0px 8px 16px 0px rgba(0,0,0,0.2)",background: `linear-gradient(0deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),url('${bg1}') center no-repeat`, backgroundSize:"cover"}} className={`hover:text-white flex justify-center items-center rounded-md h-[200px] w-[240px]`}>
+                                                            <p className="text-base text-gray-100">Background image 1</p>
+                                                        </button>
+                                                        {/* <button onClick={()=>props.data.changeBackground(bg2)} style={{boxShadow: "0px 8px 16px 0px rgba(0,0,0,0.2)",background: `linear-gradient(0deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),url('${bg2}') center no-repeat`, backgroundSize:"cover"}} className={`hover:text-white flex justify-center items-center rounded-md h-[200px] w-[240px]`}>
+                                                            <p className="text-base text-gray-100">Background image 1</p>
+                                                        </button> */}
                                                     </div>
                                                 </div>
                                             </div>
