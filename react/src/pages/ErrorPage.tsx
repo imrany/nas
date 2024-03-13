@@ -3,6 +3,11 @@ import { Link, useSearchParams } from "react-router-dom";
 import { ErrorBody } from "../types/definitions";
 
 function NotFound() {
+    let [resolveBtn,setResolveBtn]=useState(
+        <button onClick={()=>window.location.reload()} className="mr-[12px] py-[4px] px-[16px] hover:bg-[#EDFFA1] border-none font-semibold h-[28px] w-[119px] text-[13px] text-[#1D1D1D] rounded-sm bg-[#EDFFA5]">
+            Refresh page
+        </button>
+    )
     let [errorBody,setErrorBody]=useState<ErrorBody>({
         error_type:"",
         error_code:"",
@@ -47,7 +52,7 @@ function NotFound() {
                 setErrorBody({
                     error_type:errorQuery,
                     error_code:"404",
-                    message:`This item might not be visible because ${errorQuery}.`,
+                    message:`${errorQuery}.`,
                     solution:(
                         <>
                             If the issue persists,
@@ -56,6 +61,14 @@ function NotFound() {
                         </>
                     )
                 })
+                setResolveBtn(
+                    <button onClick={()=>{
+                        localStorage.removeItem("path")
+                        window.location.href="/welcome"
+                    }} className="mr-[12px] py-[4px] px-[16px] hover:bg-[#EDFFA1] border-none font-semibold h-[28px] w-[119px] text-[13px] text-[#1D1D1D] rounded-sm bg-[#EDFFA5]">
+                        Try again
+                    </button>
+                )
             break;
         }
     },[])
@@ -88,6 +101,10 @@ function NotFound() {
                         </div>
                         <div className="mt-[16px] grid grid-rows-2 gap-3">
                             <code className="grid grid-cols-2 gap-6">
+                                <span>Status</span> 
+                                <span>{errorBody.error_code}</span>
+                            </code>
+                            <code className="grid grid-cols-2 gap-6">
                                 <span>Version</span> 
                                 <span>0.1.0</span>
                             </code>
@@ -99,9 +116,7 @@ function NotFound() {
                     </div>
                 </details>
                 <div className="flex items-center mt-[24px]">
-                    <button onClick={()=>window.location.reload()} className="mr-[12px] py-[4px] px-[16px] hover:bg-[#EDFFA1] border-none font-semibold h-[28px] w-[119px] text-[13px] text-[#1D1D1D] rounded-sm bg-[#EDFFA5]">
-                        Refresh page
-                    </button>
+                    {resolveBtn}
                     <Link to="/" className="mr-[12px] py-[4px] px-[16px] border-[1px] border-[#343434] font-semibold hover:bg-[#292d39]  hover:text-white h-[28px] w-[119px] text-[13px] text-[#C2C2C2] rounded-sm bg-[#252525]">
                         Back Home
                     </Link>
