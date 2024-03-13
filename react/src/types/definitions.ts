@@ -9,6 +9,11 @@ export type UserPreference={
 	backgroundImage:string,
 }
 
+export type ChooseBackground={
+	name:string,
+	image:string
+}
+
 export interface Content{
 	root:string,
 	path:string,

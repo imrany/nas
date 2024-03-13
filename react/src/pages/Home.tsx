@@ -3,7 +3,7 @@ import Footer from "../components/Footer";
 import SideNav from "../components/SideNav";
 import TopNav from "../components/TopNav";
 import { useEffect, useState } from "react";
-import { ErrorBody, Folder, Content, Notifications } from "../types/definitions"
+import { ErrorBody, Folder, Content, Notifications, ChooseBackground } from "../types/definitions"
 import FileImage from "../assets/icons/file.png";
 import FolderImage from "../assets/icons/folder.png";
 import { openFile } from "../components/actions";
@@ -58,6 +58,18 @@ export default function Home(props:Props){
     let [error,setError]=useState<ErrorBody>({
         message:""
     })
+
+    let chooseBackground:ChooseBackground[]=[
+        {
+            name:"Background Image 1",
+            image:bg1
+        },
+        // {
+        //     name:"Background Image 2",
+        //     image:bg2
+        // }
+    ]
+
     async function open(url:string){
         try {
             const response=await fetch(url,{
@@ -167,7 +179,6 @@ export default function Home(props:Props){
                 message:"Zero connections"
             },
         ])
-        // console.log("hey")
 	},[counter])
     return(
         <>
@@ -296,12 +307,15 @@ export default function Home(props:Props){
                                                         <button onClick={()=>props.data.changeBackground("default")} style={{boxShadow: "0px 8px 16px 0px rgba(0,0,0,0.2)"}} className="bg-[#252525] flex justify-center items-center rounded-md h-[200px] hover:text-white w-[240px]">
                                                             <p className="text-base text-gray-100">Default</p>
                                                         </button>
-                                                        <button onClick={()=>props.data.changeBackground(bg1)} style={{boxShadow: "0px 8px 16px 0px rgba(0,0,0,0.2)",background: `linear-gradient(0deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),url('${bg1}') center no-repeat`, backgroundSize:"cover"}} className={`hover:text-white flex justify-center items-center rounded-md h-[200px] w-[240px]`}>
-                                                            <p className="text-base text-gray-100">Background image 1</p>
-                                                        </button>
-                                                        {/* <button onClick={()=>props.data.changeBackground(bg2)} style={{boxShadow: "0px 8px 16px 0px rgba(0,0,0,0.2)",background: `linear-gradient(0deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),url('${bg2}') center no-repeat`, backgroundSize:"cover"}} className={`hover:text-white flex justify-center items-center rounded-md h-[200px] w-[240px]`}>
-                                                            <p className="text-base text-gray-100">Background image 1</p>
-                                                        </button> */}
+                                                        <div className="flex max-sm:flex-col gap-2">
+                                                            {chooseBackground.map((choice)=>{
+                                                                return(
+                                                                    <button key={choice.name} onClick={()=>props.data.changeBackground(choice.image)} style={{boxShadow: "0px 8px 16px 0px rgba(0,0,0,0.2)",background: `linear-gradient(0deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),url('${choice.image}') center no-repeat`, backgroundSize:"cover"}} className={`hover:text-white flex justify-center items-center rounded-md h-[200px] w-[240px]`}>
+                                                                        <p className="text-base text-gray-100">{choice.name}</p>
+                                                                    </button>
+                                                                )
+                                                            })}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
