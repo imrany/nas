@@ -5,6 +5,7 @@ import { ErrorBody } from "../types/definitions";
 function NotFound() {
     let [errorBody,setErrorBody]=useState<ErrorBody>({
         error_type:"",
+        error_code:"",
         message:"",
         solution:(<></>)
     });
@@ -15,6 +16,7 @@ function NotFound() {
             case "Not supported":
                 setErrorBody({
                     error_type:"Not supported",
+                    error_code:"501",
                     message:"This item or feature might not be supported on the current version, you can update to the lastest version.",
                     solution:(
                         <>
@@ -29,6 +31,7 @@ function NotFound() {
             case "Failed to fetch":
                 setErrorBody({
                     error_type:"Failed to fetch",
+                    error_code:"500",
                     message:"Anvel is not running correctly, please cancel and run again.",
                     solution:(
                         <>
@@ -42,8 +45,9 @@ function NotFound() {
 
             default:
                 setErrorBody({
-                    error_type:"Not found",
-                    message:"This item might not be visible because you're not connected.",
+                    error_type:errorQuery,
+                    error_code:"404",
+                    message:`This item might not be visible because ${errorQuery}.`,
                     solution:(
                         <>
                             If the issue persists,

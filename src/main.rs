@@ -40,7 +40,7 @@ use routes::{
     send,
     receive,
     download,
-    get_shared_folder_contents,
+    // get_shared_folder_contents,
 };
 
 #[derive(Parser)]
@@ -137,7 +137,7 @@ async fn serve_zippy(){
                     .service(send)
                     .service(receive)
                     .service(download)
-                    .service(get_shared_folder_contents)
+                    // .service(get_shared_folder_contents)
             )
             .service(
                 web::scope("/*")

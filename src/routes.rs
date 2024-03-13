@@ -32,7 +32,7 @@ use serde::{
     Serialize,
     Deserialize,
 };
-use serde_json::json;
+// use serde_json::json;
 use std::process::Command;
 use local_ip_address::local_ip;
 
@@ -85,7 +85,7 @@ pub struct AppState {
 pub async fn directory_content(state: web::Data<AppState>, path: web::Json<RootPath>)-> HttpResponse{
     let root =&state.root_dir;
     let path_dir=&path.root;
-    let shared_dir=&path::PathBuf::from("./shared");
+    let shared_dir=path::PathBuf::from("./shared");
 
     let directory_path = match path_dir.to_str().unwrap() {
         "root" => {
@@ -94,7 +94,7 @@ pub async fn directory_content(state: web::Data<AppState>, path: web::Json<RootP
         },
         "shared"=>{
             println!("{}",path_dir.to_str().unwrap());
-            shared_dir
+            &shared_dir
         }
         _ => {
             println!("{}", path_dir.to_str().unwrap());
@@ -132,7 +132,7 @@ pub async fn directory_content(state: web::Data<AppState>, path: web::Json<RootP
         Err(e) => {
             println!("{e}");
             let err_message=ErrorMessage{
-                message:format!("{e} name '{}'",directory_path.to_str().unwrap())
+                message:format!("{e} with the name '{}'",directory_path.to_str().unwrap())
             };
             return HttpResponse::InternalServerError().json(err_message);
         }
@@ -148,37 +148,38 @@ pub async fn download(path: web::Path<RootPath>) -> Result<NamedFile> {
     Ok(NamedFile::open(file_path)?)
 }
 
-#[get("/shared_folder")]
-pub async fn get_shared_folder_contents()-> HttpResponse{
-    let shared_folder_path=path::PathBuf::from("./shared");
-    // This will POST a body of `{"root":"rust","body":"json"}`
-    let data = json!({
-        "root": &shared_folder_path
-    });
+// #[get("/shared_folder")]
+// pub async fn get_shared_folder_contents()-> HttpResponse{
+//     let shared_folder_path=path::PathBuf::from("./shared");
+//     // This will POST a body of `{"root":"rust","body":"json"}`
+//     let data = json!({
+//         "root": &shared_folder_path
+//     });
 
-    let resp=Client::new()
-    .post("http://localhost:8000/api/directory_content")
-    .json(&data)
-    .send()
-    .await;
-    match resp {
-        Ok(res) =>{
-            if res.status().is_success() {
-                let res_json:DirectoryContent=res.json().await.unwrap();
-                return HttpResponse::Ok().json(res_json);
-            } else {
-                let res_text=format!("Failed to get Shared Folder. Status code: {}",res.status());
-                println!("{res_text}");
-                return HttpResponse::InternalServerError().json(res_text);
-            }
-        }, 
-        Err(e) => {
-            let res_text=format!("{e}");
-            println!("{res_text}");
-            return HttpResponse::InternalServerError().json(res_text);
-        }
-    }
-}
+//     let resp=Client::new()
+//     .post("http://localhost:8000/api/directory_content")
+//     .json(&data)
+//     .send()
+//     .await;
+//     match resp {
+//         Ok(res) =>{
+//             if res.status().is_success() {
+//                 let res_json:DirectoryContent=res.json().await.unwrap();
+//                 return HttpResponse::Ok().json(res_json);
+//             } else {
+//                 let res_text=format!("Failed to get Shared Folder. Status code: {}",res.status());
+//                 println!("{res_text}");
+//                 return HttpResponse::InternalServerError().json(res_text);
+//             }
+//         }, 
+//         Err(e) => {
+//             let res_text=format!("{e}");
+//             println!("{res_text}");
+//             return HttpResponse::InternalServerError().json(res_text);
+//         }
+//     }
+// }
+
 #[post("/receive")]
 pub async fn receive(mut payload: Multipart) -> Result<HttpResponse> {
     while let Some(item) = payload.next().await {

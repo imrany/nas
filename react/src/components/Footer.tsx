@@ -11,6 +11,7 @@ type Props={
         folders:Folder,
         onlyFolders:any,
         onlyFiles:any,
+        open:any
     }
 }
 export default function Footer(props:Props){
@@ -87,13 +88,16 @@ export default function Footer(props:Props){
                                 <span>File: {fileCount.length}</span>
                             </div>
                         </button>
-                        <Link to="/" onMouseEnter={()=>showToast("shared_folder")} onMouseLeave={()=>showToast("shared_folder")} className="relative inline-block px-[10px] py-[2px] hover:bg-[#EDFFA5]">
+                        <button onClick={()=>{
+                            localStorage.setItem("path","shared")
+                            props.data.open("http://localhost:8000/api/directory_content")
+                        }} onMouseEnter={()=>showToast("shared_folder")} onMouseLeave={()=>showToast("shared_folder")} className="relative inline-block px-[10px] py-[2px] hover:bg-[#EDFFA5]">
                             <span id="shared_folder" className="absolute text-gray-300 none flex items-center justify-center bg-[#252525] z-10 -mt-8 border-[1px] border-[var(--theme-gray)] -ml-6 h-[25px] min-w-[150px]">View shared folders</span>
                             <div className="flex gap-1 items-center ">
                                 <MdFolderShared/>
                                 <span>Shared Folder: 8</span>
                             </div>
-                        </Link>
+                        </button>
 
                         <div className="relative inline-block">
                             <div id="single_notifications"

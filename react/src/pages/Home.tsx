@@ -73,6 +73,7 @@ export default function Home(){
 	    	    setContents(withOutDotConfig.contents)
             }else{
                 setError(parseRes)
+                navigate(`/error?error=${parseRes.message}`)
             }
             setIsLoading(false)
         } catch (error:any) {
@@ -129,7 +130,7 @@ export default function Home(){
                                     <div className="flex w-full bg-[#151515]">
                                         {localStorage.getItem("path")==="/"?"":(
                                             <div onClick={()=>{
-                                                let path:any=localStorage.getItem("path")!==null?localStorage.getItem("path"):""
+                                                let path:any=localStorage.getItem("path")!=="shared"?localStorage.getItem("path"):"root"
                                                 let newPath=path.slice(0,path?.lastIndexOf("/"))===""?path:path.slice(0,path?.lastIndexOf("/"))
                                                 localStorage.setItem("path",newPath)
                                                 open("http://localhost:8000/api/directory_content")
@@ -209,7 +210,7 @@ export default function Home(){
                             <div id="share_tab"></div>
                         </div>
                     </div>
-                    <Footer data={{folders, onlyFolders, onlyFiles}}/>
+                    <Footer data={{folders, onlyFolders, onlyFiles, open}}/>
                 </div>
             )}
         </>

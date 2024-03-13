@@ -1,5 +1,6 @@
 export type ErrorBody={
     error_type?:string,
+    error_code?:string,
     message:string,
     solution?:any
 }
