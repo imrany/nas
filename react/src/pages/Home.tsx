@@ -190,7 +190,6 @@ export default function Home(props:Props){
                 message:"Zero connections"
             },
         ])
-        console.log("looping request")
 	},[counter])
     return(
         <>
@@ -310,7 +309,46 @@ export default function Home(props:Props){
                                     </div>
                                 ):(
                                     <div className="w-full flex flex-wrap mt-[35px]" id="settings_view">
-                                        <div className="ml-[200px] flex flex-col w-full gap-4 px-[25px] py-[13px]">
+                                        <div className="ml-[200px] flex flex-col w-full gap-x-4 gap-y-12 px-[25px] py-[13px]">
+                                            <div>
+                                                <p className="text-white text-lg mb-2">Network Information</p>
+                                                <div className="flex gap-6 flex-col">
+                                                    <div>
+                                                        <div className="flex flex-col gap-2 my-2">
+                                                            <div className="grid grid-cols-4 gap-10">
+                                                                <p>Internet Protocol (IP)</p>
+                                                                <p className="text-white">192.10.0.96</p>
+                                                            </div>
+                                                            <div className="grid grid-cols-4 gap-10">
+                                                                <p>Port (number)</p>
+                                                                <p className="text-white">8000</p>
+                                                            </div>
+                                                            <div className="grid grid-cols-4 gap-10">
+                                                                <p>Server (host)</p>
+                                                                <a href="#" target="_blank" rel="noopener noreferrer" className="text-white underline">http://192.10.0.96:8000/</a>
+                                                            </div>
+                                                            <div className="grid grid-cols-4 gap-10">
+                                                                <p>Status (internet)</p>
+                                                                <p className="text-white">{window.navigator.onLine===true?"Online":"Offline"}</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div>
+                                                        <p className="text-gray-100">Configurations</p>
+                                                        <div className="flex flex-col gap-2 my-2">
+                                                            <div className="grid grid-cols-4 gap-10">
+                                                                <label htmlFor="recepient_ip">Enter Recepient's IP</label>
+                                                                <input id="recepient_ip" name="recepient_ip" className="px-2 py-1 w-full rounded-md bg-transparent text-white border-violet-300 border-[1px] focus:ring-1 focus:ring-violet-300" type="text" placeholder="192.10.0.96" required/>
+                                                            </div>
+                                                            <div className="grid grid-cols-4 gap-10">
+                                                                <label htmlFor="recepient_ip">Share Both Folder and File</label>
+                                                                <input type="checkbox" className="h-[20px] w-[20px] cursor-pointer rounded-md bg-transparent focus:outline-none checked:bg-violet-300 focus:ring-1 focus:ring-violet-300" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                             <div>
                                                 <p className="text-white text-lg mb-2">User Preference</p>
                                                 <div className="flex flex-col">
