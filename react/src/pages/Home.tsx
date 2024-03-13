@@ -14,6 +14,7 @@ export default function Home(){
     let [name,setName]=useState("")
     let [isLoading,setIsLoading]=useState(true)
     let [showSettings,setShowSettings]=useState(false)
+    let [showSettingsTab,setShowSettingsTab]=useState(false)
     let [folders,setFolders]=useState<Folder>({
         contents:[
             {
@@ -109,8 +110,9 @@ export default function Home(){
 
     function handleShowSettings(){
         setShowSettings(true)
+        setShowSettingsTab(true)
     }
-
+    
     function toggleShowCloseBtn(id:string){
         let closeBtn=document.getElementById(id)
         closeBtn?.classList.contains("none")?closeBtn?.classList.remove("none"):closeBtn?.classList.add("none")
@@ -163,15 +165,18 @@ export default function Home(){
                                             }}/>
                                         </div>
 
-                                        <div onMouseEnter={()=>toggleShowCloseBtn(`settings_close_btn`)} onMouseLeave={()=>toggleShowCloseBtn(`settings_close_btn`)} className={showSettings!==true?"bg-[#151515] border-dotted border-r-[1px] border-[#3c3c3c]/50 hover:bg-[#3c3c3c]/55 cursor-pointer pr-[3px] min-w-[128px] h-[35px] flex items-center":"bg-[#1d1d1d] hover:bg-[#3c3c3c]/55 cursor-pointer pr-[3px] min-w-[128px] h-[35px] flex items-center"}>
-                                            <div className="flex pl-[10px]" onClick={()=>setShowSettings(true)}>
-                                                <MdSettings className="w-[18px] h-[18px] mr-[5px]"/>
-                                                <p className="text-[#E5E5E5] mr-[3px] text-[13px] capitalize">Settings</p>
+                                        {showSettingsTab?(
+                                            <div onMouseEnter={()=>toggleShowCloseBtn(`settings_close_btn`)} onMouseLeave={()=>toggleShowCloseBtn(`settings_close_btn`)} className={showSettings!==true?"bg-[#151515] border-dotted border-r-[1px] border-[#3c3c3c]/50 hover:bg-[#3c3c3c]/55 cursor-pointer pr-[3px] min-w-[128px] h-[35px] flex items-center":"bg-[#1d1d1d] hover:bg-[#3c3c3c]/55 cursor-pointer pr-[3px] min-w-[128px] h-[35px] flex items-center"}>
+                                                <div className="flex pl-[10px]" onClick={()=>setShowSettings(true)}>
+                                                    <MdSettings className="w-[18px] h-[18px] mr-[5px]"/>
+                                                    <p className="text-[#E5E5E5] mr-[3px] text-[13px] capitalize">Settings</p>
+                                                </div>
+                                                <MdClose id="settings_close_btn" className="p-[3px] none w-[22px] h-[22px] bg-[#3c3c3c]/90 ml-auto rounded-sm text-white" onClick={()=>{
+                                                    setShowSettings(false)
+                                                    setShowSettingsTab(false)
+                                                }}/>
                                             </div>
-                                            <MdClose id="settings_close_btn" className="p-[3px] none w-[22px] h-[22px] bg-[#3c3c3c]/90 ml-auto rounded-sm text-white" onClick={()=>{
-                                                setShowSettings(false)
-                                            }}/>
-                                        </div>
+                                        ):""}
                                     </div>
                                 </div>
                                 {!showSettings?(
