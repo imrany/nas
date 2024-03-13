@@ -1,6 +1,5 @@
 // @flow strict
-import { MdContentCopy, MdEdit, MdNotifications, MdOutlineExpandMore, MdSettings,  } from "react-icons/md";
-import { Link } from "react-router-dom";
+import { MdEdit, MdNotifications, MdOutlineExpandMore, MdSettings,  } from "react-icons/md";
 import { openDialog } from "./actions";
 
 type Props={
