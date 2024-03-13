@@ -136,7 +136,7 @@ export default function Home(){
         closeBtn?.classList.contains("none")?closeBtn?.classList.remove("none"):closeBtn?.classList.add("none")
     }
 
-    let maxRequest=1
+    let maxRequest=2
     for (let i = 0; i < maxRequest; i++) {
         setTimeout(() => {
             setCounter(i)
