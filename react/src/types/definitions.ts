@@ -5,6 +5,15 @@ export type ErrorBody={
     solution?:any
 }
 
+export interface NetworkInformation{
+	internal:string,
+	external:string
+}
+
+export interface Configurations{
+	recipient_ip:string
+}
+
 export type UserPreference={
 	backgroundImage:string,
 }

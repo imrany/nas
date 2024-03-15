@@ -8,7 +8,9 @@ type Props = {
     data:{
         folders:Folder,
         error:ErrorBody
-        open:any
+        open:any,
+        getIPs:any,
+        showSettings:boolean
     }
 };
 function SideNav(props:Props) {
@@ -55,7 +57,9 @@ function SideNav(props:Props) {
                     <button onClick={()=>setSearchView(true)} className="focus:ring-1 focus:ring-violet-300 rounded-sm hover:bg-[#3c3c3c]/35 active:text-[#e5e5e5] cursor-pointer hover:text-[#e5e5e5] focus:text-[#e5e5e5]  p-[4px]">
                         <MdSearch className="w-[18px] h-[18px]"/>
                     </button>
-                    <button onClick={()=>props.data.open("http://localhost:8000/api/directory_content")} className="focus:ring-1 focus:ring-violet-300 rounded-sm hover:bg-[#3c3c3c]/35 active:text-[#e5e5e5] cursor-pointer hover:text-[#e5e5e5] focus:text-[#e5e5e5]  p-[4px]">
+                    <button onClick={()=>{
+                        props.data.showSettings===false?props.data.open("http://localhost:8000/api/directory_content"):props.data.getIPs("http://localhost:8000/api/get_ip_address")
+                    }} className="focus:ring-1 focus:ring-violet-300 rounded-sm hover:bg-[#3c3c3c]/35 active:text-[#e5e5e5] cursor-pointer hover:text-[#e5e5e5] focus:text-[#e5e5e5]  p-[4px]">
                         <MdRefresh className="w-[18px] h-[18px]"/>
                     </button>
                 </div>

@@ -3,7 +3,7 @@ import Footer from "../components/Footer";
 import SideNav from "../components/SideNav";
 import TopNav from "../components/TopNav";
 import { useEffect, useState } from "react";
-import { ErrorBody, Folder, Content, Notifications, ChooseBackground } from "../types/definitions"
+import { ErrorBody, Folder, Configurations , Content, Notifications, ChooseBackground, NetworkInformation } from "../types/definitions"
 import FileImage from "../assets/icons/file.png";
 import FolderImage from "../assets/icons/folder.png";
 import { openFile } from "../components/actions";
@@ -22,10 +22,24 @@ export default function Home(props:Props){
     let [name,setName]=useState("")
     let [counter,setCounter]=useState(0)
     let [isLoading,setIsLoading]=useState(true)
+    let [isLoadingNetInfo,setIsLoadingNetInfo]=useState(true)
     let [showSettings,setShowSettings]=useState(false)
     let [showSettingsTab,setShowSettingsTab]=useState(false)
     let [startRequestLoop,setStartRequestLoop]=useState(false)
     let [settingsHeader,setSettingsHeader]=useState("")
+    let [networkInformation,setNetworkInformation]=useState<NetworkInformation>(
+        {
+            internal:"",
+            external:""
+        }
+    )
+    let unparsedConfigurations:any=window.localStorage.getItem("configurations")===null?JSON.stringify({
+        recipient_ip:""
+    }):window.localStorage.getItem("configurations")
+    let parsedConfigurations:Configurations=JSON.parse(unparsedConfigurations)
+    let [configurations,setConfigurations]=useState<Configurations>({
+        recipient_ip:parsedConfigurations.recipient_ip
+    })
     let [folders,setFolders]=useState<Folder>({
         contents:[
             {
@@ -73,6 +87,7 @@ export default function Home(props:Props){
 
     async function open(url:string){
         try {
+            setIsLoading(true)
             const response=await fetch(url,{
                 method:"POST",
                 headers:{
@@ -88,8 +103,6 @@ export default function Home(props:Props){
             setName(parts[parts.length - 1]);
             const parseRes:any=await response.json()
             if(response.ok){
-	    	    // setContents(parseRes.contents)
-                // setFolders(parseRes)
                 let withOutDotConfig:Folder={
                     contents:[]
                 }
@@ -108,6 +121,26 @@ export default function Home(props:Props){
         } catch (error:any) {
             console.error(error.message)
             setIsLoading(false)
+            navigate(`/error?error=${error.message}`)
+        }
+    }
+
+    async function getIPs(url:string){
+        try {
+            setIsLoadingNetInfo(true)
+            const response=await fetch(url,{
+                method:"GET",
+            })
+            const parseRes:any=await response.json()
+            if(response.ok){
+                setNetworkInformation(parseRes)
+            }else{
+                setError(parseRes)
+                // navigate(`/error?error=${parseRes.message}`)
+            }
+            setIsLoadingNetInfo(false)
+        }catch(error:any){
+            console.log(error.message)
             navigate(`/error?error=${error.message}`)
         }
     }
@@ -176,6 +209,7 @@ export default function Home(props:Props){
 
     useEffect(()=>{
         open("http://localhost:8000/api/directory_content")
+        getIPs("http://localhost:8000/api/get_ip_address")
         setNotifications([
             {
                 priority:"not important",
@@ -201,7 +235,7 @@ export default function Home(props:Props){
                 <div style={props.data.backgroundImage!=="default"?{background: `linear-gradient(0deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),url('${props.data.backgroundImage}') top no-repeat`, backgroundSize:"cover", backgroundAttachment:"fixed"}:{background: "var(--theme-gray)"}} className="min-h-[100vh]">
                     <TopNav data={{name, handleShowSettings, settingsHeader, showToast}}/>
                     <div className="flex">
-                        <SideNav data={{folders,error,open}}/>
+                        <SideNav data={{folders,error,open, getIPs, showSettings}}/>
                         <div className="mt-[48px] flex-grow mb-[22px] text-[#999999]">
                             {/*  folder view */}
                             <div id="folder_view">
@@ -296,10 +330,22 @@ export default function Home(props:Props){
                                                                     <MdContentCopy className="w-[25px] h-[25px] pr-[6px]"/>
                                                                     <p>Copy Path</p>
                                                                 </button>
-                                                                {content.metadata.is_file?(<div className='px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
-                                                                    <MdSend className="w-[25px] h-[25px] pr-[6px]"/>
-                                                                    <p>Send to ...</p>
-                                                                </div>):""}
+                                                                {content.metadata.is_file?(
+                                                                    <div onClick={()=>{
+                                                                        if(configurations.recipient_ip.length===0){
+                                                                            handleShowSettings()
+                                                                        }else{
+                                                                            console.log("send")
+                                                                        }
+                                                                    }} className='px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
+                                                                        <MdSend className="w-[25px] h-[25px] pr-[6px]"/>
+                                                                        <p>{configurations.recipient_ip.length!==0?(
+                                                                            <span>Send to {configurations.recipient_ip}</span>
+                                                                        ):(
+                                                                            <span>Add Recipient's IP</span>
+                                                                        )}</p>
+                                                                    </div>
+                                                                ):""}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -315,37 +361,81 @@ export default function Home(props:Props){
                                                 <div className="flex gap-6 flex-col">
                                                     <div>
                                                         <div className="flex flex-col gap-2 my-2">
-                                                            <div className="grid grid-cols-4 gap-10">
-                                                                <p>Internet Protocol (IP)</p>
-                                                                <p className="text-white">192.10.0.96</p>
-                                                            </div>
-                                                            <div className="grid grid-cols-4 gap-10">
-                                                                <p>Port (number)</p>
-                                                                <p className="text-white">8000</p>
-                                                            </div>
-                                                            <div className="grid grid-cols-4 gap-10">
-                                                                <p>Server (host)</p>
-                                                                <a href="#" target="_blank" rel="noopener noreferrer" className="text-white underline">http://192.10.0.96:8000/</a>
-                                                            </div>
-                                                            <div className="grid grid-cols-4 gap-10">
-                                                                <p>Status (internet)</p>
-                                                                <p className="text-white">{window.navigator.onLine===true?"Online":"Offline"}</p>
-                                                            </div>
+                                                            {isLoadingNetInfo?(
+                                                                <i className="text-sm">Getting Network Information...</i>
+                                                            ):(
+                                                                <>
+                                                                    {networkInformation.internal.length===0?(<>{error.message}</>):(
+                                                                        <>
+                                                                            <div className="grid grid-cols-4 gap-10">
+                                                                                <p>Internet Protocol (IP)</p>
+                                                                                <p className="text-white">{networkInformation.internal}</p>
+                                                                            </div>
+                                                                            {networkInformation.external.includes("No internet")?"":(
+                                                                                <div className="grid grid-cols-4 gap-10">
+                                                                                    <p>External IP</p>
+                                                                                    <p className="text-white">{networkInformation.external}</p>
+                                                                                </div>
+                                                                            )}
+                                                                            <div className="grid grid-cols-4 gap-10">
+                                                                                <p>Port (number)</p>
+                                                                                <p className="text-white">8000</p>
+                                                                            </div>
+                                                                            <div className="grid grid-cols-4 gap-10">
+                                                                                <p>Server (host)</p>
+                                                                                <a href={`http://${networkInformation.internal}:8000/`} target="_blank" rel="noopener noreferrer" className="text-white underline">http://{networkInformation.internal}:8000/</a>
+                                                                            </div>
+                                                                            <div className="grid grid-cols-4 gap-10">
+                                                                                <p>Status</p>
+                                                                                <p className="text-white">{networkInformation.external.includes("No internet")?"Offline":"Online"}</p>
+                                                                            </div>
+                                                                        </>
+                                                                    )}
+                                                                </>
+                                                            )}
+                                                        
                                                         </div>
                                                     </div>
 
                                                     <div>
                                                         <p className="text-gray-100">Configurations</p>
-                                                        <div className="flex flex-col gap-2 my-2">
+                                                        <form onSubmit={(e:any)=>{
+                                                            e.preventDefault()
+                                                            let configs:Configurations={
+                                                                recipient_ip:e.target.recipient_ip.value
+                                                            }
+                                                            setConfigurations(configs)
+                                                            window.localStorage.setItem("configurations",JSON.stringify(configs))
+                                                        }} className="flex flex-col gap-2 my-2">
+                                                                {configurations.recipient_ip.length===0?(
+                                                                    <div className="grid grid-cols-4 gap-10">
+                                                                        <label htmlFor="recipient_ip">Enter Recipient's IP</label>
+                                                                        <input id="recipient_ip" name="recipient_ip" className="px-2 py-1 w-full rounded-md bg-transparent text-white border-violet-300 border-[1px] focus:ring-1 focus:ring-violet-300" type="text" placeholder="192.10.0.95" required/>
+                                                                    </div>
+                                                                ):(
+                                                                    <div className="grid grid-cols-4 gap-10">
+                                                                        <p>Recipient's IP</p>
+                                                                        <p className="text-white">{configurations.recipient_ip}</p>
+                                                                    </div>
+                                                                )}
                                                             <div className="grid grid-cols-4 gap-10">
-                                                                <label htmlFor="recepient_ip">Enter Recepient's IP</label>
-                                                                <input id="recepient_ip" name="recepient_ip" className="px-2 py-1 w-full rounded-md bg-transparent text-white border-violet-300 border-[1px] focus:ring-1 focus:ring-violet-300" type="text" placeholder="192.10.0.96" required/>
+                                                                <label htmlFor="both_folder_and_file">Send Both Folder and File</label>
+                                                                <input disabled id="both_folder_and_file" name="both_folder_and_file" checked type="checkbox" className="h-[20px] w-[20px] cursor-pointer rounded-md bg-transparent focus:outline-none checked:bg-violet-300 focus:ring-1 focus:ring-violet-300" />
                                                             </div>
-                                                            <div className="grid grid-cols-4 gap-10">
-                                                                <label htmlFor="recepient_ip">Share Both Folder and File</label>
-                                                                <input type="checkbox" className="h-[20px] w-[20px] cursor-pointer rounded-md bg-transparent focus:outline-none checked:bg-violet-300 focus:ring-1 focus:ring-violet-300" />
-                                                            </div>
-                                                        </div>
+                                                            {configurations.recipient_ip.length===0?(
+                                                                <button className="py-1 px-[16px] hover:bg-[#EDFFA1] border-none w-[100px] text-[#1D1D1D] rounded-sm bg-[var(--theme-yellow)]">
+                                                                    Save
+                                                                </button>
+                                                            ):(
+                                                                <button type="button" onClick={()=>{
+                                                                    setConfigurations({
+                                                                        recipient_ip:""
+                                                                    })
+                                                                }} className="py-1 px-[16px] hover:bg-[#EDFFA1] border-none w-[100px] text-[#1D1D1D] rounded-sm bg-[var(--theme-yellow)]">
+                                                                    Change
+                                                                </button>
+                                                            )}
+                                                        </form>
                                                     </div>
                                                 </div>
                                             </div>
