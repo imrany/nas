@@ -9,6 +9,11 @@ export interface NetworkInformation{
 	internal:string,
 	external:string
 }
+export interface SendFileInfo{
+	name:string,
+	path:string,
+	recipient_server:string
+}
 
 export interface Configurations{
 	recipient_ip:string

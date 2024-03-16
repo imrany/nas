@@ -3,7 +3,7 @@ import Footer from "../components/Footer";
 import SideNav from "../components/SideNav";
 import TopNav from "../components/TopNav";
 import { useEffect, useState } from "react";
-import { ErrorBody, Folder, Configurations , Content, Notifications, ChooseBackground, NetworkInformation } from "../types/definitions"
+import { ErrorBody, Folder, Configurations , Content, Notifications, ChooseBackground, NetworkInformation, SendFileInfo } from "../types/definitions"
 import FileImage from "../assets/icons/file.png";
 import FolderImage from "../assets/icons/folder.png";
 import { openFile } from "../components/actions";
@@ -22,6 +22,7 @@ export default function Home(props:Props){
     let [name,setName]=useState("")
     let [counter,setCounter]=useState(0)
     let [isLoading,setIsLoading]=useState(true)
+    let [loadingText,setLoadingText]=useState("Loading...")
     let [isLoadingNetInfo,setIsLoadingNetInfo]=useState(true)
     let [showSettings,setShowSettings]=useState(false)
     let [showSettingsTab,setShowSettingsTab]=useState(false)
@@ -86,8 +87,9 @@ export default function Home(props:Props){
     ]
 
     async function open(url:string){
+        setLoadingText("Loading...")
         try {
-            setIsLoading(true)
+            //setIsLoading(true)
             const response=await fetch(url,{
                 method:"POST",
                 headers:{
@@ -145,6 +147,35 @@ export default function Home(props:Props){
         }
     }
 
+    async function sendFile(url:string,info:SendFileInfo){
+        setLoadingText("Sending...")
+        console.log(info.recipient_server)
+        try{
+            setIsLoading(true)
+            let response=await fetch(url,{
+                method:"POST",
+                headers:{
+                    "content-type":"application/json"
+                },
+                body:JSON.stringify({
+                    file_name:info.name,
+                    file_path:info.path,
+                    recipient_server: info.recipient_server,
+                })
+            })
+            let parseRes=await response.json()
+            if(response.ok){
+                console.log(parseRes)
+            }else{
+                console.log(parseRes)
+            }
+            setIsLoading(false)
+        }catch(error:any){
+            console.log(error.message)
+            navigate(`/error?error=${error.message}`)
+        }
+    }
+
     function onlyFolders(){
 	    let arr:Folder={
             contents:[]
@@ -177,6 +208,7 @@ export default function Home(props:Props){
     function handleShowSettings(){
         setShowSettings(true)
         setShowSettingsTab(true)
+        setStartRequestLoop(false)
         setSettingsHeader("Settings - Anvel")
     }
 
@@ -229,7 +261,7 @@ export default function Home(props:Props){
         <>
             {isLoading?(
                 <div className="bg-white text-[var(--theme-dark)] flex flex-col h-screen w-screen items-center justify-center">
-                    <p className="text-lg">Loading...</p>
+                    <p className="text-lg">{loadingText}</p>
                 </div>
             ):(
                 <div style={props.data.backgroundImage!=="default"?{background: `linear-gradient(0deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),url('${props.data.backgroundImage}') top no-repeat`, backgroundSize:"cover", backgroundAttachment:"fixed"}:{background: "var(--theme-gray)"}} className="min-h-[100vh]">
@@ -274,6 +306,7 @@ export default function Home(props:Props){
                                                 <div className="flex pl-[10px]" onClick={()=>{
                                                     setSettingsHeader("Settings - Anvel")
                                                     setShowSettings(true)
+                                                    setStartRequestLoop(false)
                                                 }}>
                                                     <MdSettings className="w-[18px] h-[18px] mr-[5px]"/>
                                                     <p className="text-[#E5E5E5] mr-[3px] text-[13px] capitalize">Settings</p>
@@ -330,12 +363,17 @@ export default function Home(props:Props){
                                                                     <MdContentCopy className="w-[25px] h-[25px] pr-[6px]"/>
                                                                     <p>Copy Path</p>
                                                                 </button>
-                                                                {content.metadata.is_file?(
+                                                                {content.metadata.is_file&&localStorage.getItem("path")!=="shared"?(
                                                                     <div onClick={()=>{
                                                                         if(configurations.recipient_ip.length===0){
                                                                             handleShowSettings()
                                                                         }else{
-                                                                            console.log("send")
+                                                                            let sendFileInfo:SendFileInfo={
+                                                                                name:content.name,
+                                                                                path:content.path,
+                                                                                recipient_server:`http://${configurations.recipient_ip}:8000/api/receive`
+                                                                            };
+                                                                            sendFile("http://localhost:8000/api/send",sendFileInfo)
                                                                         }
                                                                     }} className='px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
                                                                         <MdSend className="w-[25px] h-[25px] pr-[6px]"/>
