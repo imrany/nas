@@ -23,15 +23,6 @@ function App() {
     setBackgroundImage(background)
   }
 
-  async function handleSaveRecepientIP(e:any){
-    try {
-      e.preventDefault()
-      let url=``
-      let response=await fetch(url)
-    } catch (error:any) {
-      console.log(error.mesage)
-    }
-  }
   window.oncontextmenu=(e:any)=>{
     e.preventDefault()
   }
