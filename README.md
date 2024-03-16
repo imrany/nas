@@ -1,12 +1,10 @@
-__Anvel__ is a productivity software that connects you to people in your network and enable file sharing and collaboration.
+__Anvel__ is a networking program for file sharing.
 
 ## Looking for latest release of a version branch?
 
 | __Anvel versions__ | __Status__ | __Release Date__ | __Releases__ |
 |--------------------|------------|------------------|--------------|
-| v1.0.2 | LTS - Recommended for most users | 2023-12-25 | [Releases](./releases.md) |
-| v1.0.1 | Not Maintained - Obsolete | 2023-12-16 | [Releases](./releases.md) |
-| v1.0.0 | Not maintained - Obsolete | 2023-12-15 | [Releases](./releases.md) |
+| v0.2.0 | LTS - Recommended for most users | 2023-03-16 | [Releases](./releases.md) |
 
 To get all previous releases, go to [Releases](./releases.md)
 
@@ -66,7 +64,16 @@ This means it's correctly installed and configure.
 
 
 ## Usage 
+
+### Open Anvel
+To launch anvel click on `anvel.exe` or run 
+```bash
+anvel
+```
+
+### To serve a folder
 Use it to serve static files from a folder, example serving a website locally.
+
 ```bash
 anvel serve /path-to-static-folder
 ```

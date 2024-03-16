@@ -1,24 +1,9 @@
 # Releases
 
-## v1.0.2 - Recommended for most users
+## v0.2.0 - Recommended for most users
 
 | __Anvel versions__ | __Release Date__ | __Platforms__ | __Releases__ |
 |--------------------|------------------|---------------|--------------|
-| v1.0.2  | 2023-12-25 | Windows_x64 | [anvel-v1.0.2-windows-x64.zip](https://github.com/imrany/anvel/releases/download/v1.0.2/windows-x64.zip) |
-| v1.0.2  | 2023-12-25 | Linux_x64 | [anvel-v1.0.2-linux-x64.tar.gz](https://github.com/imrany/anvel/releases/download/v1.0.2/linux-x64.tar.gz) |
 
-
-## v1.0.1 - Not Maintained
-
-| __Anvel versions__ | __Release Date__ | __Platforms__ | __Releases__ |
-|--------------------|------------------|---------------|--------------|
-| v1.0.1  | 2023-12-16 | Windows_x64 | [anvel-v1.0.1-windows-x64.zip](https://github.com/imrany/anvel/releases/download/v1.0.1/windows-x64.zip) |
-| v1.0.1  | 2023-12-16 | Linux_x64 | [anvel-v1.0.1-linux-x64.tar.gz](https://github.com/imrany/anvel/releases/download/v1.0.1/linux-x64.tar.gz) |
-
-
-## v1.0.0 - Not Maintained
-
-| __Anvel versions__ | __Release Date__ | __Platforms__ | __Releases__ |
-|--------------------|------------------|---------------|--------------|
-| v1.0.0  | 2023-12-15 | Windows_x64 | [anvel-v1.0.0-windows-x64.zip](https://github.com/imrany/anvel/releases/download/v1.0.0/windows-x64.zip) |
-| v1.0.0  | 2023-12-15 | Linux_x64 | [anvel-v1.0.0-linux-x64.tar.gz](https://github.com/imrany/anvel/releases/download/v1.0.0/linux-x64.tar.gz) |
+| v0.2.0  | 2023-03-16 | Linux_x64 | [anvel-v0.2.0-linux-x64.zip](https://github.com/imrany/anvel/releases/download/v0.2.0/linux-x64.zip) |
+| v0.2.0  | 2023-03-16 | Windows_x64 | [anvel-v0.2.0-windows-x64.zip](https://github.com/imrany/anvel/releases/download/v0.2.0/windows-x64.zip) |
