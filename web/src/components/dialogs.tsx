@@ -1,28 +1,48 @@
 import { MdClose } from "react-icons/md";
+import { Content } from "../types/definitions";
 
-export function FeedbackDialog(){
-    const close_dialog=()=>{
-        let dialog_bg=document.getElementById("offline_dialog");
-        dialog_bg?.classList.add("ease-in-out");
-        dialog_bg?.classList.remove("block");
-        dialog_bg?.classList.add("duration-1000");
-        dialog_bg?.classList.add("delay-2000");
-    };
+type Props={
+    data:{
+        info:Content,
+        functions:{
+            toggleDialog:any
+        }
+    }
+}
+
+export function FileInfoDialog(props:Props){
     return(
-        <div id="feedback_dialog" className="fixed top-0 bottom-0 left-0 right-0 z-20 bg-[#151515]/70 none">
+        <div id={`file_info_dialog`} className="fixed top-0 bottom-0 left-0 right-0 z-20 bg-[#151515]/70 none">
             <div className="flex flex-col justify-center items-center h-[100vh]">
-                <div id="dialog" className="text-white items-center flex flex-col bg-[#252525] justify-center p-[24px] focus:ring-1 focus:ring-violet-300">
+                <div id="dialog" className="items-center flex flex-col bg-[#252525] justify-center p-[24px] focus:ring-1 focus:ring-violet-300">
                     <div className="flex ml-auto mb-[8px] justify-end h-[22px] pb-[4px] text-white">
-                        <MdClose onClick={close_dialog} className="md-16 cursor-pointer"/>
+                        <MdClose onClick={()=>props.data.functions.toggleDialog(`file_info_dialog`)} className="md-16 cursor-pointer"/>
                     </div>    
-                    <div className="w-[452px] h-[162px]"> 
-                        <div id="feedback_container"></div>
+                    <div className="w-[452px] h-[132px]"> 
+                        <div className="flex flex-col gap-3 pb-4 text-[13px]  text-gray-300">
+                            <div className="flex gap-14">
+                                <p>Name:</p>
+                                <p>{props.data.info.name}</p>
+                            </div>
+                            {props.data.info.metadata.is_file===true?(
+                                <div className="flex gap-16">
+                                    <p>Type:</p> 
+                                    <p className="uppercase">{props.data.info.metadata.file_extension}</p>
+                                </div>
+                            ):(
+                                <div className="flex gap-16">
+                                    <p>Type:</p> 
+                                    <p className="capitalize">{props.data.info.metadata.file_extension}</p>
+                                </div>
+                            )}
+                            <div className="flex gap-10">
+                                <p>Location:</p> 
+                                <p>{props.data.info.path.slice(0,props.data.info.path?.lastIndexOf("/"))}</p>
+                            </div>
+                        </div>
                         <div className="flex justify-end items-center">
-                            <button onClick={close_dialog} className="mr-[12px] py-[4px] px-[16px] hover:bg-[#EDFFA1] border-none h-[28px] w-[100px] text-[13px] text-[#1D1D1D] rounded-sm bg-[#EDFFA5]">
+                            <button onClick={()=>props.data.functions.toggleDialog(`file_info_dialog`)} className="mr-[12px] py-[4px] px-[16px] hover:bg-[#EDFFA1] border-none h-[28px] w-[100px] text-[13px] text-[#1D1D1D] rounded-sm bg-[#EDFFA5]">
                                 Close
-                            </button>
-                            <button onClick={()=>window.location.reload()} className="rounded-sm border-[1px] border-violet-300 mr-[12px] py-[4px] hover:text-white h-[28px] w-[70px] text-[13px] text-[#C2C2C2]">
-                                Reload
                             </button>
                         </div>
                     </div>

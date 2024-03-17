@@ -1,14 +1,44 @@
-import { MdArrowBack, MdClose, MdContentCopy, MdFolder, MdOpenInNew, MdSend, MdSettings } from "react-icons/md";
+import { MdArrowBack, MdClose, MdContentCopy, MdDelete, MdEdit, MdFolder, MdInfoOutline, MdOpenInNew, MdSend, MdSettings } from "react-icons/md";
 import Footer from "../components/Footer";
 import SideNav from "../components/SideNav";
 import TopNav from "../components/TopNav";
 import { useEffect, useState } from "react";
 import { ErrorBody, Folder, Configurations , Content, Notifications, ChooseBackground, NetworkInformation, SendFileInfo } from "../types/definitions"
-import FileImage from "../assets/icons/file.png";
-import FolderImage from "../assets/icons/folder.png";
 import { openFile } from "../components/actions";
 import { useNavigate } from "react-router-dom";
+import unknownFile from "../assets/icons/filetype/application-x-zerosize.svg";
+import audioMp3 from "../assets/icons/filetype/audio-mp3.svg";
+import videoMp4 from "../assets/icons/filetype/application-vnd.rn-realmedia.svg"
+import PDF from "../assets/icons/filetype/application-pdf.svg"
+import DOCX from "../assets/icons/filetype/application-x-kword.svg"
+import DOC from "../assets/icons/filetype/application-x-kword.svg"
+import TXT from "../assets/icons/filetype/application-text.svg"
+import ISOIMAGE from "../assets/icons/filetype/application-x-raw-disk-image.svg"
+import PPTX from "../assets/icons/filetype/application-vnd.ms-powerpoint.svg"
+import MKV from "../assets/icons/filetype/video-x-matroska.svg"
+import AVI from "../assets/icons/filetype/video-x-wmv.svg"
+import XLSX from "../assets/icons/filetype/libreoffice-oasis-spreadsheet.svg"
+import CSV from "../assets/icons/filetype/text-csv.svg"
+import DESKTOP from "../assets/icons/filetype/application-x-desktop.svg"
+import OLD from "../assets/icons/filetype/application-x-trash.svg"
+import ZIP from "../assets/icons/filetype/application-zip.svg"
+import HTML from "../assets/icons/filetype/text-html.svg"
+import CSS from "../assets/icons/filetype/text-css.svg"
+import XML from "../assets/icons/filetype/text-xml.svg"
+import PHP from "../assets/icons/filetype/application-x-php.svg"
+import PYTHON from "../assets/icons/filetype/text-x-python.svg"
+import SCRIPT from "../assets/icons/filetype/text-x-script.svg"
+import JAVA from "../assets/icons/filetype/text-x-java.svg"
+import CSHARP from "../assets/icons/filetype/text-csharp.svg"
+import CPP from "../assets/icons/filetype/text-x-c++src.svg"
+import PERL from "../assets/icons/filetype/application-x-perl.svg"
+import CHEADER from "../assets/icons/filetype/text-x-chdr.svg"
+import C from "../assets/icons/filetype/text-x-csrc.svg"
+import RUBY from "../assets/icons/filetype/application-x-ruby.svg"
+
+import FolderImage from "../assets/icons/folder.png";
 import bg1 from "../assets/background/bg_1.png";
+import { FileInfoDialog } from "../components/dialogs";
 // import bg2 from "../assets/background/bg_2.png";
 
 type Props={
@@ -24,6 +54,15 @@ export default function Home(props:Props){
     let [isLoading,setIsLoading]=useState(true)
     let [loadingText,setLoadingText]=useState("Loading...")
     let [isLoadingNetInfo,setIsLoadingNetInfo]=useState(true)
+    let [infoContent,setInfoContent]=useState<Content>({
+        name:"",
+        root:"",
+        path:"",
+        metadata:{
+            is_file:false,
+            file_extension:""
+        }
+    })
     let [showSettings,setShowSettings]=useState(false)
     let [showSettingsTab,setShowSettingsTab]=useState(false)
     let [startRequestLoop,setStartRequestLoop]=useState(false)
@@ -205,6 +244,14 @@ export default function Home(props:Props){
         toast?.classList.contains("none")?toast?.classList.remove("none"):toast?.classList.add("none")
     }
 
+    function toggleDialog(id:string){
+        let dialog_bg=document.getElementById(id);
+        dialog_bg?.classList.add("ease-in-out");
+        dialog_bg?.classList.toggle("none");
+        // dialog_bg?.classList.add("duration-1000");
+        // dialog_bg?.classList.add("delay-2000");
+    }
+
     function handleShowSettings(){
         setShowSettings(true)
         setShowSettingsTab(true)
@@ -278,6 +325,7 @@ export default function Home(props:Props){
                                             <div onClick={()=>{
                                                 let path:any=localStorage.getItem("path")!==null?localStorage.getItem("path"):""
                                                 let newPath:any;
+                                                // let slash=path.includes("/")?"/":"'\'"
                                                 if(path.slice(0,path?.lastIndexOf("/"))===""||path.slice(0,path?.lastIndexOf("/"))===":"){
                                                     newPath="root"
                                                 }else if(path==="shared"){
@@ -324,6 +372,163 @@ export default function Home(props:Props){
                                     <div className="w-full flex flex-wrap mt-[35px]" id="folder_view_body">
                                         <div id="test" className="ml-[200px] grid max-sm:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 w-full gap-4 px-[25px] py-[13px]">
                                             { folders&&folders.contents.map((content)=>{
+                                                let fileIcon
+                                                let downloadURL=`http://localhost:8000/api/download/${content.path}`
+                                                switch (content.metadata.file_extension) {
+                                                    case "mp3":
+                                                        fileIcon=audioMp3
+                                                        break;
+                                                    case "jpeg":
+                                                        fileIcon=downloadURL
+                                                        break;
+                                                    case "svg":
+                                                        fileIcon=downloadURL
+                                                        break;
+                                                    case "ttf":
+                                                        fileIcon=TXT
+                                                        break;
+                                                    case "gif":
+                                                        fileIcon=downloadURL
+                                                        break;
+                                                    case "jpg":
+                                                        fileIcon=downloadURL
+                                                        break;
+                                                    case "png":
+                                                        fileIcon=downloadURL
+                                                        break;
+                                                    case "webp":
+                                                        fileIcon=downloadURL
+                                                        break;
+                                                    case "pdf":
+                                                        fileIcon=PDF
+                                                        break;
+                                                    case "iso":
+                                                        fileIcon=ISOIMAGE
+                                                        break; 
+                                                    case "img":
+                                                        fileIcon=ISOIMAGE
+                                                        break; 
+                                                    case "old":
+                                                        fileIcon=OLD
+                                                        break;
+                                                    case "docx":
+                                                        fileIcon=DOCX
+                                                    break;
+                                                    case "odp":
+                                                        fileIcon=PPTX
+                                                    break;
+                                                    case "html":
+                                                        fileIcon=HTML
+                                                    break;
+                                                    case "css":
+                                                        fileIcon=CSS
+                                                    break;
+                                                    case "php":
+                                                        fileIcon=PHP
+                                                    break;
+                                                    case "py":
+                                                        fileIcon=PYTHON
+                                                    break;
+                                                    case "xml":
+                                                        fileIcon=XML
+                                                    break;
+                                                    case "js":
+                                                        fileIcon=SCRIPT
+                                                    break;
+                                                    case "sh":
+                                                        fileIcon=SCRIPT
+                                                    break;
+                                                    case "odt":
+                                                        fileIcon=DOCX
+                                                    break;
+                                                    case "ods":
+                                                        fileIcon=XLSX
+                                                    break
+                                                    case "doc":
+                                                        fileIcon=DOC
+                                                    break;
+                                                    case "csv":
+                                                        fileIcon=CSV
+                                                    break;
+                                                    case "java":
+                                                        fileIcon=JAVA
+                                                    break;
+                                                    case "cs":
+                                                        fileIcon=CSHARP
+                                                    break;
+                                                    case "cpp":
+                                                        fileIcon=CPP
+                                                    break;
+                                                    case "rs":
+                                                        fileIcon=TXT
+                                                    break;
+                                                    case "s":
+                                                        fileIcon=TXT
+                                                    break;
+                                                    case "json":
+                                                        fileIcon=SCRIPT
+                                                    break;
+                                                    case "c":
+                                                        fileIcon=C
+                                                    break;
+                                                    case "m":
+                                                        fileIcon=C
+                                                    break;
+                                                    case "h":
+                                                        fileIcon=CHEADER
+                                                    break;
+                                                    case "rb":
+                                                        fileIcon=RUBY
+                                                    break;
+                                                    case "fal":
+                                                        fileIcon=TXT
+                                                    break;
+                                                    case "go":
+                                                        fileIcon=TXT
+                                                    break;
+                                                    case "asm":
+                                                        fileIcon=TXT
+                                                    break;
+                                                    case "nim":
+                                                        fileIcon=TXT
+                                                    break;
+                                                    case "pm":
+                                                        fileIcon=PERL
+                                                    break;
+                                                    case "pl":
+                                                        fileIcon=PERL
+                                                    break;
+                                                    case "txt":
+                                                        fileIcon=TXT
+                                                        break;
+                                                    case "md":
+                                                        fileIcon=TXT
+                                                        break;
+                                                    case "zip":
+                                                        fileIcon=ZIP
+                                                        break;
+                                                    case "mp4":
+                                                        fileIcon=videoMp4
+                                                        break;
+                                                    case "mkv":
+                                                        fileIcon=MKV
+                                                        break;
+                                                    case "avi":
+                                                        fileIcon=AVI
+                                                        break;
+                                                    case "pptx":
+                                                        fileIcon=PPTX
+                                                        break;
+                                                    case "xlsx":
+                                                        fileIcon=XLSX
+                                                        break;
+                                                    case "desktop":
+                                                        fileIcon=DESKTOP
+                                                        break;
+                                                    default:
+                                                        fileIcon=unknownFile
+                                                        break;
+                                                }
                                                 return(
                                                     <div key={content.name} className="flex flex-col items-center text-center">
                                                         <button id={content.name} title={content.name}
@@ -339,9 +544,13 @@ export default function Home(props:Props){
                                                                     openFile("http://localhost:8000/api/open",content.path)
                                                                 }
                                                             }}  className='flex flex-col items-center justify-center text-[12px] max-w-[150px] hover:text-white active:text-white focus:bg-[#3c3c3c]/90 focus:text-white dropdown_btn'>
-                                                            {content.metadata.is_file?(<img src={FileImage} alt='file' className='w-[70px] h-[70px]'/>):(<img src={FolderImage} alt='folder' className='w-[70px] h-[70px]'/>)}
-                                                            <div>
-                                                                <p className='text-center'>{content.name.length<30?content.name:(<>{content.name.slice(0,30)}...</>)}</p>
+                                                            {content.metadata.is_file?(<img src={fileIcon} alt='file' className='w-[55px] h-[55px]'/>):(<img src={FolderImage} alt='folder' className='w-[65px] h-[65px]'/>)}
+                                                            <div className='flex justify-center'>
+                                                                {content.name.length<30?(
+                                                                    <p className="w-fit">{content.name}</p>
+                                                                ):(
+                                                                    <p className="w-fit">{!content.name.includes(" ")?content.name.slice(0,22):content.name.slice(0,30)}...</p>
+                                                                )}
                                                             </div>
                                                         </button>
                                                         <div id={`context_list_${content.name}`} className='dropdown-content  flex-wrap  w-[200px] mt-[50px] -ml-[5px] max-lg:-ml-[27px]'>
@@ -363,6 +572,12 @@ export default function Home(props:Props){
                                                                     <MdContentCopy className="w-[25px] h-[25px] pr-[6px]"/>
                                                                     <p>Copy Path</p>
                                                                 </button>
+                                                                <button onClick={()=>{
+                                                                    navigator.clipboard.writeText(content.path)
+                                                                }} className='px-[12px] w-full py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35 {name_str}_open_item'>
+                                                                    <MdEdit className="w-[25px] h-[25px] pr-[6px]"/>
+                                                                    <p>Rename</p>
+                                                                </button>
                                                                 {content.metadata.is_file&&localStorage.getItem("path")!=="shared"?(
                                                                     <div onClick={()=>{
                                                                         if(configurations.recipient_ip.length===0){
@@ -375,7 +590,7 @@ export default function Home(props:Props){
                                                                             };
                                                                             sendFile("http://localhost:8000/api/send",sendFileInfo)
                                                                         }
-                                                                    }} className='px-[12px] py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
+                                                                    }} className='px-[12px] w-full py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35 {name_str}_open_item'>
                                                                         <MdSend className="w-[25px] h-[25px] pr-[6px]"/>
                                                                         <p>{configurations.recipient_ip.length!==0?(
                                                                             <span>Send to {configurations.recipient_ip}</span>
@@ -384,6 +599,19 @@ export default function Home(props:Props){
                                                                         )}</p>
                                                                     </div>
                                                                 ):""}
+                                                                <button onClick={()=>{
+                                                                    navigator.clipboard.writeText(content.path)
+                                                                }} className='px-[12px] w-full py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35 {name_str}_open_item'>
+                                                                    <MdDelete className="w-[25px] h-[25px] pr-[6px]"/>
+                                                                    <p>Delete</p>
+                                                                </button>
+                                                                <button onClick={()=>{
+                                                                    toggleDialog(`file_info_dialog`)
+                                                                    setInfoContent(content)
+                                                                }} className='px-[12px] w-full py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
+                                                                    <MdInfoOutline className="w-[25px] h-[25px] pr-[6px]"/>
+                                                                    <p>Properties</p>
+                                                                </button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -503,6 +731,7 @@ export default function Home(props:Props){
                             </div>
                         </div>
                     </div>
+                    <FileInfoDialog data={{info:infoContent,functions:{toggleDialog}}}/>
                     <Footer data={{folders, onlyFolders, onlyFiles, open, handleShowSettings, notifications, showToast, handleCloseSettings, kickOffStartRequestLoop, endStartRequestLoop}}/>
                 </div>
             )}

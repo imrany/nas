@@ -83,7 +83,7 @@ function SideNav(props:Props) {
                                                     }else{
                                                         openFile("http://localhost:8000/api/open",content.path)
                                                     }
-                                                }} className='flex w-[198px] items-center mx-[1px] px-3 py-1 cursor-pointer hover:text-white active:text-white focus:text-white focus:ring-1 focus:ring-violet-300'>
+                                                }} className='flex w-[195px] items-center mx-[1px] px-3 py-1 cursor-pointer hover:text-white active:text-white focus:text-white focus:ring-1 focus:ring-violet-300'>
                                                     <MdFileOpen className="w-[20px] h-[20px] pr-[3px]"/>
                                                     <p className='text-[#e5e5e5 text-[11px] uppercase'>{content.name.length<20?content.name:(<>{content.name.slice(0,16)}...</>)}</p>
                                                 </button>
@@ -91,7 +91,7 @@ function SideNav(props:Props) {
                                                 <button onClick={()=>{
                                                     localStorage.setItem("path",content.path)
                                                     props.data.open("http://localhost:8000/api/directory_content")
-                                                }} key={content.name} className='flex w-[198px] flex-grow items-center mx-[1px] px-3 py-1 cursor-pointer hover:text-white active:text-white focus:text-white focus:ring-1 focus:ring-violet-300'>
+                                                }} key={content.name} className='flex w-[195px] flex-grow items-center mx-[1px] px-3 py-1 cursor-pointer hover:text-white active:text-white focus:text-white focus:ring-1 focus:ring-violet-300'>
                                                     <MdFolder className="w-[20px] h-[20px] pr-[3px]"/>
                                                     <p className='text-[#e5e5e5 text-[11px] uppercase'>{content.name.length<20?content.name:(<>{content.name.slice(0,16)}...</>)}</p>
                                                 </button>
@@ -131,7 +131,7 @@ function SideNav(props:Props) {
                                                     }else{
                                                         openFile("http://localhost:8000/api/open",content.path)
                                                     }
-                                                }} className='flex w-[198px] flex-grow items-center mx-[1px] px-3 py-1 cursor-pointer hover:text-white active:text-white focus:text-white focus:ring-1 focus:ring-violet-300'>
+                                                }} className='flex w-[195px] flex-grow items-center mx-[1px] px-3 py-1 cursor-pointer hover:text-white active:text-white focus:text-white focus:ring-1 focus:ring-violet-300'>
                                                     <MdFileOpen className="w-[20px] h-[20px] pr-[3px]"/>
                                                     <p className='text-[#e5e5e5 text-[11px] uppercase'>{content.name.length<20?content.name:(<>{content.name.slice(0,16)}...</>)}</p>
                                                 </button>
@@ -139,7 +139,7 @@ function SideNav(props:Props) {
                                                 <button onClick={()=>{
                                                     localStorage.setItem("path",content.path)
                                                     props.data.open("http://localhost:8000/api/directory_content")
-                                                }} key={content.name} id='folders_{name_str}' className='flex w-[198px] flex-grow items-center mx-[1px] px-3 py-1 cursor-pointer hover:text-white active:text-white focus:text-white focus:ring-1 focus:ring-violet-300'>
+                                                }} key={content.name} id='folders_{name_str}' className='flex w-[195px] flex-grow items-center mx-[1px] px-3 py-1 cursor-pointer hover:text-white active:text-white focus:text-white focus:ring-1 focus:ring-violet-300'>
                                                     <MdFolder className="w-[20px] h-[20px] pr-[3px]"/>
                                                     <p className='text-[#e5e5e5 text-[11px] uppercase'>{content.name.length<20?content.name:(<>{content.name.slice(0,16)}...</>)}</p>
                                                 </button>
