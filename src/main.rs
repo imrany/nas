@@ -97,17 +97,17 @@ async fn main(){
                 serve_me(path.to_string()).await;
             }else {
                 println!("  ERROR Specify a path to serve.");
-                println!(" {}",format!(" HINT: To serve the current folder - 'zippy serve ./'."));
+                println!(" {}",format!(" HINT: To serve the current folder - 'anvel serve ./'."));
             }
 
         }
         None => {
-            serve_zippy().await;
+            serve_anvel().await;
         }
     }
 }
 
-async fn serve_zippy(){
+async fn serve_anvel(){
     // Create the 'shared' directory if it doesn't exist
     tokio::fs::create_dir_all("shared").await.unwrap();
 
@@ -159,7 +159,7 @@ async fn serve_zippy(){
             if let Err(e)= launch_browser(&url).await{
                 println!(" ERROR: An error occurred when opening {url} {e}");
             }else {
-                println!(" INFO: Launching zippy...");
+                println!(" INFO: Launching anvel...");
                 println!(" INFO: Open {url}");
             }
             server.run().await.unwrap_or_else(|err| println!(" ERROR: {err} "));
