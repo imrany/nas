@@ -111,11 +111,17 @@ pub async fn directory_content(state: web::Data<AppState>, path: web::Json<RootP
                     if let Some(file_name) = entry.file_name().to_str() {
                         let metadata= FileMeta{
                             is_file:directory_path.join(file_name.to_owned()).is_file(),
-                            file_extension: Some(String::from("none"))
-                            // file_extension:match directory_path.join(file_name.to_owned()).is_file() {
-                            //     true => Some(format!("{}",directory_path.join(file_name.to_owned()).extension().unwrap().to_str().unwrap())),
-                            //     false => Some(String::from("Folder")),
-                            // }
+                            // file_extension: Some(String::from("none"))
+                            file_extension:match directory_path.join(file_name.to_owned()).is_file() {
+                                true => {
+                                    let extension=match directory_path.join(file_name.to_owned()).extension() {
+                                        Some(v) =>format!("{}",v.to_str().unwrap()), 
+                                        None => String::from("no file extension")
+                                    };
+                                    Some(extension)
+                                },
+                                false => Some(String::from("folder")),
+                            }
                         };
                         let directory_object=DirectoryObject {
                             root:format!("{}",directory_path.to_str().unwrap()),
