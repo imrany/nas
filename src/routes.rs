@@ -1,5 +1,6 @@
 use actix_web::{
     HttpResponse,
+    HttpRequest,
     Responder,
     get,
     post,
@@ -148,11 +149,17 @@ pub async fn directory_content(state: web::Data<AppState>, path: web::Json<RootP
     HttpResponse::Ok().json(&directory_content)
 }
 
-#[get("/download/{filename}")]
-pub async fn download(path: web::Path<RootPath>) -> Result<NamedFile> {
-    let file_path= format!("shared/{}",&path.root.to_str().unwrap());
-    Ok(NamedFile::open(file_path)?)
+#[get("/download/{filename:.*}")]
+pub async fn download(req: HttpRequest) -> Result<NamedFile> {
+    let path: path::PathBuf = req.match_info().query("filename").parse().unwrap();
+    Ok(NamedFile::open(path)?)
 }
+
+// #[get("/download/{filename}")]
+// pub async fn download(path: web::Path<RootPath>) -> Result<NamedFile> {
+//     let file_path= format!("shared/{}",&path.root.to_str().unwrap());
+//     Ok(NamedFile::open(file_path)?)
+// }
 
 // #[get("/shared_folder")]
 // pub async fn get_shared_folder_contents()-> HttpResponse{
