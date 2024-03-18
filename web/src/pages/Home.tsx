@@ -17,8 +17,9 @@ import ISOIMAGE from "../assets/icons/filetype/application-x-raw-disk-image.svg"
 import PPTX from "../assets/icons/filetype/application-vnd.ms-powerpoint.svg"
 import MKV from "../assets/icons/filetype/video-x-matroska.svg"
 import AVI from "../assets/icons/filetype/video-x-wmv.svg"
-import XLSX from "../assets/icons/filetype/libreoffice-oasis-spreadsheet.svg"
 import CSV from "../assets/icons/filetype/text-csv.svg"
+import XLSX from "../assets/icons/filetype/libreoffice-oasis-spreadsheet.svg"
+import PSD from "../assets/icons/filetype/image-vnd.adobe.photoshop.svg"
 import DESKTOP from "../assets/icons/filetype/application-x-desktop.svg"
 import OLD from "../assets/icons/filetype/application-x-trash.svg"
 import ZIP from "../assets/icons/filetype/application-zip.svg"
@@ -35,6 +36,11 @@ import PERL from "../assets/icons/filetype/application-x-perl.svg"
 import CHEADER from "../assets/icons/filetype/text-x-chdr.svg"
 import C from "../assets/icons/filetype/text-x-csrc.svg"
 import RUBY from "../assets/icons/filetype/application-x-ruby.svg"
+import EXE from "../assets/icons/filetype/application-octet-stream.svg"
+import SYS from "../assets/icons/filetype/application-octet-stream.svg"
+import APK from "../assets/icons/filetype/android-package-archive.svg"
+import JS from "../assets/icons/filetype/application-javascript.svg"
+import SQL from "../assets/icons/filetype/application-sql.svg"
 
 import FolderImage from "../assets/icons/folder.png";
 import bg1 from "../assets/background/bg_1.png";
@@ -325,7 +331,6 @@ export default function Home(props:Props){
                                             <div onClick={()=>{
                                                 let path:any=localStorage.getItem("path")!==null?localStorage.getItem("path"):""
                                                 let newPath:any;
-                                                // let slash=path.includes("/")?"/":"'\'"
                                                 if(path.slice(0,path?.lastIndexOf("/"))===""||path.slice(0,path?.lastIndexOf("/"))===":"){
                                                     newPath="root"
                                                 }else if(path==="shared"){
@@ -375,10 +380,40 @@ export default function Home(props:Props){
                                                 let fileIcon
                                                 let downloadURL=`http://localhost:8000/api/download/${content.path}`
                                                 switch (content.metadata.file_extension) {
-                                                    case "mp3":
+                                                    case "apk":
+						        fileIcon=APK
+							break;
+						    case "APK":
+						        fileIcon=APK
+							break;
+						    case "sys":
+						        fileIcon=SYS
+							break
+						    case "exe":
+						        fileIcon=EXE
+							break
+						    case "mp3":
                                                         fileIcon=audioMp3
                                                         break;
                                                     case "jpeg":
+                                                        fileIcon=downloadURL
+                                                        break;
+						    case "sql":
+						      fileIcon=SQL
+						      break
+						    case "db":
+						       fileIcon=SQL
+						       break
+						    case "DB":
+						       fileIcon=SQL
+						       break
+                                                    case "psd":
+                                                        fileIcon=PSD;
+                                                        break;
+                                                    case "PSD":
+                                                        fileIcon=PSD
+                                                        break;
+                                                    case "JPEG":
                                                         fileIcon=downloadURL
                                                         break;
                                                     case "svg":
@@ -393,10 +428,19 @@ export default function Home(props:Props){
                                                     case "jpg":
                                                         fileIcon=downloadURL
                                                         break;
+                                                    case "JPG":
+                                                        fileIcon=downloadURL
+                                                        break;
                                                     case "png":
                                                         fileIcon=downloadURL
                                                         break;
+                                                    case "PNG":
+                                                        fileIcon=downloadURL
+                                                        break;
                                                     case "webp":
+                                                        fileIcon=downloadURL
+                                                        break;
+                                                    case "WEBP":
                                                         fileIcon=downloadURL
                                                         break;
                                                     case "pdf":
@@ -433,7 +477,7 @@ export default function Home(props:Props){
                                                         fileIcon=XML
                                                     break;
                                                     case "js":
-                                                        fileIcon=SCRIPT
+                                                        fileIcon=JS
                                                     break;
                                                     case "sh":
                                                         fileIcon=SCRIPT
@@ -529,6 +573,11 @@ export default function Home(props:Props){
                                                         fileIcon=unknownFile
                                                         break;
                                                 }
+						let path=content.path
+						if(path.includes("\\")){
+            					   // Replace backslashes with forward slashes
+            					   path = path.replace(/\\/g, "/")
+        					}	
                                                 return(
                                                     <div key={content.name} className="flex flex-col items-center text-center">
                                                         <button id={content.name} title={content.name}
@@ -538,10 +587,10 @@ export default function Home(props:Props){
                                                             }}
                                                             onDoubleClick={()=>{
                                                                 if(!content.metadata.is_file){
-                                                                    localStorage.setItem("path",content.path)
+                                                                    localStorage.setItem("path",path)
                                                                     open("http://localhost:8000/api/directory_content")
                                                                 }else{
-                                                                    openFile("http://localhost:8000/api/open",content.path)
+                                                                    openFile("http://localhost:8000/api/open",path)
                                                                 }
                                                             }}  className='flex flex-col items-center justify-center text-[12px] max-w-[150px] hover:text-white active:text-white focus:bg-[#3c3c3c]/90 focus:text-white dropdown_btn'>
                                                             {content.metadata.is_file?(<img src={fileIcon} alt='file' className='w-[55px] h-[55px]'/>):(<img src={FolderImage} alt='folder' className='w-[65px] h-[65px]'/>)}
@@ -557,9 +606,9 @@ export default function Home(props:Props){
                                                             <div>
                                                                 <div onClick={()=>{
                                                                     if(content.metadata.is_file){
-                                                                        openFile("http://localhost:8000/api/open",content.path)
+                                                                        openFile("http://localhost:8000/api/open",path)
                                                                     }else{
-                                                                        localStorage.setItem("path",content.path)
+                                                                        localStorage.setItem("path",path)
                                                                         open("http://localhost:8000/api/directory_content")
                                                                     }
                                                                 }} className='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35 {name_str}_open_item'>
@@ -567,13 +616,13 @@ export default function Home(props:Props){
                                                                     <p>Open</p>
                                                                 </div>
                                                                 <button onClick={()=>{
-                                                                    navigator.clipboard.writeText(content.path)
+                                                                    navigator.clipboard.writeText(path)
                                                                 }} className='px-[12px] w-full py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35 {name_str}_open_item'>
                                                                     <MdContentCopy className="w-[25px] h-[25px] pr-[6px]"/>
                                                                     <p>Copy Path</p>
                                                                 </button>
                                                                 <button onClick={()=>{
-                                                                    navigator.clipboard.writeText(content.path)
+                                                                    navigator.clipboard.writeText(path)
                                                                 }} className='px-[12px] w-full py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35 {name_str}_open_item'>
                                                                     <MdEdit className="w-[25px] h-[25px] pr-[6px]"/>
                                                                     <p>Rename</p>
@@ -585,7 +634,7 @@ export default function Home(props:Props){
                                                                         }else{
                                                                             let sendFileInfo:SendFileInfo={
                                                                                 name:content.name,
-                                                                                path:content.path,
+                                                                                path,
                                                                                 recipient_server:`http://${configurations.recipient_ip}:8000/api/receive`
                                                                             };
                                                                             sendFile("http://localhost:8000/api/send",sendFileInfo)
@@ -600,7 +649,7 @@ export default function Home(props:Props){
                                                                     </div>
                                                                 ):""}
                                                                 <button onClick={()=>{
-                                                                    navigator.clipboard.writeText(content.path)
+                                                                    navigator.clipboard.writeText(path)
                                                                 }} className='px-[12px] w-full py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35 {name_str}_open_item'>
                                                                     <MdDelete className="w-[25px] h-[25px] pr-[6px]"/>
                                                                     <p>Delete</p>

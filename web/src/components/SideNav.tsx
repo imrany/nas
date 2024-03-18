@@ -73,15 +73,20 @@ function SideNav(props:Props) {
                         <div id="folders" className="sidebar_folders overflow-y-auto pb-[33px] pt-1 h-screen">
                             <div className="flex flex-col">
                                 {props.data.folders?props.data.folders.contents.map(content=>{
+			    	   let path=content.path
+		         	   if(path.includes("\\")){
+			              // Replace backslashes with forward slashes
+            			      path = path.replace(/\\/g, "/")
+        			    }
                                     return(
                                         <div className="flex-grow" key={content.name} title={content.name}>
                                             {content.metadata.is_file?(
                                                 <button key={content.name} onClick={()=>{
                                                     if(!content.metadata.is_file){
-                                                        localStorage.setItem("path",content.path)
+                                                        localStorage.setItem("path",path)
                                                         props.data.open("http://localhost:8000/api/directory_content")
                                                     }else{
-                                                        openFile("http://localhost:8000/api/open",content.path)
+                                                        openFile("http://localhost:8000/api/open",path)
                                                     }
                                                 }} className='flex w-[195px] items-center mx-[1px] px-3 py-1 cursor-pointer hover:text-white active:text-white focus:text-white focus:ring-1 focus:ring-violet-300'>
                                                     <MdFileOpen className="w-[20px] h-[20px] pr-[3px]"/>
@@ -89,7 +94,7 @@ function SideNav(props:Props) {
                                                 </button>
                                             ):(
                                                 <button onClick={()=>{
-                                                    localStorage.setItem("path",content.path)
+                                                    localStorage.setItem("path",path)
                                                     props.data.open("http://localhost:8000/api/directory_content")
                                                 }} key={content.name} className='flex w-[195px] flex-grow items-center mx-[1px] px-3 py-1 cursor-pointer hover:text-white active:text-white focus:text-white focus:ring-1 focus:ring-violet-300'>
                                                     <MdFolder className="w-[20px] h-[20px] pr-[3px]"/>

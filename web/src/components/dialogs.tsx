@@ -22,7 +22,11 @@ export function FileInfoDialog(props:Props){
                         <div className="flex flex-col gap-3 pb-4 text-[13px]  text-gray-300">
                             <div className="flex gap-14">
                                 <p>Name:</p>
-                                <p>{props.data.info.name}</p>
+                                {props.data.info.name.length>30?(
+				  <p>{props.data.info.name.slice(0,33)}...</p>
+				):(
+				  <p>{props.data.info.name}</p>
+				)}
                             </div>
                             {props.data.info.metadata.is_file===true?(
                                 <div className="flex gap-16">
@@ -62,7 +66,11 @@ export function OpenFolderDialog(){
     };
     function handleOpenFolder(e: any): void {
         e.preventDefault()
-        let path=e.target.path.value;
+        let path:string=e.target.path.value;
+        if(path.includes("\\")){
+            // Replace backslashes with forward slashes
+            path = path.replace(/\\/g, "/")
+        }
         localStorage.setItem("path",path);
         e.target.reset()
         window.location.reload()
