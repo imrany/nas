@@ -41,6 +41,8 @@ import SYS from "../assets/icons/filetype/application-octet-stream.svg"
 import APK from "../assets/icons/filetype/android-package-archive.svg"
 import JS from "../assets/icons/filetype/application-javascript.svg"
 import SQL from "../assets/icons/filetype/application-sql.svg"
+import DEB from "../assets/icons/filetype/application-x-deb.svg"
+import LNK from "../assets/icons/filetype/libreoffice-oasis-web-template.svg"
 
 import FolderImage from "../assets/icons/folder.png";
 import bg1 from "../assets/background/bg_1.png";
@@ -331,7 +333,7 @@ export default function Home(props:Props){
                                             <div onClick={()=>{
                                                 let path:any=localStorage.getItem("path")!==null?localStorage.getItem("path"):""
                                                 let newPath:any;
-                                                if(path.slice(0,path?.lastIndexOf("/"))===""||path.slice(0,path?.lastIndexOf("/"))===":"){
+                                                if(path.slice(0,path?.lastIndexOf("/"))===""||path.slice(0,path?.lastIndexOf("/")).includes(":")||!path.slice(0,path?.lastIndexOf("/")).includes("/")){
                                                     newPath="root"
                                                 }else if(path==="shared"){
                                                     newPath=localStorage.getItem("previous")
@@ -398,6 +400,12 @@ export default function Home(props:Props){
                                                     case "jpeg":
                                                         fileIcon=downloadURL
                                                         break;
+						    case "deb":
+						        fileIcon=DEB;
+							break;
+						    case "lnk":
+						        fileIcon=LNK
+							break;
 						    case "sql":
 						      fileIcon=SQL
 						      break
@@ -485,6 +493,9 @@ export default function Home(props:Props){
                                                     case "odt":
                                                         fileIcon=DOCX
                                                     break;
+						    case "ini":
+						    	fileIcon=DESKTOP
+							break
                                                     case "ods":
                                                         fileIcon=XLSX
                                                     break
