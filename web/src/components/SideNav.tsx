@@ -74,7 +74,7 @@ function SideNav(props:Props) {
                             <div className="flex flex-col">
                                 {props.data.folders?props.data.folders.contents.map(content=>{
                                     return(
-                                        <div className="flex-grow" key={content.name}>
+                                        <div className="flex-grow" key={content.name} title={content.name}>
                                             {content.metadata.is_file?(
                                                 <button key={content.name} onClick={()=>{
                                                     if(!content.metadata.is_file){
@@ -85,7 +85,7 @@ function SideNav(props:Props) {
                                                     }
                                                 }} className='flex w-[195px] items-center mx-[1px] px-3 py-1 cursor-pointer hover:text-white active:text-white focus:text-white focus:ring-1 focus:ring-violet-300'>
                                                     <MdFileOpen className="w-[20px] h-[20px] pr-[3px]"/>
-                                                    <p className='text-[#e5e5e5 text-[11px] uppercase'>{content.name.length<20?content.name:(<>{content.name.slice(0,16)}...</>)}</p>
+                                                    <p className='text-[#e5e5e5 text-[11px] uppercase'>{content.name.length<20?content.name:(<>{content.name.slice(0,18)}...</>)}</p>
                                                 </button>
                                             ):(
                                                 <button onClick={()=>{
