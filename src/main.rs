@@ -44,7 +44,7 @@ use routes::{
 };
 
 #[derive(Parser)]
-#[command(author="Imran <imranmat254@gmail.com>", version, about="A simple http server for static files.", long_about = None)]
+#[command(author="Imrany <imranmat254@gmail.com>", version, about="A networking program for file sharing.", long_about = None)]
 struct Args {
     /// Path to the folder you want to serve
     #[arg(short, long, value_name= "PATH")]
