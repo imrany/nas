@@ -342,6 +342,7 @@ export default function Home(props:Props){
                                                 }
                                                 localStorage.setItem("path",newPath)
                                                 open("http://localhost:8000/api/directory_content")
+						endStartRequestLoop()
                                             }} title="Previous" className="bg-[#151515] hover:bg-[#3c3c3c]/55 cursor-pointer pl-[10px] pr-[3px] w-[50px] h-[35px] flex items-center">
                                                 <MdArrowBack className="w-[18px] h-[18px] mr-[5px]"/>
                                             </div>
