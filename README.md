@@ -4,7 +4,8 @@ __Anvel__ is a networking program for file sharing.
 
 | __Anvel versions__ | __Status__ | __Release Date__ | __Releases__ |
 |--------------------|------------|------------------|--------------|
-| v0.2.1 | LTS - Recommended for most users | 2023-03-18 | [Releases](./releases.md) |
+| v0.2.2 | LTS - Recommended for most users | 2023-03-18 | [Releases](./releases.md) |
+| v0.2.1 | Obsolete - Not Maintained | 2023-03-18 | [Releases](./releases.md) |
 | v0.2.0 | Obsolete - Not Maintained | 2023-03-16 | [Releases](./releases.md) |
 
 To get all previous releases, go to [Releases](./releases.md)
