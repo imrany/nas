@@ -119,7 +119,7 @@ function NotFound() {
                 <div className="flex items-center gap-3 mt-[24px]">
                     {resolveBtn}
                     <button onClick={()=>{
-			let previous=localStorage.getItem("previous")===null?"":localStorage.getItem("previous")
+			let previous:any=localStorage.getItem("previous")===null?"":localStorage.getItem("previous")
 			if(previous.length!==0){
 			   localStorage.setItem("path",previous)
 			   navigate("/")

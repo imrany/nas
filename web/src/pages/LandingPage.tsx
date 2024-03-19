@@ -9,7 +9,7 @@ type Props={
     }
 }
 export default function LandingPage(props:Props){
-    let previous=localStorage.getItem("previous")===null?"":localStorage.getItem("previous")
+    let previous:any=localStorage.getItem("previous")===null?"":localStorage.getItem("previous")
 
     useEffect(()=>{
 		document.title="Welcome to Anvel"
