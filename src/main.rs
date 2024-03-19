@@ -2,6 +2,7 @@ use clap::{
     Parser,
     Subcommand,
 };
+use dirs;
 use rand::{thread_rng, Rng};
 use actix_web::{
     HttpServer,
@@ -108,13 +109,19 @@ async fn main(){
 }
 
 async fn serve_anvel(){
-    // Create the 'shared' directory if it doesn't exist
-    tokio::fs::create_dir_all("shared").await.unwrap();
+    // Create the '/home/username/Downloads/Anvel shared' directory if it doesn't exist
+    let mut shared_dir=PathBuf::new();
+    shared_dir.push(dirs::download_dir().unwrap().display().to_string());   
+    shared_dir.push("Anvel shared");
+    tokio::fs::create_dir_all(shared_dir.to_str().unwrap()).await.unwrap();
 
     // let path: PathBuf = Path::new(PathBuf::from(current_exe().unwrap()).parent().unwrap()).join("static_files");
     let path =Path::new("./static_files");
     let app_state = web::Data::new(AppState {
         root_dir: get_root_directory().unwrap(),
+        home_dir:dirs::home_dir().unwrap(),
+        download_dir:dirs::download_dir().unwrap(),
+        shared_dir:shared_dir
     });
     let port:u16=8000;
     let ipv4: (Ipv4Addr, u16)=("0.0.0.0".parse().unwrap(),port);
