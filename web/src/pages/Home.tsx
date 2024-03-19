@@ -333,9 +333,9 @@ export default function Home(props:Props){
                                             <div onClick={()=>{
                                                 let path:any=localStorage.getItem("path")!==null?localStorage.getItem("path"):""
                                                 let newPath:any;
-                                                if(path.slice(0,path?.lastIndexOf("/"))===""||path.slice(0,path?.lastIndexOf("/")).startsWith("\\:")||!path.slice(0,path?.lastIndexOf("/")).includes("/")){
+                                                if(path.slice(0,path?.lastIndexOf("/"))===""||path.slice(0,path?.lastIndexOf("/")).startsWith("\\:")||!path.slice(0,path?.lastIndexOf("/")).includes("/")&&path!=="Anvel shared"){
                                                     newPath="root"
-                                                }else if(path==="shared"){
+                                                }else if(path==="Anvel shared"){
                                                     newPath=localStorage.getItem("previous")
                                                 }else{
                                                     newPath=path.slice(0,path?.lastIndexOf("/"))
