@@ -113,8 +113,8 @@ export default function Footer(props:Props){
                         </button>
                         <button onClick={()=>{
                             let path:any=localStorage.getItem("path")
-                            path!=="shared"?localStorage.setItem("previous",path):""
-                            localStorage.setItem("path","shared")
+                            path!=="Anvel shared"?localStorage.setItem("previous",path):""
+                            localStorage.setItem("path","Anvel shared")
                             props.data.open("http://localhost:8000/api/directory_content")
                             props.data.handleCloseSettings()
                             props.data.kickOffStartRequestLoop()
