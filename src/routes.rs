@@ -80,22 +80,30 @@ struct SendInfo{
 
 pub struct AppState {
     pub root_dir: path::PathBuf,
+    pub home_dir: path::PathBuf,
+    pub download_dir: path::PathBuf,
+    pub shared_dir: path::PathBuf,
 }
 
 #[post("/directory_content")]
 pub async fn directory_content(state: web::Data<AppState>, path: web::Json<RootPath>)-> HttpResponse{
     let root =&state.root_dir;
     let path_dir=&path.root;
-    let shared_dir=path::PathBuf::from("./shared");
+    let shared_dir=&state.shared_dir;
+    let home_dir=&state.home_dir;
 
     let directory_path = match path_dir.to_str().unwrap() {
         "root" => {
             println!("{}", root.to_str().unwrap());
             root
         },
-        "shared"=>{
-            println!("{}",path_dir.to_str().unwrap());
-            &shared_dir
+        "home" =>{
+            println!("{}",home_dir.to_str().unwrap());
+            home_dir
+        },
+        "Anvel shared"=>{
+            println!("{}",shared_dir.to_str().unwrap());
+            shared_dir
         }
         _ => {
             println!("{}", path_dir.to_str().unwrap());
@@ -194,14 +202,15 @@ pub async fn download(req: HttpRequest) -> Result<NamedFile> {
 // }
 
 #[post("/receive")]
-pub async fn receive(mut payload: Multipart) -> Result<HttpResponse> {
+pub async fn receive(state: web::Data<AppState>,mut payload: Multipart) -> Result<HttpResponse> {
     while let Some(item) = payload.next().await {
         let mut field = item?;
         let content_disposition = field.content_disposition().clone();
         let filename = content_disposition.get_filename().unwrap_or_default();
 
         // Create a file with a unique name in the server's current directory
-        let filepath = format!("./shared/{}", filename);
+        let shared_dir=state.shared_dir.to_str().unwrap();
+        let filepath=format!("{shared_dir}/{filename}");
         let mut file = File::create(&filepath).await?;
 
         // Write file content
@@ -210,10 +219,10 @@ pub async fn receive(mut payload: Multipart) -> Result<HttpResponse> {
             file.write_all(&data).await?;
         }
 
-        println!("Sent file: {}", filename);
+        println!("Received file: {}", filename);
     }
 
-    Ok(HttpResponse::Ok().json("File was sent successfully"))
+    Ok(HttpResponse::Ok().json("File was received successfully"))
 }
 
 #[post("/send")]
@@ -244,10 +253,9 @@ pub async fn send(resource: web::Json<SendInfo>)-> HttpResponse{
         Ok(res) => {
             // Check the server's response
             if res.status().is_success() {
-                let res_text=format!("'{file_name}' sent to '{server_url}'");
                 let res_json:String=res.json().await.unwrap();
-                println!("{res_text}, {res_json}");
-                return HttpResponse::Ok().json(res_text);
+                println!("{res_json}");
+                return HttpResponse::Ok().json(res_json);
             } else {
                 let res_text=format!("Failed to send '{file_name}' to '{server_url}'.  Status code: {}",res.status());
                 println!("{res_text}");
