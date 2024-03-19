@@ -9,6 +9,8 @@ type Props={
     }
 }
 export default function LandingPage(props:Props){
+    let previous=localStorage.getItem("previous")===null?"":localStorage.getItem("previous")
+
     useEffect(()=>{
 		document.title="Welcome to Anvel"
     },[])
@@ -27,13 +29,27 @@ export default function LandingPage(props:Props){
                     </p>
                     <div className="mt-8 w-full">
                         <div className="flex items-center justify-center gap-2">
+			  {previous.length===0?(
+			   <button onClick={()=>{
+                                        localStorage.setItem("path","home")
+                                        window.location.reload()
+                                }} className="flex gap-2 text-[#252525] flex-grow items-center justify-center h-[30px] w-fit px-[20px] rounded-sm bg-[#EDFFA5]">
+                                <span>Quick Start</span>
+                                <MdArrowForward className="w-[15px] h-[15px]"/>
+                            </button>
+			  ):(
+			   <button onClick={()=>{
+                                        localStorage.setItem("path",previous)
+                                        window.location.reload()
+                                }} className="flex gap-2 text-[#252525] flex-grow items-center justify-center h-[30px] w-fit px-[20px] rounded-sm bg-[#EDFFA5]">
+                                <MdRefresh className="w-[20px] h-[20px]"/>
+                                <span>Open Recent Folder</span>
+                            </button>
+
+			  )}
                             <button onClick={()=>openDialog("open_folder_dialog")} className="flex gap-2 text-[#252525] flex-grow items-center justify-center h-[30px] w-fit px-[20px] rounded-sm bg-[#EDFFA5]">
                                 <MdFolder className="w-[20px] h-[20px]"/>
                                 <span>Open Folder</span>
-                            </button>
-                            <button onClick={()=>window.location.reload()} className="flex gap-2 text-[#252525] flex-grow items-center justify-center h-[30px] px-[20px] rounded-sm bg-[#EDFFA5]">
-                                <MdRefresh className="w-[20px] h-[20px]"/>
-                                <span>Refresh</span>
                             </button>
                         </div>
                     </div>
