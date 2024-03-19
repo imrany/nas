@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { ErrorBody } from "../types/definitions";
 
 function NotFound() {
+    let navigate=useNavigate()
     let [resolveBtn,setResolveBtn]=useState(
         <button onClick={()=>window.location.reload()} className="mr-[12px] py-[4px] px-[16px] hover:bg-[#EDFFA1] border-none font-semibold h-[28px] w-[119px] text-[13px] text-[#1D1D1D] rounded-sm bg-[#EDFFA5]">
             Refresh page
@@ -115,11 +116,20 @@ function NotFound() {
                         </div>
                     </div>
                 </details>
-                <div className="flex items-center mt-[24px]">
+                <div className="flex items-center gap-3 mt-[24px]">
                     {resolveBtn}
-                    <Link to="/" className="mr-[12px] py-[4px] px-[16px] border-[1px] border-[#343434] font-semibold hover:bg-[#292d39]  hover:text-white h-[28px] w-[119px] text-[13px] text-[#C2C2C2] rounded-sm bg-[#252525]">
-                        Back Home
-                    </Link>
+                    <button onClick={()=>{
+			let previous=localStorage.getItem("previous")===null?"":localStorage.getItem("previous")
+			if(previous.length!==0){
+			   localStorage.setItem("path",previous)
+			   navigate("/")
+			}else{
+			   localStorage.removeItem("path")
+			   window.location.href="/welcome"
+			}
+		    }} className="py-[4px] text-center px-[16px] border-[1px] border-[#343434] font-semibold hover:bg-[#292d39]  hover:text-white h-[28px] w-[119px] text-[13px] text-[#C2C2C2] rounded-sm bg-[#252525]">
+                        Go Back
+                    </button>
                 </div>
             </div>
         </div>
