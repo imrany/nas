@@ -1,3 +1,4 @@
+use actix::{Actor, StreamHandler};
 use actix_web::{
     HttpResponse,
     HttpRequest,
@@ -13,6 +14,10 @@ use reqwest::{
         Form, 
         Part
     }
+};
+use notify_rust::{
+    Timeout,
+    Notification
 };
 use actix_files::NamedFile;
 use actix_multipart::Multipart;
@@ -36,6 +41,7 @@ use serde::{
 // use serde_json::json;
 use std::process::Command;
 use local_ip_address::local_ip;
+use actix_web_actors::ws;
 
 #[derive(Serialize,Deserialize, Debug)]
 struct DirectoryObject {
@@ -44,6 +50,8 @@ struct DirectoryObject {
     path:path::PathBuf,
     metadata:FileMeta
 }
+use dirs;
+
 #[derive(Serialize,Deserialize, Debug)]
 struct FileMeta{
     is_file:bool,
@@ -91,22 +99,42 @@ pub async fn directory_content(state: web::Data<AppState>, path: web::Json<RootP
     let path_dir=&path.root;
     let shared_dir=&state.shared_dir;
     let home_dir=&state.home_dir;
+    let download_dir=&state.download_dir;
+    let audio_dir=&path::PathBuf::from(dirs::audio_dir().unwrap().display().to_string());
+    let desktop_dir=&path::PathBuf::from(dirs::desktop_dir().unwrap().display().to_string());
+    let picture_dir=&path::PathBuf::from(dirs::picture_dir().unwrap().display().to_string());
+    let video_dir=&path::PathBuf::from(dirs::video_dir().unwrap().display().to_string());
+    let document_dir=&path::PathBuf::from(dirs::document_dir().unwrap().display().to_string());
 
     let directory_path = match path_dir.to_str().unwrap() {
         "root" => {
-            println!("{}", root.to_str().unwrap());
             root
         },
+        "Music"=>{
+            audio_dir  
+        },
+        "Desktop"=>{
+            desktop_dir
+        },
+        "Pictures"=>{
+            picture_dir
+        },
+        "Videos"=>{
+            video_dir
+        },
+        "Downloads"=>{
+            download_dir
+        },
+        "Documents"=>{
+            document_dir
+        },
         "home" =>{
-            println!("{}",home_dir.to_str().unwrap());
             home_dir
         },
         "Anvel shared"=>{
-            println!("{}",shared_dir.to_str().unwrap());
             shared_dir
         }
         _ => {
-            println!("{}", path_dir.to_str().unwrap());
             path_dir
         }
     };
@@ -145,7 +173,6 @@ pub async fn directory_content(state: web::Data<AppState>, path: web::Json<RootP
             contents
         }
         Err(e) => {
-            println!("{e}");
             let err_message=ErrorMessage{
                 message:format!("{e} with the name '{}'",directory_path.to_str().unwrap())
             };
@@ -168,6 +195,43 @@ pub async fn download(req: HttpRequest) -> Result<NamedFile> {
 //     let file_path= format!("shared/{}",&path.root.to_str().unwrap());
 //     Ok(NamedFile::open(file_path)?)
 // }
+
+#[get("/ping/{sender_ip}")]
+pub async fn ping(sender_ip: web::Path<String>)->HttpResponse{
+    let resp=Client::new()
+        .get(format!("http://{sender_ip}:80/api/pong/{sender_ip}"))
+        .send()
+        .await;
+    match resp {
+        Ok(res) =>{
+            if res.status().is_success() {
+                let res_json:String=res.json().await.unwrap();
+                return HttpResponse::Ok().json(res_json);
+            } else {
+                let res_text=format!("Failed to ping. Status code: {}",res.status());
+                println!("{res_text}");
+                return HttpResponse::InternalServerError().json(res_text);
+            }
+        }, 
+        Err(e) => {
+            let res_text=format!("{e}");
+            println!("{res_text}");
+            return HttpResponse::InternalServerError().json(res_text);
+        }
+    }
+}
+
+#[get("/pong/{sender_ip}")]
+pub async fn pong(sender_ip: web::Path<String>)->HttpResponse{
+    Notification::new()
+        .summary("Anvel - Ping alert")
+        .body(format!("Device '{}' can now send you files.",&sender_ip.as_str()).as_str())
+        .icon("thunderbird")
+        .appname("Anvel")
+        .timeout(Timeout::Milliseconds(10000)) //milliseconds
+        .show().unwrap();
+    HttpResponse::Ok().json("pong")
+}
 
 // #[get("/shared_folder")]
 // pub async fn get_shared_folder_contents()-> HttpResponse{
@@ -219,7 +283,15 @@ pub async fn receive(state: web::Data<AppState>,mut payload: Multipart) -> Resul
             file.write_all(&data).await?;
         }
 
-        println!("Received file: {}", filename);
+        //println!("Received file: {}", filename);
+        //show file recieved notification
+        Notification::new()
+            .summary("Anvel - New file received")
+            .body("You've received a new file")
+            .icon("thunderbird")
+            .appname("Anvel")
+            .timeout(Timeout::Milliseconds(10000)) //milliseconds
+            .show().unwrap();
     }
 
     Ok(HttpResponse::Ok().json("File was received successfully"))
@@ -254,17 +326,14 @@ pub async fn send(resource: web::Json<SendInfo>)-> HttpResponse{
             // Check the server's response
             if res.status().is_success() {
                 let res_json:String=res.json().await.unwrap();
-                println!("{res_json}");
                 return HttpResponse::Ok().json(res_json);
             } else {
                 let res_text=format!("Failed to send '{file_name}' to '{server_url}'.  Status code: {}",res.status());
-                println!("{res_text}");
                 return HttpResponse::InternalServerError().json(res_text);
             }
         },
         Err(e) => {
             let res_text=format!("{e}");
-            println!("{res_text}");
             return HttpResponse::InternalServerError().json(res_text);
         }
     }
@@ -281,8 +350,7 @@ pub async fn open_file(path: web::Json<RootPath>) -> impl Responder {
             .args(&["/C", "start", "", &file_path.to_str().unwrap()])
             .spawn();
 
-        if let Ok(file) = open_cmd {
-            println!("{:?}", file);
+        if let Ok(_file) = open_cmd {
             return HttpResponse::Ok().json("File opened");
         }else {
             return HttpResponse::InternalServerError().json("Failed to open file");
@@ -296,7 +364,6 @@ pub async fn open_file(path: web::Json<RootPath>) -> impl Responder {
             .spawn();
             
         if let Ok(file) = open_cmd {
-            println!("{:?}", file);
             return HttpResponse::Ok().json("File opened");
         }else {
             return HttpResponse::InternalServerError().json("Failed to open file");
@@ -326,8 +393,30 @@ pub async fn get_ip_address()-> impl Responder {
         };
     }else {
         let err_message=ErrorMessage{
-            message: "Connect to a wifi or hotspot".to_string()
+            message: "Searching for network information failed".to_string()
         };
         return HttpResponse::InternalServerError().json(err_message);
     }
+}
+
+//websocket
+struct MyWebSocket;
+
+impl Actor for MyWebSocket {
+    type Context = ws::WebsocketContext<Self>;
+}
+
+impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for MyWebSocket {
+    fn handle(&mut self, msg: Result<ws::Message, ws::ProtocolError>, ctx: &mut Self::Context) {
+        match msg {
+            Ok(ws::Message::Text(text)) => ctx.text(text), // Echo the text back
+            Ok(ws::Message::Binary(bin)) => ctx.binary(bin),
+            _ => (),
+        }
+    }
+}
+
+#[get("/ws")]
+pub async fn websocket(req: HttpRequest, stream: web::Payload) -> impl Responder {
+    ws::start(MyWebSocket {}, &req, stream)
 }

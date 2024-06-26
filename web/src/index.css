@@ -11,7 +11,6 @@
   font-weight: 400;
   scroll-behavior: smooth;
 
-  color: #ffff;
   background: #252525;
   font-size: 15px;
 
@@ -19,11 +18,29 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  color-scheme: light dark;
 
-  --theme-dark: #151515;
+  --primary-01:light-dark(#fff,#1d1d1d)
+  --primary-02:light-dark(#f2f2f2,#151515);
+  --primary-03:light-dark(#f3f3f3,#252525);
+  --primary-04:light-dark(#252525,white);
+  --primary-05:light-dark(#c2dcef4d,#3c3c3c);
+  --primary-06:light-dark(#f2f2f2,#252525);
+
+  --theme-dark: white;
   --hover-gray:#3c3c3c;
   --theme-gray:#1d1d1d;
-  --theme-yellow:#e0ff72;
+
+  --yellow-primary-01:#e0ff72;
+  --yellow-primary-02:#EDFFA5;
+  --yellow-primary-03:#EDFFA1;
+
+  /*Color themes*/
+  --purple-primary-01:#faf6ff;
+  --orange-primary-01:#f9f4f0;
+  --red-primary-01:#f7ecec;
+  --pink-primary-01:#f5ecf0;
+
 }
 
 .dropdown {
@@ -32,13 +49,12 @@
 }
 
 .dropdown-content {
-  font-weight: 500;
   padding: 4px 0;
   display: none;
   position: absolute;
-  color: white;
+  color: var(--primary-04);
   font-size: 13px;
-  background: #252525;
+  background: var(--primary-06);
   border-radius: 4px;
   min-width: 180px;
   overflow: auto;

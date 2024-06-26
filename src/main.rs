@@ -1,9 +1,7 @@
-use clap::{
-    Parser,
-    Subcommand,
-};
+// Prevents additional console window on Windows in release, DO NOT REMOVE!!
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+
 use dirs;
-use rand::{thread_rng, Rng};
 use actix_web::{
     HttpServer,
     http,
@@ -41,27 +39,12 @@ use routes::{
     send,
     receive,
     download,
+    websocket,
+    ping,
+    pong
     // get_shared_folder_contents,
 };
 
-#[derive(Parser)]
-#[command(author="Imrany <imranmat254@gmail.com>", version, about="A networking program for file sharing.", long_about = None)]
-struct Args {
-    /// Path to the folder you want to serve
-    #[arg(short, long, value_name= "PATH")]
-    root: Option<String>,
-
-    #[command(subcommand)]
-    command: Option<Commands>,
-}
-
-#[derive(Subcommand)]
-enum Commands {
-    /// Serves a specific folder.
-    Serve {
-        path: Option<String>,
-    },
-}
 
 fn get_root_directory() -> Option<PathBuf> {
     // On Unix-like systems (Linux, macOS), the root directory is "/"
@@ -87,25 +70,7 @@ fn get_root_directory() -> Option<PathBuf> {
 
 #[actix_web::main]
 async fn main(){
-    let args = Args::parse();
-    if let Some(path) = args.root.as_deref() {
-        serve_me(path.to_string()).await;
-    }
-    
-    match &args.command {
-        Some(Commands::Serve { path }) => {
-            if let Some(path) = path.as_deref() {
-                serve_me(path.to_string()).await;
-            }else {
-                println!("  ERROR Specify a path to serve.");
-                println!(" {}",format!(" HINT: To serve the current folder - 'anvel serve ./'."));
-            }
-
-        }
-        None => {
-            serve_anvel().await;
-        }
-    }
+    serve_anvel().await;
 }
 
 async fn serve_anvel(){
@@ -123,7 +88,7 @@ async fn serve_anvel(){
         download_dir:dirs::download_dir().unwrap(),
         shared_dir:shared_dir
     });
-    let port:u16=8000;
+    let port:u16=80;
     let ipv4: (Ipv4Addr, u16)=("0.0.0.0".parse().unwrap(),port);
     let server=HttpServer::new(move ||{
         let app_state = app_state.clone();
@@ -144,6 +109,9 @@ async fn serve_anvel(){
                     .service(send)
                     .service(receive)
                     .service(download)
+                    .service(ping)
+                    .service(pong)
+                    .service(websocket)
                     // .service(get_shared_folder_contents)
             )
             .service(
@@ -162,7 +130,7 @@ async fn serve_anvel(){
     .bind(ipv4);
     match server {
         Ok(server) => {
-            let url=format!("http://localhost:{port}/");
+            let url=format!("http://{}:{port}/",local_ip().unwrap());
             if let Err(e)= launch_browser(&url).await{
                 println!(" ERROR: An error occurred when opening {url} {e}");
             }else {
@@ -170,46 +138,6 @@ async fn serve_anvel(){
                 println!(" INFO: Open {url}");
             }
             server.run().await.unwrap_or_else(|err| println!(" ERROR: {err} "));
-        },
-        Err(e) =>  println!(" {} ",e)
-    }
-}
-
-async fn serve_me(path: String) {
-    let port:u16=thread_rng().gen_range(3000..=8080);
-    let ipv4: (Ipv4Addr, u16)=("0.0.0.0".parse().unwrap(),port);
-    let server=HttpServer::new(move ||
-        App::new()
-            .service(Files::new("/", path.clone()).show_files_listing().index_file("index.html")
-                .default_handler(fn_service(|req: ServiceRequest| async {
-                    let (req, _) = req.into_parts();
-                    let current_exe_path=PathBuf::from(current_exe().unwrap());
-                    let file = NamedFile::open_async(Path::new(current_exe_path.parent().unwrap()).join("static_files/404.html")).await?;
-                    let res = file.into_response(&req);
-                    Ok(ServiceResponse::new(req, res))
-                }))
-            )
-    )
-    .bind(ipv4);
-    match server {
-        Ok(serve) => {
-            let url=format!("http://localhost:{port}/");
-            if let Err(e) = launch_browser(&url).await {
-                println!(" ERROR An error occurred when opening {url} {e}");
-            }else{
-                let my_local_ip = local_ip();
-                println!(" Local: {url}");
-                
-                match my_local_ip {
-                    Ok(ip) => {
-                        println!(" Network: {}",format!("http://{ip}:{port}/"));
-                    },
-                    Err(e) => {
-                        println!(" {} {}.", format!(" WARNING "),e );
-                    }
-                }
-            };
-            serve.run().await.unwrap_or_else(|err| println!(" ERROR {} ",err));
         },
         Err(e) =>  println!(" {} ",e)
     }

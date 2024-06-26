@@ -1,10 +1,12 @@
-import { MdArrowBack, MdClose, MdContentCopy, MdDelete, MdEdit, MdFolder, MdInfoOutline, MdOpenInNew, MdSend, MdSettings } from "react-icons/md";
+import { message } from "@tauri-apps/api/dialog";
+import { MdArrowBack, MdClose, MdContentCopy, MdFolder, MdRefresh, MdInfoOutline, MdOpenInNew, MdSend, MdSettings } from "react-icons/md";
 import Footer from "../components/Footer";
 import SideNav from "../components/SideNav";
 import TopNav from "../components/TopNav";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { GlobalContext } from "../context";
 import { ErrorBody, Folder, Configurations , Content, Notifications, ChooseBackground, NetworkInformation, SendFileInfo } from "../types/definitions"
-import { openFile } from "../components/actions";
+import { openFile, createWindow, browserSupportedFiles } from "../components/actions";
 import { useNavigate } from "react-router-dom";
 import unknownFile from "../assets/icons/filetype/application-x-zerosize.svg";
 import audioMp3 from "../assets/icons/filetype/audio-mp3.svg";
@@ -43,7 +45,6 @@ import JS from "../assets/icons/filetype/application-javascript.svg"
 import SQL from "../assets/icons/filetype/application-sql.svg"
 import DEB from "../assets/icons/filetype/application-x-deb.svg"
 import LNK from "../assets/icons/filetype/libreoffice-oasis-web-template.svg"
-
 import FolderImage from "../assets/icons/folder.png";
 import bg1 from "../assets/background/bg_1.png";
 import { FileInfoDialog } from "../components/dialogs";
@@ -55,13 +56,17 @@ type Props={
         changeBackground:any
     }
 }
+
 export default function Home(props:Props){
+    let { API_URL }=useContext(GlobalContext)
     const navigate=useNavigate()
     let [name,setName]=useState("")
     let [counter,setCounter]=useState(0)
     let [isLoading,setIsLoading]=useState(true)
     let [loadingText,setLoadingText]=useState("Loading...")
     let [isLoadingNetInfo,setIsLoadingNetInfo]=useState(true)
+    let [isDisabled,setIsDisabled]=useState(false)
+    let [backgroundOption,setBackgroundOption]=useState("")
     let [infoContent,setInfoContent]=useState<Content>({
         name:"",
         root:"",
@@ -213,8 +218,16 @@ export default function Home(props:Props){
             let parseRes=await response.json()
             if(response.ok){
                 console.log(parseRes)
+                setNotifications(prevNotifications => [...prevNotifications,{
+                    priority:"important",
+                    message:parseRes
+                }])
             }else{
                 console.log(parseRes)
+                setNotifications(prevNotifications => [...prevNotifications,{
+                    priority:"not important",
+                    message:`${parseRes}`
+                }])
             }
             setIsLoading(false)
         }catch(error:any){
@@ -294,41 +307,58 @@ export default function Home(props:Props){
         }
     }
 
+    async function handlePing(e:any){
+        try{
+            e.preventDefault()
+            setIsDisabled(true)
+            let configs:Configurations={
+                recipient_ip:e.target.recipient_ip.value
+            }
+            let response=await fetch(`http://${configs.recipient_ip}:80/api/ping/${configs.recipient_ip}`)
+            let parseRes=await response.json()
+            if(parseRes!=="pong"){
+                await message(`${parseRes.error}`, { title: 'Error', type: 'error' });
+                console.log(parseRes.error)
+                setIsDisabled(false)
+            }else{
+                console.log(parseRes)
+                setConfigurations(configs)
+                window.localStorage.setItem("configurations",JSON.stringify(configs))
+                setIsDisabled(false)
+            }
+        }catch(error:any){
+            setIsDisabled(false)
+            let errorMessage=error.message==="Failed to fetch"?`Cannot ping ${e.target.recipient_ip.value}`:error.message
+            await message(`${errorMessage}`, { title: 'Error', type: 'error' });
+            setNotifications([{
+                priority:"not important",
+                message:errorMessage
+            }])
+            console.log(errorMessage)
+        }
+    }
+
     useEffect(()=>{
-        open("http://localhost:8000/api/directory_content")
-        getIPs("http://localhost:8000/api/get_ip_address")
-        setNotifications([
-            {
-                priority:"not important",
-                message:"Hello welcome to anvel, contact our support via imranmat254@gmail.com for help."
-            },
-            {
-                priority:"not important",
-                message:"Turn on Hotspot or WIFI and connect with other person using anvel."
-            },
-            {
-                priority:"important",
-                message:"Zero connections"
-            },
-        ])
+        open(`${API_URL}/api/directory_content`)
+        getIPs(`${API_URL}/api/get_ip_address`)
 	},[counter])
     return(
         <>
             {isLoading?(
-                <div className="bg-white text-[var(--theme-dark)] flex flex-col h-screen w-screen items-center justify-center">
+                <div className="bg-[var(--primary-01)] text-[var(--primary-04)] flex flex-col h-screen w-screen items-center justify-center">
                     <p className="text-lg">{loadingText}</p>
                 </div>
             ):(
-                <div style={props.data.backgroundImage!=="default"?{background: `linear-gradient(0deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),url('${props.data.backgroundImage}') top no-repeat`, backgroundSize:"cover", backgroundAttachment:"fixed"}:{background: "var(--theme-gray)"}} className="min-h-[100vh]">
+            <div style={!props.data.backgroundImage.includes("primary-01")&&props.data.backgroundImage!=="default"?{background: `linear-gradient(0deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),url('${props.data.backgroundImage}') top no-repeat`, backgroundSize:"cover", backgroundAttachment:"fixed"}:props.data.backgroundImage==="default"?{background: "var(--primary-01)"}:{background: `var(--${props.data.backgroundImage})`}} className="min-h-[100vh]">
                     <TopNav data={{name, handleShowSettings, settingsHeader, showToast}}/>
                     <div className="flex">
                         <SideNav data={{folders,error,open, getIPs, showSettings}}/>
-                        <div className="mt-[48px] flex-grow mb-[22px] text-[#999999]">
+                        <div className="mt-[48px] flex-grow mb-[22px]">
                             {/*  folder view */}
                             <div id="folder_view">
                                 {/* folder view nav */}
-                                <div id="folder_view_nav" className="fixed overflow-hidden border-[#3c3c3c]/50 border-l-[1px] left-[199px] right-0 top-[35px]">
-                                    <div className="flex w-full bg-[#151515]">
+                                <div id="folder_view_nav" className="fixed overflow-hidden border-dotted border-[#3c3c3c]/50 border-l-[1px] left-[199px] right-0 top-[35px]">
+                                    <div className="flex w-full bg-[var(--primary-02)]">
                                         {localStorage.getItem("path")==="/"?"":(
                                             <div onClick={()=>{
                                                 let path:any=localStorage.getItem("path")!==null?localStorage.getItem("path"):""
@@ -341,33 +371,33 @@ export default function Home(props:Props){
                                                     newPath=path.slice(0,path?.lastIndexOf("/"))
                                                 }
                                                 localStorage.setItem("path",newPath)
-                                                open("http://localhost:8000/api/directory_content")
-						endStartRequestLoop()
-                                            }} title="Previous" className="bg-[#151515] hover:bg-[#3c3c3c]/55 cursor-pointer pl-[10px] pr-[3px] w-[50px] h-[35px] flex items-center">
+                                                open(`${API_URL}/api/directory_content`)
+						                        endStartRequestLoop()
+                                            }} title="Previous" className="bg-[var(--primary-02)] cursor-pointer pl-[10px] pr-[3px] w-[50px] h-[35px] flex items-center">
                                                 <MdArrowBack className="w-[18px] h-[18px] mr-[5px]"/>
                                             </div>
                                         )}
 
-                                        <div onClick={()=>handleCloseSettings()} onMouseEnter={()=>toggleShowCloseBtn(`folder_close_btn`)} onMouseLeave={()=>toggleShowCloseBtn(`folder_close_btn`)} className={showSettings===true?"bg-[#151515] border-dotted border-l-[1px] border-[#3c3c3c]/50 hover:bg-[#3c3c3c]/55 cursor-pointer pl-[10px] pr-[3px] min-w-[128px] h-[35px] flex items-center":"bg-[#1d1d1d] hover:bg-[#3c3c3c]/55 cursor-pointer pl-[10px] pr-[3px] min-w-[128px] h-[35px] flex items-center"}>
+                                        <div onClick={()=>handleCloseSettings()} onMouseEnter={()=>toggleShowCloseBtn(`folder_close_btn`)} onMouseLeave={()=>toggleShowCloseBtn(`folder_close_btn`)} className={showSettings===true?`bg-[var(--primary-02)] border-dotted border-l-[1px] border-[#3c3c3c]/50 hover:bg-[#3c3c3c]/55 cursor-pointer pl-[10px] pr-[3px] min-w-[128px] h-[35px] flex items-center`:props.data.backgroundImage!=="default"?`bg-[var(--${props.data.backgroundImage})] hover:bg-[#3c3c3c]/55 cursor-pointer pl-[10px] pr-[3px] min-w-[128px] h-[35px] flex items-center`:`bg-[var(--primary-01)] hover:bg-[#3c3c3c]/55 cursor-pointer pl-[10px] pr-[3px] min-w-[128px] h-[35px] flex items-center`}>
                                             <MdFolder className="w-[18px] h-[18px] mr-[5px]"/>
-                                            <p className="text-[#E5E5E5] mr-[3px] text-[13px] capitalize root_path_indicator">{name}</p>
-                                            <MdClose id="folder_close_btn" className="p-[3px] none w-[22px] h-[22px] bg-[#3c3c3c]/90 ml-auto rounded-sm text-white" onClick={()=>{
+                                            <p className="mr-[3px] text-[13px] capitalize root_path_indicator">{name}</p>
+                                            <MdClose id="folder_close_btn" className="p-[3px] none w-[22px] h-[22px] bg-[var(--primary-02)] ml-auto rounded-sm" onClick={()=>{
                                                 localStorage.setItem("path","root");
-                                                open("http://localhost:8000/api/directory_content")
+                                                open(`${API_URL}/api/directory_content`)
                                             }}/>
                                         </div>
 
                                         {showSettingsTab?(
-                                            <div onMouseEnter={()=>toggleShowCloseBtn(`settings_close_btn`)} onMouseLeave={()=>toggleShowCloseBtn(`settings_close_btn`)} className={showSettings!==true?"bg-[#151515] border-dotted border-r-[1px] border-[#3c3c3c]/50 hover:bg-[#3c3c3c]/55 cursor-pointer pr-[3px] min-w-[128px] h-[35px] flex items-center":"bg-[#1d1d1d] hover:bg-[#3c3c3c]/55 cursor-pointer pr-[3px] min-w-[128px] h-[35px] flex items-center"}>
+                                            <div onMouseEnter={()=>toggleShowCloseBtn(`settings_close_btn`)} onMouseLeave={()=>toggleShowCloseBtn(`settings_close_btn`)} className={showSettings!==true?"bg-[var(--primary-02)] border-dotted border-r-[1px] border-[#3c3c3c]/50 hover:bg-[#3c3c3c]/55 cursor-pointer pr-[3px] min-w-[128px] h-[35px] flex items-center":props.data.backgroundImage!=="default"?`bg-[var(--${props.data.backgroundImage})] hover:bg-[#3c3c3c]/55 cursor-pointer pr-[3px] min-w-[128px] h-[35px] flex items-center`:`bg-[var(--primary-01)] hover:bg-[#3c3c3c]/55 cursor-pointer pr-[3px] min-w-[128px] h-[35px] flex items-center`} >
                                                 <div className="flex pl-[10px]" onClick={()=>{
                                                     setSettingsHeader("Settings - Anvel")
                                                     setShowSettings(true)
                                                     setStartRequestLoop(false)
                                                 }}>
                                                     <MdSettings className="w-[18px] h-[18px] mr-[5px]"/>
-                                                    <p className="text-[#E5E5E5] mr-[3px] text-[13px] capitalize">Settings</p>
+                                                    <p className="mr-[3px] text-[13px] capitalize">Settings</p>
                                                 </div>
-                                                <MdClose id="settings_close_btn" className="p-[3px] none w-[22px] h-[22px] bg-[#3c3c3c]/90 ml-auto rounded-sm text-white" onClick={()=>{
+                                                <MdClose id="settings_close_btn" className="p-[3px] none w-[22px] h-[22px] bg-[var(--primary-02)] ml-auto rounded-sm" onClick={()=>{
                                                     setShowSettings(false)
                                                     setShowSettingsTab(false)
                                                     setSettingsHeader("")
@@ -377,344 +407,376 @@ export default function Home(props:Props){
                                     </div>
                                 </div>
                                 {!showSettings?(
-                                    <div className="w-full flex flex-wrap mt-[35px]" id="folder_view_body">
-                                        <div id="test" className="ml-[200px] grid max-sm:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 w-full gap-4 px-[25px] py-[13px]">
-                                            { folders&&folders.contents.map((content)=>{
-                                                let fileIcon
-                                                let downloadURL=`http://localhost:8000/api/download/${content.path}`
-                                                switch (content.metadata.file_extension) {
-                                                    case "apk":
-						        fileIcon=APK
-							break;
-						    case "APK":
-						        fileIcon=APK
-							break;
-						    case "sys":
-						        fileIcon=SYS
-							break
-						    case "exe":
-						        fileIcon=EXE
-							break
-						    case "mp3":
-                                                        fileIcon=audioMp3
+                                    <div className="w-full flex flex-wrap mt-[35px]"  style={props.data.backgroundImage==="default"||props.data.backgroundImage.includes("primary-01")?{}:{color:"white"}} id="folder_view_body">
+                                        {folders.contents.length===0?(
+                                            <div className="ml-[200px] w-full px-[25px] py-[13px]">
+                                                <p className="text-[13px] text-center text-[var(--primary-04)]" style={props.data.backgroundImage==="default"||props.data.backgroundImage.includes("primary-01")?{}:{color:"white"}}>This folder is empty</p>
+                                            </div>
+                                        ):(
+                                            <div id="test" className="ml-[200px] grid max-sm:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 w-full gap-4 px-[25px] py-[13px]">
+                                                {folders.contents.map(content=>{
+                                                    let fileIcon
+                                                    let downloadURL=`${API_URL}/api/download/${content.path}`
+                                                    switch (content.metadata.file_extension) {
+                                                        case "apk":
+                                                            fileIcon=APK
                                                         break;
-                                                    case "jpeg":
-                                                        fileIcon=downloadURL
+                                                        case "APK":
+                                                            fileIcon=APK
                                                         break;
-						    case "deb":
-						        fileIcon=DEB;
-							break;
-						    case "lnk":
-						        fileIcon=LNK
-							break;
-						    case "sql":
-						      fileIcon=SQL
-						      break
-						    case "db":
-						       fileIcon=SQL
-						       break
-						    case "DB":
-						       fileIcon=SQL
-						       break
-                                                    case "psd":
-                                                        fileIcon=PSD;
+                                                        case "sys":
+                                                            fileIcon=SYS
+                                                        break
+                                                        case "exe":
+                                                            fileIcon=EXE
+                                                        break
+                                                        case "mp3":
+                                                            fileIcon=audioMp3
                                                         break;
-                                                    case "PSD":
-                                                        fileIcon=PSD
+                                                        case "jpeg":
+                                                            fileIcon=downloadURL
+                                                            break;
+                                                        case "deb":
+                                                            fileIcon=DEB;
                                                         break;
-                                                    case "JPEG":
-                                                        fileIcon=downloadURL
+                                                        case "lnk":
+                                                            fileIcon=LNK
                                                         break;
-                                                    case "svg":
-                                                        fileIcon=downloadURL
+                                                        case "sql":
+                                                            fileIcon=SQL
+                                                        break
+                                                        case "db":
+                                                            fileIcon=SQL
+                                                        break
+                                                        case "DB":
+                                                            fileIcon=SQL
+                                                        break
+                                                        case "psd":
+                                                            fileIcon=PSD;
+                                                            break;
+                                                        case "PSD":
+                                                            fileIcon=PSD
+                                                            break;
+                                                        case "JPEG":
+                                                            fileIcon=downloadURL
+                                                            break;
+                                                        case "svg":
+                                                            fileIcon=downloadURL
+                                                            break;
+                                                        case "ttf":
+                                                            fileIcon=TXT
+                                                            break;
+                                                        case "gif":
+                                                            fileIcon=downloadURL
+                                                            break;
+                                                        case "jpg":
+                                                            fileIcon=downloadURL
+                                                            break;
+                                                        case "JPG":
+                                                            fileIcon=downloadURL
+                                                            break;
+                                                        case "png":
+                                                            fileIcon=downloadURL
+                                                            break;
+                                                        case "PNG":
+                                                            fileIcon=downloadURL
+                                                            break;
+                                                        case "webp":
+                                                            fileIcon=downloadURL
+                                                            break;
+                                                        case "WEBP":
+                                                            fileIcon=downloadURL
+                                                            break;
+                                                        case "pdf":
+                                                            fileIcon=PDF
+                                                            break;
+                                                        case "iso":
+                                                            fileIcon=ISOIMAGE
+                                                            break; 
+                                                        case "img":
+                                                            fileIcon=ISOIMAGE
+                                                            break; 
+                                                        case "old":
+                                                            fileIcon=OLD
+                                                            break;
+                                                        case "docx":
+                                                            fileIcon=DOCX
                                                         break;
-                                                    case "ttf":
-                                                        fileIcon=TXT
+                                                        case "odp":
+                                                            fileIcon=PPTX
                                                         break;
-                                                    case "gif":
-                                                        fileIcon=downloadURL
+                                                        case "html":
+                                                            fileIcon=HTML
                                                         break;
-                                                    case "jpg":
-                                                        fileIcon=downloadURL
+                                                        case "css":
+                                                            fileIcon=CSS
                                                         break;
-                                                    case "JPG":
-                                                        fileIcon=downloadURL
+                                                        case "php":
+                                                            fileIcon=PHP
                                                         break;
-                                                    case "png":
-                                                        fileIcon=downloadURL
+                                                        case "py":
+                                                            fileIcon=PYTHON
                                                         break;
-                                                    case "PNG":
-                                                        fileIcon=downloadURL
+                                                        case "xml":
+                                                            fileIcon=XML
                                                         break;
-                                                    case "webp":
-                                                        fileIcon=downloadURL
+                                                        case "js":
+                                                            fileIcon=JS
                                                         break;
-                                                    case "WEBP":
-                                                        fileIcon=downloadURL
+                                                        case "sh":
+                                                            fileIcon=SCRIPT
                                                         break;
-                                                    case "pdf":
-                                                        fileIcon=PDF
+                                                        case "odt":
+                                                            fileIcon=DOCX
                                                         break;
-                                                    case "iso":
-                                                        fileIcon=ISOIMAGE
-                                                        break; 
-                                                    case "img":
-                                                        fileIcon=ISOIMAGE
-                                                        break; 
-                                                    case "old":
-                                                        fileIcon=OLD
+                                                        case "ini":
+                                                            fileIcon=DESKTOP
+                                                        break
+                                                        case "ods":
+                                                            fileIcon=XLSX
+                                                        break
+                                                        case "doc":
+                                                            fileIcon=DOC
                                                         break;
-                                                    case "docx":
-                                                        fileIcon=DOCX
-                                                    break;
-                                                    case "odp":
-                                                        fileIcon=PPTX
-                                                    break;
-                                                    case "html":
-                                                        fileIcon=HTML
-                                                    break;
-                                                    case "css":
-                                                        fileIcon=CSS
-                                                    break;
-                                                    case "php":
-                                                        fileIcon=PHP
-                                                    break;
-                                                    case "py":
-                                                        fileIcon=PYTHON
-                                                    break;
-                                                    case "xml":
-                                                        fileIcon=XML
-                                                    break;
-                                                    case "js":
-                                                        fileIcon=JS
-                                                    break;
-                                                    case "sh":
-                                                        fileIcon=SCRIPT
-                                                    break;
-                                                    case "odt":
-                                                        fileIcon=DOCX
-                                                    break;
-						    case "ini":
-						    	fileIcon=DESKTOP
-							break
-                                                    case "ods":
-                                                        fileIcon=XLSX
-                                                    break
-                                                    case "doc":
-                                                        fileIcon=DOC
-                                                    break;
-                                                    case "csv":
-                                                        fileIcon=CSV
-                                                    break;
-                                                    case "java":
-                                                        fileIcon=JAVA
-                                                    break;
-                                                    case "cs":
-                                                        fileIcon=CSHARP
-                                                    break;
-                                                    case "cpp":
-                                                        fileIcon=CPP
-                                                    break;
-                                                    case "rs":
-                                                        fileIcon=TXT
-                                                    break;
-                                                    case "s":
-                                                        fileIcon=TXT
-                                                    break;
-                                                    case "json":
-                                                        fileIcon=SCRIPT
-                                                    break;
-                                                    case "c":
-                                                        fileIcon=C
-                                                    break;
-                                                    case "m":
-                                                        fileIcon=C
-                                                    break;
-                                                    case "h":
-                                                        fileIcon=CHEADER
-                                                    break;
-                                                    case "rb":
-                                                        fileIcon=RUBY
-                                                    break;
-                                                    case "fal":
-                                                        fileIcon=TXT
-                                                    break;
-                                                    case "go":
-                                                        fileIcon=TXT
-                                                    break;
-                                                    case "asm":
-                                                        fileIcon=TXT
-                                                    break;
-                                                    case "nim":
-                                                        fileIcon=TXT
-                                                    break;
-                                                    case "pm":
-                                                        fileIcon=PERL
-                                                    break;
-                                                    case "pl":
-                                                        fileIcon=PERL
-                                                    break;
-                                                    case "txt":
-                                                        fileIcon=TXT
+                                                        case "csv":
+                                                            fileIcon=CSV
                                                         break;
-                                                    case "md":
-                                                        fileIcon=TXT
+                                                        case "java":
+                                                            fileIcon=JAVA
                                                         break;
-                                                    case "zip":
-                                                        fileIcon=ZIP
+                                                        case "cs":
+                                                            fileIcon=CSHARP
                                                         break;
-                                                    case "mp4":
-                                                        fileIcon=videoMp4
+                                                        case "cpp":
+                                                            fileIcon=CPP
                                                         break;
-                                                    case "mkv":
-                                                        fileIcon=MKV
+                                                        case "rs":
+                                                            fileIcon=TXT
                                                         break;
-                                                    case "avi":
-                                                        fileIcon=AVI
+                                                        case "s":
+                                                            fileIcon=TXT
                                                         break;
-                                                    case "pptx":
-                                                        fileIcon=PPTX
+                                                        case "json":
+                                                            fileIcon=SCRIPT
                                                         break;
-                                                    case "xlsx":
-                                                        fileIcon=XLSX
+                                                        case "c":
+                                                            fileIcon=C
                                                         break;
-                                                    case "desktop":
-                                                        fileIcon=DESKTOP
+                                                        case "m":
+                                                            fileIcon=C
                                                         break;
-                                                    default:
-                                                        fileIcon=unknownFile
+                                                        case "h":
+                                                            fileIcon=CHEADER
                                                         break;
-                                                }
-						let path=content.path
-						if(path.includes("\\")){
-            					   // Replace backslashes with forward slashes
-            					   path = path.replace(/\\/g, "/")
-        					}	
-                                                return(
-                                                    <div key={content.name} className="flex flex-col items-center text-center">
-                                                        <button id={content.name} title={content.name}
-                                                            onContextMenu={()=>{
-                                                                let dropdown_list=document.getElementById(`context_list_${content.name}`);
-                                                                dropdown_list?.classList.toggle("block");
-                                                            }}
-                                                            onDoubleClick={()=>{
-                                                                if(!content.metadata.is_file){
-                                                                    localStorage.setItem("path",path)
-                                                                    open("http://localhost:8000/api/directory_content")
-                                                                }else{
-                                                                    openFile("http://localhost:8000/api/open",path)
-                                                                }
-                                                            }}  className='flex flex-col items-center justify-center text-[12px] max-w-[150px] hover:text-white active:text-white focus:bg-[#3c3c3c]/90 focus:text-white dropdown_btn'>
-                                                            {content.metadata.is_file?(<img src={fileIcon} alt='file' className='w-[55px] h-[55px]'/>):(<img src={FolderImage} alt='folder' className='w-[65px] h-[65px]'/>)}
-                                                            <div className='flex justify-center'>
-                                                                {content.name.length<30?(
-                                                                    <p className="w-fit">{content.name}</p>
-                                                                ):(
-                                                                    <p className="w-fit">{!content.name.includes(" ")?content.name.slice(0,22):content.name.slice(0,30)}...</p>
-                                                                )}
-                                                            </div>
-                                                        </button>
-                                                        <div id={`context_list_${content.name}`} className='dropdown-content  flex-wrap  w-[200px] mt-[50px] -ml-[5px] max-lg:-ml-[27px]'>
-                                                            <div>
-                                                                <div onClick={()=>{
-                                                                    if(content.metadata.is_file){
-                                                                        openFile("http://localhost:8000/api/open",path)
-                                                                    }else{
+                                                        case "rb":
+                                                            fileIcon=RUBY
+                                                        break;
+                                                        case "fal":
+                                                            fileIcon=TXT
+                                                        break;
+                                                        case "go":
+                                                            fileIcon=TXT
+                                                        break;
+                                                        case "asm":
+                                                            fileIcon=TXT
+                                                        break;
+                                                        case "nim":
+                                                            fileIcon=TXT
+                                                        break;
+                                                        case "pm":
+                                                            fileIcon=PERL
+                                                        break;
+                                                        case "pl":
+                                                            fileIcon=PERL
+                                                        break;
+                                                        case "txt":
+                                                            fileIcon=TXT
+                                                            break;
+                                                        case "md":
+                                                            fileIcon=TXT
+                                                            break;
+                                                        case "zip":
+                                                            fileIcon=ZIP
+                                                            break;
+                                                        case "mp4":
+                                                            fileIcon=videoMp4
+                                                            break;
+                                                        case "mkv":
+                                                            fileIcon=MKV
+                                                            break;
+                                                        case "avi":
+                                                            fileIcon=AVI
+                                                            break;
+                                                        case "pptx":
+                                                            fileIcon=PPTX
+                                                            break;
+                                                        case "xlsx":
+                                                            fileIcon=XLSX
+                                                            break;
+                                                        case "desktop":
+                                                            fileIcon=DESKTOP
+                                                            break;
+                                                        default:
+                                                            fileIcon=unknownFile
+                                                            break;
+                                                    }
+
+                                                    let path=content.path
+                                                    if(path.includes("\\")){
+                                                        // Replace backslashes with forward slashes
+                                                        path = path.replace(/\\/g, "/")
+                                                    }	
+
+                                                    let unique_media=["MP3","MP4"];
+                                                    let label=unique_media.includes(content.metadata.file_extension.toUpperCase())?content.metadata.file_extension:content.name
+                                                    if(label.includes(" ")||label.includes(".")){
+                                                        label=label.replace(/ /g,"_")
+                                                        if(label.includes(".")){
+                                                            label=label.replace(/./g,"_")
+                                                        }
+                                                    }
+                                                    return(
+                                                        <div key={content.name} className="flex flex-col items-center text-center">
+                                                            <button id={content.name} title={content.name}
+                                                                onContextMenu={()=>{
+                                                                    let dropdown_list=document.getElementById(`context_list_${content.name}`);
+                                                                    dropdown_list?.classList.toggle("block");
+                                                                }}
+                                                                onDoubleClick={()=>{
+                                                                    if(!content.metadata.is_file){
                                                                         localStorage.setItem("path",path)
-                                                                        open("http://localhost:8000/api/directory_content")
-                                                                    }
-                                                                }} className='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35 {name_str}_open_item'>
-                                                                    <MdOpenInNew className="w-[25px] h-[25px] pr-[6px]"/>
-                                                                    <p>Open</p>
-                                                                </div>
-                                                                <button onClick={()=>{
-                                                                    navigator.clipboard.writeText(path)
-                                                                }} className='px-[12px] w-full py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35 {name_str}_open_item'>
-                                                                    <MdContentCopy className="w-[25px] h-[25px] pr-[6px]"/>
-                                                                    <p>Copy Path</p>
-                                                                </button>
-                                                                <button onClick={()=>{
-                                                                    navigator.clipboard.writeText(path)
-                                                                }} className='px-[12px] w-full py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35 {name_str}_open_item'>
-                                                                    <MdEdit className="w-[25px] h-[25px] pr-[6px]"/>
-                                                                    <p>Rename</p>
-                                                                </button>
-                                                                {content.metadata.is_file&&localStorage.getItem("path")!=="shared"?(
-                                                                    <div onClick={()=>{
-                                                                        if(configurations.recipient_ip.length===0){
-                                                                            handleShowSettings()
+                                                                        open(`${API_URL}/api/directory_content`)
+                                                                    }else{
+                                                                        if(browserSupportedFiles(content.metadata.file_extension)){
+                                                                            path.includes("#")?path=path.replace(/#/g,"%23"):path;
+                                                                            createWindow(`file://${path}`,label,content.name)
                                                                         }else{
-                                                                            let sendFileInfo:SendFileInfo={
-                                                                                name:content.name,
-                                                                                path,
-                                                                                recipient_server:`http://${configurations.recipient_ip}:8000/api/receive`
-                                                                            };
-                                                                            sendFile("http://localhost:8000/api/send",sendFileInfo)
+                                                                            openFile(`${API_URL}/api/open`,path)
                                                                         }
-                                                                    }} className='px-[12px] w-full py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35 {name_str}_open_item'>
-                                                                        <MdSend className="w-[25px] h-[25px] pr-[6px]"/>
-                                                                        <p>{configurations.recipient_ip.length!==0?(
-                                                                            <span>Send to {configurations.recipient_ip}</span>
-                                                                        ):(
-                                                                            <span>Add Recipient's IP</span>
-                                                                        )}</p>
+                                                                    }
+                                                                }}  className='flex flex-col items-center justify-center text-[12px] max-w-[150px] focus:bg-[var(--primary-05)] hover:bg-[var(--primary-05)] dropdown_btn'>
+                                                                {content.metadata.is_file?(<img src={fileIcon} alt='file' className={fileIcon!==downloadURL?'w-[55px] h-[55px]':"w-[75px] h-[60px] object-cover"}/>):(<img src={FolderImage} alt='folder' className='w-[65px] h-[65px]'/>)}
+                                                                <div className='flex justify-center'>
+                                                                    {content.name.length<30?(
+                                                                        <p className="w-fit">{content.name}</p>
+                                                                    ):(
+                                                                        <p className="w-fit">{!content.name.includes(" ")?content.name.slice(0,22):content.name.slice(0,30)}...</p>
+                                                                    )}
+                                                                </div>
+                                                            </button>
+                                                            <div id={`context_list_${content.name}`} className='dropdown-content  flex-wrap  w-[200px] mt-[50px] -ml-[5px] max-lg:-ml-[27px]'>
+                                                                <div>
+                                                                    <div onClick={()=>{
+                                                                        if(content.metadata.is_file){
+                                                                            if(browserSupportedFiles(content.metadata.file_extension)){
+                                                                                path.includes("#")?path=path.replace(/#/g,"%23"):path;
+                                                                                createWindow(`file://${path}`,label,content.name)
+                                                                            }else{
+                                                                                openFile(`${API_URL}/api/open`,path)
+                                                                            }
+                                                                        }else{
+                                                                            localStorage.setItem("path",path)
+                                                                            open(`${API_URL}/api/directory_content`)
+                                                                        }
+                                                                    }} className='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35 {name_str}_open_item'>
+                                                                        <MdOpenInNew className="w-[25px] h-[25px] pr-[6px]"/>
+                                                                        <p>Open</p>
                                                                     </div>
-                                                                ):""}
-                                                                <button onClick={()=>{
-                                                                    navigator.clipboard.writeText(path)
-                                                                }} className='px-[12px] w-full py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35 {name_str}_open_item'>
-                                                                    <MdDelete className="w-[25px] h-[25px] pr-[6px]"/>
-                                                                    <p>Delete</p>
-                                                                </button>
-                                                                <button onClick={()=>{
-                                                                    toggleDialog(`file_info_dialog`)
-                                                                    setInfoContent(content)
-                                                                }} className='px-[12px] w-full py-[8px] flex items-center border-t-[1px] border-[#9999991A] cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
-                                                                    <MdInfoOutline className="w-[25px] h-[25px] pr-[6px]"/>
-                                                                    <p>Properties</p>
-                                                                </button>
+                                                                    {content.metadata.is_file&&browserSupportedFiles(content.metadata.file_extension)?(<div onClick={()=>{
+                                                                        openFile(`${API_URL}/api/open`,path)
+                                                                    }} className='px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35 {name_str}_open_item'>
+                                                                        <MdOpenInNew className="w-[25px] h-[25px] pr-[6px]"/>
+                                                                        <p>Open with default app</p>
+                                                                    </div>):""}
+
+                                                                    <button onClick={()=>{
+                                                                        navigator.clipboard.writeText(path)
+                                                                    }} className='px-[12px] w-full py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35 {name_str}_open_item'>
+                                                                        <MdContentCopy className="w-[25px] h-[25px] pr-[6px]"/>
+                                                                        <p>Copy Path</p>
+                                                                    </button>
+                                                                    {content.metadata.is_file&&localStorage.getItem("path")!=="shared"?(
+                                                                        <div onClick={()=>{
+                                                                            if(configurations.recipient_ip.length===0){
+                                                                                handleShowSettings()
+                                                                            }else{
+                                                                                let sendFileInfo:SendFileInfo={
+                                                                                    name:content.name,
+                                                                                    path,
+                                                                                    recipient_server:`http://${configurations.recipient_ip}:80/api/receive`
+                                                                                };
+                                                                                sendFile(`${API_URL}/api/send`,sendFileInfo)
+                                                                            }
+                                                                        }} className='px-[12px] w-full py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35 {name_str}_open_item'>
+                                                                            <MdSend className="w-[25px] h-[25px] pr-[6px]"/>
+                                                                            <p>{configurations.recipient_ip.length!==0?(
+                                                                                <span>Send to {configurations.recipient_ip}</span>
+                                                                            ):(
+                                                                                <span>Add Recipient's IP</span>
+                                                                            )}</p>
+                                                                        </div>
+                                                                    ):""}
+                                                                    <button onClick={()=>{
+                                                                        toggleDialog(`file_info_dialog`)
+                                                                        setInfoContent(content)
+                                                                    }} className='px-[12px] w-full py-[8px] flex items-center border-t-[1px] border-[#9999991A] hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35'>
+                                                                        <MdInfoOutline className="w-[25px] h-[25px] pr-[6px]"/>
+                                                                        <p>Properties</p>
+                                                                    </button>
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                )
-                                            })}
-                                        </div>
+                                                    )
+                                                })}
+                                            </div>
+                                        )}
                                     </div>
                                 ):(
-                                    <div className="w-full flex flex-wrap mt-[35px]" id="settings_view">
-                                        <div className="ml-[200px] flex flex-col w-full gap-x-4 gap-y-12 px-[25px] py-[13px]">
+                                    <div style={props.data.backgroundImage==="default"||props.data.backgroundImage.includes("primary-01")?{}:{color:"white"}} className="w-full flex flex-wrap mt-[35px] text-[var(--primary-04)]" id="settings_view">
+                                        <div className="ml-[200px] flex flex-col w-full gap-x-4 gap-y-12 px-[25px] pt-[13px] pb-[50px]">
+
                                             <div>
-                                                <p className="text-white text-lg mb-2">Network Information</p>
+                                                <p className="text-lg font-semibold mb-2">Network Information</p>
                                                 <div className="flex gap-6 flex-col">
                                                     <div>
                                                         <div className="flex flex-col gap-2 my-2">
                                                             {isLoadingNetInfo?(
-                                                                <i className="text-sm">Getting Network Information...</i>
+                                                                <div className="flex gap-2  items-center w-fit justify-center">
+                                                                    <div className="flex items-center justify-center w-[18px] h-[18px]">
+                                                                        <MdRefresh className="text-[14px]"/>
+                                                                    </div>
+                                                                    <i className="text-[14px]">Searching for network information...</i>
+                                                                </div>
                                                             ):(
                                                                 <>
-                                                                    {networkInformation.internal.length===0?(<>{error.message}</>):(
+                                                                    {networkInformation.internal.length===0?(
+                                                                        <div className="flex flex-col gap-y-4">
+                                                                            <div className="flex gap-2  items-center w-fit justify-center">
+                                                                                <div className="flex items-center justify-center w-[18px] h-[18px] bg-red-600 rounded-[50px] text-white">
+                                                                                    <MdClose className="text-[14px]"/>
+                                                                                </div>
+                                                                                <p className="text-[14px]">{error.message}</p>
+                                                                            </div>
+                                                                            <button onClick={()=>{
+                                                                                getIPs(`${API_URL}/api/get_ip_address`)
+                                                                            }} className="flex items-center justify-center h-[30px] w-[120px] text-[13px] bg-[var(--primary-02)] border-none" style={{color:"var(--primary-04"}} >Try again</button>
+
+                                                                        </div>
+                                                                    ):(
                                                                         <>
                                                                             <div className="grid grid-cols-4 gap-10">
                                                                                 <p>Internet Protocol (IP)</p>
-                                                                                <p className="text-white">{networkInformation.internal}</p>
+                                                                                <p style={props.data.backgroundImage==="default"||props.data.backgroundImage.includes("primary-01")?{}:{color:"white"}} className="text-[var(--primary-04)]">{networkInformation.internal}</p>
                                                                             </div>
                                                                             {networkInformation.external.includes("No internet")?"":(
                                                                                 <div className="grid grid-cols-4 gap-10">
                                                                                     <p>External IP</p>
-                                                                                    <p className="text-white">{networkInformation.external}</p>
+                                                                                    <p style={props.data.backgroundImage==="default"||props.data.backgroundImage.includes("primary-01")?{}:{color:"white"}} className="text-[var(--primary-04)]">{networkInformation.external}</p>
                                                                                 </div>
                                                                             )}
-                                                                            <div className="grid grid-cols-4 gap-10">
-                                                                                <p>Port (number)</p>
-                                                                                <p className="text-white">8000</p>
-                                                                            </div>
-                                                                            <div className="grid grid-cols-4 gap-10">
-                                                                                <p>Server (host)</p>
-                                                                                <a href={`http://${networkInformation.internal}:8000/`} target="_blank" rel="noopener noreferrer" className="text-white underline">http://{networkInformation.internal}:8000/</a>
-                                                                            </div>
-                                                                            <div className="grid grid-cols-4 gap-10">
+                                                                           <div className="grid grid-cols-4 gap-10">
                                                                                 <p>Status</p>
-                                                                                <p className="text-white">{networkInformation.external.includes("No internet")?"Offline":"Online"}</p>
+                                                                                <p style={props.data.backgroundImage==="default"||props.data.backgroundImage.includes("primary-01")?{}:{color:"white"}} className="text-[var(--primary-04)]">{networkInformation.external.includes("No internet")?"Offline":"Online"}</p>
                                                                             </div>
                                                                         </>
                                                                     )}
@@ -724,25 +786,18 @@ export default function Home(props:Props){
                                                         </div>
                                                     </div>
 
-                                                    <div>
-                                                        <p className="text-gray-100">Configurations</p>
-                                                        <form onSubmit={(e:any)=>{
-                                                            e.preventDefault()
-                                                            let configs:Configurations={
-                                                                recipient_ip:e.target.recipient_ip.value
-                                                            }
-                                                            setConfigurations(configs)
-                                                            window.localStorage.setItem("configurations",JSON.stringify(configs))
-                                                        }} className="flex flex-col gap-2 my-2">
+                                                    {networkInformation.internal.length!==0?(<div>
+                                                        <p className="font-semibold text-lg">Recipient Information</p>
+                                                        <form onSubmit={handlePing} className="flex flex-col gap-2 my-2">
                                                                 {configurations.recipient_ip.length===0?(
                                                                     <div className="grid grid-cols-4 gap-10">
                                                                         <label htmlFor="recipient_ip">Enter Recipient's IP</label>
-                                                                        <input id="recipient_ip" name="recipient_ip" className="px-2 py-1 w-full rounded-md bg-transparent text-white border-violet-300 border-[1px] focus:ring-1 focus:ring-violet-300" type="text" placeholder="192.10.0.95" required/>
+                                                                        <input id="recipient_ip" name="recipient_ip" className="px-2 py-1 w-full rounded-md bg-transparent border-violet-300 focus:border-none focus:outline-none border-[1px] focus:ring-1 focus:ring-violet-300" type="text" placeholder="192.10.0.95" required/>
                                                                     </div>
                                                                 ):(
                                                                     <div className="grid grid-cols-4 gap-10">
                                                                         <p>Recipient's IP</p>
-                                                                        <p className="text-white">{configurations.recipient_ip}</p>
+                                                                        <p className="text-[var(--primary-04)]" style={props.data.backgroundImage==="default"||props.data.backgroundImage.includes("primary-01")?{}:{color:"white"}}>{configurations.recipient_ip}</p>
                                                                     </div>
                                                                 )}
                                                             <div className="grid grid-cols-4 gap-10">
@@ -750,42 +805,80 @@ export default function Home(props:Props){
                                                                 <input disabled id="both_folder_and_file" name="both_folder_and_file" checked type="checkbox" className="h-[20px] w-[20px] cursor-pointer rounded-md bg-transparent focus:outline-none checked:bg-violet-300 focus:ring-1 focus:ring-violet-300" />
                                                             </div>
                                                             {configurations.recipient_ip.length===0?(
-                                                                <button className="py-1 px-[16px] hover:bg-[#EDFFA1] border-none w-[100px] text-[#1D1D1D] rounded-sm bg-[var(--theme-yellow)]">
-                                                                    Save
+                                                                <button disabled={isDisabled} className={!isDisabled?"py-1 px-[16px] hover:bg-[var(--yellow-primary-02)] border-none w-[100px] text-black rounded-sm bg-[var(--yellow-primary-01)]":"py-1 px-[16px] cursor-wait bg-[var(--yellow-primary-02)] border-none w-[100px] text-black rounded-sm"}>
+                                                                    Ping
                                                                 </button>
                                                             ):(
                                                                 <button type="button" onClick={()=>{
                                                                     setConfigurations({
                                                                         recipient_ip:""
                                                                     })
-                                                                }} className="py-1 px-[16px] hover:bg-[#EDFFA1] border-none w-[100px] text-[#1D1D1D] rounded-sm bg-[var(--theme-yellow)]">
+                                                                }} className="py-1 px-[16px] hover:bg-[var(--yellow-primary-02)] border-none w-[100px] rounded-sm text-black bg-[var(--yellow-primary-01)]">
                                                                     Change
                                                                 </button>
                                                             )}
                                                         </form>
-                                                    </div>
+                                                    </div>):""}
                                                 </div>
                                             </div>
+
                                             <div>
-                                                <p className="text-white text-lg mb-2">User Preference</p>
+                                                <p className="font-semibold text-lg mb-2">User Preference</p>
                                                 <div className="flex flex-col">
-                                                    <p>Choose Background image</p>
-                                                    <div className="flex max-sm:flex-col gap-2 my-2">
-                                                        <button onClick={()=>props.data.changeBackground("default")} style={{boxShadow: "0px 8px 16px 0px rgba(0,0,0,0.2)"}} className="bg-[#252525] flex justify-center items-center rounded-md h-[200px] hover:text-white w-[240px]">
-                                                            <p className="text-base text-gray-100">Default</p>
-                                                        </button>
-                                                        <div className="flex max-sm:flex-col gap-2">
-                                                            {chooseBackground.map((choice)=>{
-                                                                return(
-                                                                    <button key={choice.name} onClick={()=>props.data.changeBackground(choice.image)} style={{boxShadow: "0px 8px 16px 0px rgba(0,0,0,0.2)",background: `linear-gradient(0deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),url('${choice.image}') center no-repeat`, backgroundSize:"cover"}} className={`hover:text-white flex justify-center items-center rounded-md h-[200px] w-[240px]`}>
-                                                                        <p className="text-base text-gray-100">{choice.name}</p>
-                                                                    </button>
-                                                                )
-                                                            })}
-                                                        </div>
-                                                    </div>
+                                                    <p>Background</p>
+                                                    <select style={{color:"var(--primary-04"}} className="mt-2 active:outline-none focus:outline-none mb-4 w-[250px] border-[1px] p-[6px]" onChange={(e)=>setBackgroundOption(e.target.value)}>
+                                                        <option value="Picture">Picture</option>
+                                                        <option value="Solid color">Solid color</option>
+                                                    </select>
+                                                    {backgroundOption==="Picture"?(
+                                                        <>
+                                                            <p>Choose your picture</p>
+                                                            <div className="flex max-sm:flex-col gap-2 my-2">
+                                                                <button onClick={()=>props.data.changeBackground("default")} style={{boxShadow: "0px 8px 16px 0px rgba(0,0,0,0.2)"}} className="bg-[var(--primary-01)] flex justify-center items-center rounded-md h-[200px] w-[240px]">
+                                                                    <p className="text-base text-[var(--primary-04)]">Default</p>
+                                                                </button>
+                                                                <div className="flex max-sm:flex-col gap-2">
+                                                                    {chooseBackground.map((choice)=>{
+                                                                        return(
+                                                                            <button key={choice.name} onClick={()=>props.data.changeBackground(choice.image)} style={{boxShadow: "0px 8px 16px 0px rgba(0,0,0,0.2)",background: `linear-gradient(0deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),url('${choice.image}') center no-repeat`, backgroundSize:"cover"}} className={`hover:text-white flex justify-center items-center rounded-md h-[200px] w-[240px]`}>
+                                                                                <p className="text-base text-gray-100">{choice.name}</p>
+                                                                            </button>
+                                                                        )
+                                                                    })}
+                                                                </div>
+                                                            </div>
+                                                        </>
+                                                    ):(
+                                                        <>
+                                                            <p>Choose your background color</p>
+                                                            <div className="grid grid-cols-8 w-fit max-sm:grid-cols-1 gap-1 my-2">
+                                                                <button onClick={()=>props.data.changeBackground("default")} className="bg-[var(--primary-01)] flex justify-center items-center h-[40px] w-[40px]" style={{boxShadow: "0px 8px 16px 0px rgba(0,0,0,0.1)"}}>
+                                                                </button>
+                                                                <button onClick={()=>props.data.changeBackground("purple-primary-01")} className="bg-purple-600 flex justify-center items-center h-[40px] w-[40px]" style={{boxShadow: "0px 8px 16px 0px rgba(0,0,0,0.1)"}}>
+                                                                </button>
+                                                                <button onClick={()=>props.data.changeBackground("orange-primary-01")} className="bg-orange-600 flex justify-center items-center h-[40px] w-[40px]" style={{boxShadow: "0px 8px 16px 0px rgba(0,0,0,0.1)"}}>
+                                                                </button>
+                                                                <button onClick={()=>props.data.changeBackground("red-primary-01")} className="bg-red-600 flex justify-center items-center h-[40px] w-[40px]" style={{boxShadow: "0px 8px 16px 0px rgba(0,0,0,0.1)"}}>
+                                                                </button>
+                                                                <button onClick={()=>props.data.changeBackground("pink-primary-01")} className="bg-pink-600 flex justify-center items-center h-[40px] w-[40px]" style={{boxShadow: "0px 8px 16px 0px rgba(0,0,0,0.1)"}}>
+                                                                </button>
+
+                                                            </div>
+                                                        </>
+                                                    )}
                                                 </div>
                                             </div>
+
+                                            <div>
+                                                <p>Have a question?</p>
+                                                <a href="https://github.com/imrany/anvel" target="_blank" rel="noopener noreferrer" className="text-[14px] text-blue-500 hover:text-gray-600 active:text-gray-600">Get help</a>
+                                            </div>
+
+                                            <div>
+                                                <p>Help improve Anvel</p>
+                                                <a href="mailto:imranmat254@gmail.com" target="_blank" rel="noopener noreferrer" className="text-[14px] text-blue-500 hover:text-gray-600 active:text-gray-600">Give us feedback</a>
+                                            </div>
+
                                         </div>
                                     </div>
                                 )}
