@@ -25,7 +25,6 @@ use std::{
     net::Ipv4Addr,
     path::{Path,PathBuf}
 };
-use local_ip_address::local_ip;
 mod launch;
 use launch::launch_browser;
 
@@ -130,7 +129,7 @@ async fn serve_anvel(){
     .bind(ipv4);
     match server {
         Ok(server) => {
-            let url=format!("http://{}:{port}/",local_ip().unwrap());
+            let url=format!("http://localhost:{port}/");
             if let Err(e)= launch_browser(&url).await{
                 println!(" ERROR: An error occurred when opening {url} {e}");
             }else {

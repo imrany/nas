@@ -1,16 +1,20 @@
 // @flow strict
-import { MdEdit, MdExitToApp, MdNotifications, MdOutlineExpandMore, MdSettings,  } from "react-icons/md";
-import { openDialog } from "./actions";
+import { MdEdit, MdExitToApp, MdNotifications, MdSystemUpdateAlt, MdOutlineExpandMore, MdSettings,  } from "react-icons/md";
+import { useContext } from "react";
+import { GlobalContext } from "../context";
 
 type Props={
     data:{
         name:string,
         handleShowSettings:any,
         settingsHeader:string,
-        showToast:any
+        showToast:any,
+        openFolder:any
     }
 }
+
 function TopNav(props:Props) {
+    const { updateAnvel }=useContext(GlobalContext)
     window.onclick = function(event:any) {
         if (!event.target.matches('.dropbtn')) {
             var dropdowns = document.getElementsByClassName("dropdown-content");
@@ -28,7 +32,6 @@ function TopNav(props:Props) {
         let dropdown_list=document.getElementById("dropdown_list");
         dropdown_list?.classList.toggle("block");
     }
-    
     return (
         <nav className="fixed bg-[var(--primary-02)] top-0 left-0 right-0 z-10">
             <div className="font-semibold text-[13px] flex justify-between h-[35px] items-center">
@@ -38,7 +41,7 @@ function TopNav(props:Props) {
                         <MdOutlineExpandMore className="w-[25px] h-[25px] dropbtn p-[3px]"/>
                     </button>
                     <div id="dropdown_list"  className="dropdown-content  ml-[12px]">
-                        <div onClick={()=>openDialog("open_folder_dialog")} className="px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
+                        <div onClick={props.data.openFolder} className="px-[12px] py-[8px] flex items-center cursor-pointer hover:bg-[#3c3c3c]/35 active:bg-[#3c3c3c]/35">
                             <MdEdit className="w-[25px] h-[25px] pr-[6px]"/>
                             <p>Open Folder</p>
                         </div>

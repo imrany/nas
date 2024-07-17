@@ -2,12 +2,10 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import ErrorPage from './pages/ErrorPage';
 import Docs from './pages/Docs';
 import Home from "./pages/Home";
-import { OpenFolderDialog } from "./components/dialogs";
 import LandingPage from "./pages/LandingPage";
 import Layout from "./pages/Layout";
 import { useState, useEffect } from "react";
 import { UserPreference } from "./types/definitions";
-import { invoke } from "@tauri-apps/api/tauri"
 import { socket } from "./ws"
 import { GlobalContext } from "./context"
 
@@ -32,15 +30,10 @@ function App() {
     e.preventDefault()
   }
 
-  async function startAnvel(){
-    await invoke("serve_anvel")
-  }
-
-  useEffect(()=>{
-    startAnvel()
+useEffect(()=>{
     socket.onopen = () => {
-      console.log('WebSocket connection established',socket);
-      setWs(socket)
+        console.log('WebSocket connection established',socket);
+        setWs(socket)
     };
 
     socket.onmessage=(event:any)=>{
@@ -70,7 +63,6 @@ function App() {
                 <Route path="*" element={<ErrorPage />} />
             </Routes>
         </GlobalContext.Provider>
-        <OpenFolderDialog/>
     </BrowserRouter>
   )
 }

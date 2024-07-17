@@ -1,10 +1,10 @@
 // @flow strict
-import { MdEdit, MdFileOpen, MdFolder, MdAdd, MdMoreHoriz, MdRefresh, MdSearch } from "react-icons/md"
-import { openDialog, createWindow, openFile, browserSupportedFiles } from "./actions"
-import { ErrorBody, Folder } from "../types/definitions"
+import { MdEdit, MdFileOpen, MdFolder, MdAdd, MdMoreHoriz, MdSystemUpdateAlt, MdRefresh, MdOutlineInfo, MdSearch } from "react-icons/md"
+import { openFile, browserSupportedFiles, openBlankFile } from "./actions"
+import { ErrorBody, Folder, Tab } from "../types/definitions"
 import { useState, useContext } from "react";
 import { GlobalContext } from "../context"
-import indexedDb from "./indexedDb"
+import { IoBugOutline } from "react-icons/io5";
 
 type Props = {
     data:{
@@ -12,7 +12,11 @@ type Props = {
         error:ErrorBody
         open:any,
         getIPs:any,
-        showSettings:boolean
+        updateTab:any,
+        showSettings:boolean,
+        openNewTab:any,
+        openFolder:any,
+        tabs:Tab[],
     }
 };
 function SideNav(props:Props) {
@@ -69,6 +73,7 @@ function SideNav(props:Props) {
 
     return (
         <div id="sidebar" className="overflow-hidden bg-[var(--primary-02)] border-dotted border-[#3c3c3c]/50 border-r-[1px] h-[100vh] fixed pb-[12px] bottom-[18px] left-0 w-[200px] top-[35px] text-[13px]">
+            {!props.data.showSettings?(
             <div className="flex flex-col mb-3">
                 <div className="h-[46px] flex items-center uppercase pl-[12px] pr-[8px]">
                     <button  onClick={()=>{
@@ -88,40 +93,9 @@ function SideNav(props:Props) {
                     }} className="focus:ring-1 focus:ring-violet-300 rounded-sm cursor-pointer p-[4px]">
                         <MdRefresh className="w-[18px] h-[18px]"/>
                     </button>
-                    <button title="Open a new tab" onClick={async()=>{
-                        try{
-                            const request=await indexedDb()
-                            const db:any=await request
-                            const transaction=db.transaction("tabs","readwrite")
-                            const tabStore=transaction.objectStore("tabs")
-
-                            let date=new Date()
-                            let newObj = Intl.DateTimeFormat('en-US', {
-                                timeZone: "America/New_York"
-                            })
-                            let newDate = newObj.format(date);
-                            let min=date.getMinutes()<10?`0${date.getMinutes()}`:`${date.getMinutes()}`
-                            let time=date.getHours()>12?`${date.getHours()}:${min}PM`:`${date.getHours()}:${min}AM`
-                            const getTabs=tabStore.add({
-                                name:"Root",
-                                createdAt:`${newDate} ${time}`,
-                                path:"home",
-                                type:"folder",
-                                id:`${Math.random()}`
-                            })
-                            getTabs.onsuccess=()=>{
-                                console.log("success")
-                            }
-                            getTabs.onerror=()=>{
-                                console.log("error: failed to open tab",getTabs.error)
-                            }
-                        }catch(error:any){
-                            console.log(error)
-                        }
-                    }} className="focus:ring-1 focus:ring-violet-300 rounded-sm cursor-pointer p-[4px]">
+                    {props.data.tabs.length<4?(<button title="Open a new tab" onClick={props.data.openNewTab} className="focus:ring-1 focus:ring-violet-300 rounded-sm cursor-pointer p-[4px]">
                         <MdAdd className="w-[18px] h-[18px]"/>
-                    </button>
-
+                    </button>):""}
                 </div>
                 {/* folders */}
                 {searchView?"":(
@@ -161,11 +135,11 @@ function SideNav(props:Props) {
                                             {content.metadata.is_file?(
                                                 <button key={content.name} onClick={()=>{
                                                     if(!content.metadata.is_file){
-                                                        localStorage.setItem("path",path)
+                                                        props.data.updateTab(content.name,path)
                                                         props.data.open(`${API_URL}/api/directory_content`)
                                                     }else{
                                                         if(browserSupportedFiles(content.metadata.file_extension)){
-                                                            path.includes("#")?path=path.replace(/#/g,"%23"):path;                                                                            createWindow(`file://${path}`,label,content.name)
+                                                            path.includes("#")?path=path.replace(/#/g,"%23"):path;                                                                            openBlankFile(`${API_URL}/api/download/${path}`)
                                                         }else{
                                                             openFile(`${API_URL}/api/open`,path)
                                                         }
@@ -176,7 +150,7 @@ function SideNav(props:Props) {
                                                 </button>
                                             ):(
                                                 <button onClick={()=>{
-                                                    localStorage.setItem("path",path)
+                                                    props.data.updateTab(content.name,path)
                                                     props.data.open(`${API_URL}/api/directory_content`)
                                                 }} key={content.name} className='flex w-[195px] flex-grow items-center mx-[1px] px-3 py-1 cursor-pointer focus:ring-1 focus:ring-violet-300'>
                                                     <MdFolder className="w-[20px] h-[20px] pr-[3px]"/>
@@ -188,7 +162,7 @@ function SideNav(props:Props) {
                                 }):(
                                     <div className="flex flex-col justify-start items-start py-2 px-3">
                                         <p>{props.data.error.message}</p>
-                                        <button onClick={()=>openDialog("open_folder_dialog")} className="mt-2 underline flex gap-2 text-blue-500 items-center justify-center">
+                                        <button onClick={props.data.openFolder} className="mt-2 underline flex gap-2 text-blue-500 items-center justify-center">
                                             <MdEdit className="w-[16px] h-[16px]"/>
                                             <span>Edit path</span>
                                         </button>
@@ -199,9 +173,11 @@ function SideNav(props:Props) {
                                 <div className="flex flex-col">
                                     {
                                         data.map(i=>{
-                                            return(<div className="flex-grow">
+                                            return(<div className="flex-grow" key={i.name}>
                                                 <button onClick={()=>{
-                                                    localStorage.setItem("path",i.name)
+                                                    //let path=localStorage.getItem("path")
+                                                    //let accessPath=`${path.slice(0,path.lastIndexOf("/")+1)}${i.name}`
+                                                    props.data.updateTab(i.name,i.name)
                                                     props.data.open(`${API_URL}/api/directory_content`)
                                                 }} className='flex w-[195px] items-center mx-[1px] px-3 py-1 cursor-pointer focus:ring-1 focus:ring-violet-300'>
                                                     <MdFolder className="w-[20px] h-[20px] pr-[3px]"/>
@@ -245,12 +221,13 @@ function SideNav(props:Props) {
                                             {content.metadata.is_file?(
                                                 <button key={content.name} onClick={()=>{
                                                     if(!content.metadata.is_file){
+                                                        props.data.updateTab(content.name,path)
                                                         localStorage.setItem("path",path)
                                                         props.data.open(`${API_URL}/api/directory_content`)
                                                     }else{
                                                         if(browserSupportedFiles(content.metadata.file_extension)){
                                                             path.includes("#")?path=path.replace(/#/g,"%23"):path;
-                                                            createWindow(`file://${path}`,label,content.name)
+                                                            openBlankFile(`${API_URL}/api/download/${path}`)
                                                         }else{
                                                             openFile(`${API_URL}/api/open`,path)
                                                         }
@@ -261,7 +238,7 @@ function SideNav(props:Props) {
                                                 </button>
                                             ):(
                                                 <button onClick={()=>{
-                                                    localStorage.setItem("path",path)
+                                                    props.data.updateTab(content.name,path)
                                                     props.data.open(`${API_URL}/api/directory_content`)
                                                 }} key={content.name} id='folders_{name_str}' className='flex w-[195px] flex-grow items-center mx-[1px] px-3 py-1 cursor-pointer focus:ring-1 focus:ring-violet-300'>
                                                     <MdFolder className="w-[20px] h-[20px] pr-[3px]"/>
@@ -280,7 +257,27 @@ function SideNav(props:Props) {
                     </div>
                 ):""}
                 
-            </div>
+                </div>):(
+                    <div className="flex flex-col mb-3">
+                        {/*when settings tabs is open then sidenav item would be the following*/}
+                        <div className="resize-y">
+                            <div className="sidebar_folders overflow-y-auto pt-[35px] pb-[33px] pt-1 text-[14px] h-screen">
+                                <button className="flex h-[40px] items-center hover:bg-[var(--primary-05)] active:bg-[var(--primary-05)] px-[12px] cursor-default w-full">
+                                    <MdOutlineInfo className="w-[21px] h-[23px] pr-[6px]"/>
+                                    <p>About</p>
+                                </button>
+                                
+                                <button onClick={()=>{
+                                    window.location.href="mailto:imranmat254@gmail.com?subject=Reporting a bug in Anvel"
+                                }} className="flex h-[40px] items-center hover:bg-[var(--primary-05)] active:bg-[var(--primary-05)] px-[12px] cursor-default w-full">
+                                    <IoBugOutline className="w-[21px] h-[23px] pr-[6px]"/>
+                                    <p>Report a bug</p>
+                                </button>
+
+                            </div>
+                        </div>
+                    </div>
+                )}
         </div>
     );
 };

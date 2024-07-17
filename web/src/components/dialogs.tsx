@@ -3,7 +3,9 @@ import { Content } from "../types/definitions";
 import { openFile } from "./actions"
 import { GlobalContext } from "../context";
 import { useContext } from "react"
-type Props={
+import { useLocation } from "react-router-dom"
+
+type FileInfoProps={
     data:{
         info:Content,
         functions:{
@@ -12,7 +14,7 @@ type Props={
     }
 }
 
-export function FileInfoDialog(props:Props){
+export function FileInfoDialog(props:FileInfoProps){
     let { API_URL }=useContext(GlobalContext)
 
     return(
@@ -45,7 +47,11 @@ export function FileInfoDialog(props:Props){
                             )}
                             <div className="flex gap-10">
                                 <p>Location:</p> 
-                                <p>{props.data.info.path}</p>
+                                {props.data.info.name.length>30?(
+				                    <p>{props.data.info.path.slice(0,40)}...</p>
+				                ):(
+				                    <p>{props.data.info.path}</p>
+				                )}
                             </div>
                             <button className="mr-auto text-orange-600 border-none active:text-gray-600" onClick={()=>{
                                 openFile(`${API_URL}/api/open`,props.data.info.path.slice(0,props.data.info.path?.lastIndexOf("\\")))
@@ -65,7 +71,20 @@ export function FileInfoDialog(props:Props){
     )
 }
 
-export function OpenFolderDialog(){
+type OpenFolderProps={
+    data:{
+        functions:{
+            updateTab?:any,
+            open?:any,
+            createTab:any
+        }
+        isCreateTabBtnPressed:boolean
+    }
+}
+
+export function OpenFolderDialog(props:OpenFolderProps){
+    let location=useLocation();
+
     const close_dialog=()=>{
         let dialog_bg=document.getElementById("open_folder_dialog");
         dialog_bg?.classList.add("ease-in-out");
@@ -80,9 +99,12 @@ export function OpenFolderDialog(){
             // Replace backslashes with forward slashes
             path = path.replace(/\\/g, "/")
         }
-        localStorage.setItem("path",path);
         e.target.reset()
-        window.location.reload()
+
+        close_dialog()
+        let tabName=path.slice(path?.lastIndexOf("/")+1,path.length)
+        props.data.isCreateTabBtnPressed===true?props.data.functions.createTab(tabName,path):props.data.functions.updateTab(tabName,path)
+        location.pathname.includes("/welcome")?window.location.reload():""
     }
 
     return(
@@ -92,7 +114,7 @@ export function OpenFolderDialog(){
                     <div className="flex ml-auto mb-[8px] justify-end h-[22px] pb-[4px]">
                         <MdClose onClick={close_dialog} className="w-[20px] h-[20px] cursor-pointer text-[var(--primary-04)]"/>
                     </div>    
-                    <form onSubmit={handleOpenFolder} className="w-[452px] h-[90px]"> 
+                    <form id="open_folder_form" onSubmit={handleOpenFolder} className="w-[452px] h-[90px]"> 
                         <div id="feedback_container">
                             <label htmlFor="path" className="font-medium text-base text-[var(--primary-04)]">Enter or paste the folder's path</label>
                             <div className="flex gap-2 mt-2">
