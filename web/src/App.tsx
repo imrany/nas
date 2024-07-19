@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import ErrorPage from './pages/ErrorPage';
 import Docs from './pages/Docs';
+import SignIn from "./pages/SignIn";
 import Home from "./pages/Home";
 import LandingPage from "./pages/LandingPage";
 import Layout from "./pages/Layout";
@@ -55,6 +56,7 @@ useEffect(()=>{
     <BrowserRouter>
         <GlobalContext.Provider value={{ws,API_URL}}> 
             <Routes>
+                <Route path="/sign_in" element={path===null?<SignIn data={{backgroundImage}}/>:<Navigate to="/"/>} />
                 <Route path="/welcome" element={path===null?<LandingPage data={{backgroundImage}}/>:<Navigate to="/"/>} />
                 <Route path="/" element={path!==null?<Layout/>:<Navigate to="/welcome"/>}>
                     <Route index element={<Home data={{backgroundImage, changeBackground}}/>} />

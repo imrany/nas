@@ -1,7 +1,5 @@
 // @flow strict
-import { MdEdit, MdExitToApp, MdNotifications, MdSystemUpdateAlt, MdOutlineExpandMore, MdSettings,  } from "react-icons/md";
-import { useContext } from "react";
-import { GlobalContext } from "../context";
+import { MdEdit, MdExitToApp, MdNotifications, MdOutlineExpandMore, MdSettings,  } from "react-icons/md";
 
 type Props={
     data:{
@@ -14,7 +12,6 @@ type Props={
 }
 
 function TopNav(props:Props) {
-    const { updateAnvel }=useContext(GlobalContext)
     window.onclick = function(event:any) {
         if (!event.target.matches('.dropbtn')) {
             var dropdowns = document.getElementsByClassName("dropdown-content");

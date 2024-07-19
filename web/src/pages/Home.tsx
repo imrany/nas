@@ -234,7 +234,6 @@ export default function Home(props:Props){
                 }])
             }else{
                 console.log(parseRes)
-                await message(`${parseRes}`, { title: 'Error', type: 'error' });
                 setNotifications(prevNotifications => [...prevNotifications,{
                     priority:"not important",
                     message:`${parseRes}`
@@ -329,7 +328,6 @@ export default function Home(props:Props){
             let response=await fetch(`${API_URL}/api/ping/${configs.recipient_ip}`)
             let parseRes=await response.json()
             if(parseRes!=="pong"){
-                await message(`${parseRes.error}`, { title: 'Error', type: 'error' });
                 console.log(parseRes.error)
                 setIsDisabled(false)
             }else{

@@ -1,5 +1,5 @@
 // @flow strict
-import { MdEdit, MdFileOpen, MdFolder, MdAdd, MdMoreHoriz, MdSystemUpdateAlt, MdRefresh, MdOutlineInfo, MdSearch } from "react-icons/md"
+import { MdEdit, MdFileOpen, MdFolder, MdAdd, MdMoreHoriz, MdRefresh, MdOutlineInfo, MdSearch } from "react-icons/md"
 import { openFile, browserSupportedFiles, openBlankFile } from "./actions"
 import { ErrorBody, Folder, Tab } from "../types/definitions"
 import { useState, useContext } from "react";
